@@ -205,6 +205,11 @@ public:
 		active_network = network_a;
 	}
 
+	static nano::networks get_active_network ()
+	{
+		return active_network;
+	}
+
 	/**
 	 * Optionally called on startup to override the global active network.
 	 * If not called, the compile-time option will be used.
