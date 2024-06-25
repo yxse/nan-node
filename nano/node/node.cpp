@@ -26,6 +26,7 @@
 #include <nano/node/message_processor.hpp>
 #include <nano/node/monitor.hpp>
 #include <nano/node/node.hpp>
+#include <nano/node/online_reps.hpp>
 #include <nano/node/peer_history.hpp>
 #include <nano/node/portmapping.hpp>
 #include <nano/node/request_aggregator.hpp>
@@ -138,7 +139,8 @@ nano::node::node (std::shared_ptr<boost::asio::io_context> io_ctx_a, std::filesy
 	rep_crawler (config.rep_crawler, *this),
 	rep_tiers{ ledger, network_params, online_reps, stats, logger },
 	warmed_up (0),
-	online_reps (ledger, config),
+	online_reps_impl{ std::make_unique<nano::online_reps> (config, ledger) },
+	online_reps{ *online_reps_impl },
 	history_impl{ std::make_unique<nano::local_vote_history> (config.network_params.voting) },
 	history{ *history_impl },
 	vote_uniquer{},

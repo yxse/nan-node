@@ -4,9 +4,9 @@
 #include <nano/store/component.hpp>
 #include <nano/store/online_weight.hpp>
 
-nano::online_reps::online_reps (nano::ledger & ledger_a, nano::node_config const & config_a) :
-	ledger{ ledger_a },
-	config{ config_a }
+nano::online_reps::online_reps (nano::node_config const & config_a, nano::ledger & ledger_a) :
+	config{ config_a },
+	ledger{ ledger_a }
 {
 	if (!ledger.store.init_error ())
 	{
