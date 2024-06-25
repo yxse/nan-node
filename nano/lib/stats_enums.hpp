@@ -112,6 +112,7 @@ enum class type
 	message_processor_overfill,
 	message_processor_type,
 	process_confirmed,
+	online_reps,
 
 	_last // Must be the last enum
 };
@@ -608,6 +609,15 @@ enum class detail
 	rollback_missing_block,
 	rollback_skipped,
 	loop_scan,
+
+	// online_reps
+	trim_trend,
+	sanitize_old,
+	sanitize_future,
+	sample,
+	rep_new,
+	rep_update,
+	update_online,
 
 	// error codes
 	no_buffer_space,

@@ -18,6 +18,7 @@ enum class writer
 	pruning,
 	voting_final,
 	bounded_backlog,
+	online_weight,
 	testing // Used in tests to emulate a write lock
 };
 
