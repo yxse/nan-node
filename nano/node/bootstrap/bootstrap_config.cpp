@@ -45,6 +45,7 @@ nano::error nano::bootstrap_ascending_config::deserialize (nano::tomlconfig & to
 	toml.get_duration ("throttle_wait", throttle_wait);
 	toml.get ("block_processor_threshold", block_processor_threshold);
 	toml.get ("max_requests", max_requests);
+	toml.get ("optimistic_request_percentage", optimistic_request_percentage);
 
 	if (toml.has_key ("account_sets"))
 	{
@@ -71,6 +72,7 @@ nano::error nano::bootstrap_ascending_config::serialize (nano::tomlconfig & toml
 	toml.put ("throttle_wait", throttle_wait.count (), "Length of time to wait between requests when throttled.\ntype:milliseconds");
 	toml.put ("block_processor_threshold", block_processor_threshold, "Ascending bootstrap will wait while block processor has more than this many blocks queued.\ntype:uint64");
 	toml.put ("max_requests", max_requests, "Maximum total number of in flight requests.\ntype:uint64");
+	toml.put ("optimistic_request_percentage", optimistic_request_percentage, "Percentage of requests that will be optimistic. Optimistic requests start from the (possibly unconfirmed) account frontier and are vulnerable to bootstrap poisoning. Safe requests start from the confirmed frontier and given enough time will eventually resolve forks.\ntype:uint64");
 
 	nano::tomlconfig account_sets_l;
 	account_sets.serialize (account_sets_l);

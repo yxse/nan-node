@@ -64,6 +64,7 @@ enum class type
 	bootstrap_ascending_verify_frontiers,
 	bootstrap_ascending_process,
 	bootstrap_ascending_request,
+	bootstrap_ascending_request_blocks,
 	bootstrap_ascending_reply,
 	bootstrap_ascending_next,
 	bootstrap_ascending_frontiers,
@@ -454,7 +455,6 @@ enum class detail
 	process_frontiers,
 	dropped_frontiers,
 
-	// bootstrap_ascending_accounts
 	prioritize,
 	prioritize_failed,
 	block,
@@ -490,6 +490,9 @@ enum class detail
 
 	request_blocks,
 	request_account_info,
+
+	safe,
+	base,
 
 	// active
 	started_hinted,

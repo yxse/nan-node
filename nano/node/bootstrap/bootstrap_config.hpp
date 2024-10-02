@@ -60,6 +60,7 @@ public:
 	std::chrono::milliseconds throttle_wait{ 100 };
 	std::size_t block_processor_threshold{ 1000 };
 	std::size_t max_requests{ 1024 };
+	unsigned optimistic_request_percentage{ 75 };
 
 	account_sets_config account_sets;
 	frontier_scan_config frontier_scan;

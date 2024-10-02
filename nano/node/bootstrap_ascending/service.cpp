@@ -13,6 +13,7 @@
 #include <nano/secure/ledger_set_any.hpp>
 #include <nano/store/account.hpp>
 #include <nano/store/component.hpp>
+#include <nano/store/confirmation_height.hpp>
 
 using namespace std::chrono_literals;
 
@@ -263,6 +264,7 @@ void nano::bootstrap_ascending::service::inspect (secure::transaction const & tx
 		break;
 		case nano::block_status::gap_source:
 		{
+			// Prevent malicious live traffic from filling up the blocked set
 			if (source == nano::block_source::bootstrap)
 			{
 				const auto account = block.previous ().is_zero () ? block.account_field ().value () : ledger.any.block_account (tx, block.previous ()).value_or (0);
@@ -491,18 +493,40 @@ bool nano::bootstrap_ascending::service::request (nano::account account, size_t 
 	tag.account = account;
 	tag.count = count;
 
-	// Check if the account picked has blocks, if it does, start the pull from the highest block
-	auto info = ledger.store.account.get (ledger.store.tx_begin_read (), account);
-	if (info)
 	{
-		tag.type = query_type::blocks_by_hash;
-		tag.start = info->head;
-		tag.hash = info->head;
-	}
-	else
-	{
-		tag.type = query_type::blocks_by_account;
-		tag.start = account;
+		auto transaction = ledger.store.tx_begin_read ();
+
+		// Check if the account picked has blocks, if it does, start the pull from the highest block
+		if (auto info = ledger.store.account.get (transaction, account))
+		{
+			tag.type = query_type::blocks_by_hash;
+
+			// Probabilistically choose between requesting blocks from account frontier or confirmed frontier
+			// Optimistic requests start from the (possibly unconfirmed) account frontier and are vulnerable to bootstrap poisoning
+			// Safe requests start from the confirmed frontier and given enough time will eventually resolve forks
+			bool optimistic_reuest = rng.random (100) < config.optimistic_request_percentage;
+			if (!optimistic_reuest)
+			{
+				if (auto conf_info = ledger.store.confirmation_height.get (transaction, account))
+				{
+					stats.inc (nano::stat::type::bootstrap_ascending_request_blocks, nano::stat::detail::safe);
+					tag.start = conf_info->frontier;
+					tag.hash = conf_info->height;
+				}
+			}
+			if (tag.start.is_zero ())
+			{
+				stats.inc (nano::stat::type::bootstrap_ascending_request_blocks, nano::stat::detail::optimistic);
+				tag.start = info->head;
+				tag.hash = info->head;
+			}
+		}
+		else
+		{
+			stats.inc (nano::stat::type::bootstrap_ascending_request_blocks, nano::stat::detail::base);
+			tag.type = query_type::blocks_by_account;
+			tag.start = account;
+		}
 	}
 
 	return send (channel, tag);

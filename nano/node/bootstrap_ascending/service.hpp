@@ -4,6 +4,7 @@
 #include <nano/lib/locks.hpp>
 #include <nano/lib/numbers.hpp>
 #include <nano/lib/observer_set.hpp>
+#include <nano/lib/random.hpp>
 #include <nano/lib/rate_limiting.hpp>
 #include <nano/lib/thread_pool.hpp>
 #include <nano/lib/timer.hpp>
@@ -211,6 +212,7 @@ namespace bootstrap_ascending
 		std::thread timeout_thread;
 
 		nano::thread_pool workers;
+		nano::random_generator_mt rng;
 	};
 
 	nano::stat::detail to_stat_detail (service::query_type);
