@@ -8,9 +8,9 @@
  * bucket
  */
 
-nano::scheduler::bucket::bucket (nano::uint128_t minimum_balance_a, priority_bucket_config const & config_a, nano::active_elections & active_a, nano::stats & stats_a) :
+nano::scheduler::bucket::bucket (nano::bucket_index index_a, priority_bucket_config const & config_a, nano::active_elections & active_a, nano::stats & stats_a) :
+	index{ index_a },
 	config{ config_a },
-	minimum_balance{ minimum_balance_a },
 	active{ active_a },
 	stats{ stats_a }
 {
@@ -34,7 +34,7 @@ bool nano::scheduler::bucket::available () const
 	}
 }
 
-bool nano::scheduler::bucket::election_vacancy (priority_t candidate) const
+bool nano::scheduler::bucket::election_vacancy (nano::priority_timestamp candidate) const
 {
 	debug_assert (!mutex.try_lock ());
 

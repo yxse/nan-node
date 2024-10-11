@@ -1254,6 +1254,21 @@ uint64_t nano::ledger::pruning_action (secure::write_transaction & transaction_a
 	return pruned_count;
 }
 
+auto nano::ledger::block_priority (nano::secure::transaction const & transaction, nano::block const & block) const -> block_priority_result
+{
+	auto const balance = block.balance ();
+	auto const previous_block = !block.previous ().is_zero () ? any.block_get (transaction, block.previous ()) : nullptr;
+	auto const previous_balance = previous_block ? previous_block->balance () : 0;
+
+	// Handle full send case nicely where the balance would otherwise be 0
+	auto const priority_balance = std::max (balance, block.is_send () ? previous_balance : 0);
+
+	// Use previous block timestamp as priority timestamp for least recently used prioritization within the same bucket
+	// Account info timestamp is not used here because it will get out of sync when rollbacks happen
+	auto const priority_timestamp = previous_block ? previous_block->sideband ().timestamp : block.sideband ().timestamp;
+	return { priority_balance, priority_timestamp };
+}
+
 // A precondition is that the store is an LMDB store
 bool nano::ledger::migrate_lmdb_to_rocksdb (std::filesystem::path const & data_path_a) const
 {

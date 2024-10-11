@@ -256,8 +256,7 @@ TEST (election_scheduler_bucket, construction)
 	auto & node = *system.add_node ();
 
 	nano::scheduler::priority_bucket_config bucket_config;
-	nano::scheduler::bucket bucket{ nano::Knano_ratio, bucket_config, node.active, node.stats };
-	ASSERT_EQ (nano::Knano_ratio, bucket.minimum_balance);
+	nano::scheduler::bucket bucket{ 0, bucket_config, node.active, node.stats };
 	ASSERT_TRUE (bucket.empty ());
 	ASSERT_EQ (0, bucket.size ());
 }
