@@ -43,6 +43,11 @@ void nano::scheduler::component::stop ()
 	priority.stop ();
 }
 
+bool nano::scheduler::component::contains (nano::block_hash const & hash) const
+{
+	return manual.contains (hash) || priority.contains (hash);
+}
+
 nano::container_info nano::scheduler::component::container_info () const
 {
 	nano::container_info info;

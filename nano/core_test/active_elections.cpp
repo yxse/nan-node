@@ -514,6 +514,7 @@ TEST (inactive_votes_cache, election_start)
 	node.vote_processor.vote (vote2, std::make_shared<nano::transport::inproc::channel> (node, node));
 	// Only election for send1 should start, other blocks are missing dependencies and don't have enough final weight
 	ASSERT_TIMELY_EQ (5s, 1, node.active.size ());
+	ASSERT_TRUE (node.vote_router.contains (send1->hash ()));
 	ASSERT_TRUE (node.vote_router.active (send1->hash ()));
 
 	// Confirm elections with weight quorum

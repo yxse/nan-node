@@ -126,6 +126,7 @@ public:
 	 * Tries to find an entry associated with block hash
 	 */
 	std::vector<std::shared_ptr<nano::vote>> find (nano::block_hash const & hash) const;
+	bool contains (nano::block_hash const & hash) const;
 
 	/**
 	 * Removes an entry associated with block hash, does nothing if entry does not exist
