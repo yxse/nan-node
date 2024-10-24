@@ -747,7 +747,12 @@ nano::hash_or_account::hash_or_account () :
 }
 
 nano::hash_or_account::hash_or_account (uint64_t value_a) :
-	raw (value_a)
+	raw{ value_a }
+{
+}
+
+nano::hash_or_account::hash_or_account (uint256_union const & value_a) :
+	raw{ value_a }
 {
 }
 
@@ -779,11 +784,6 @@ std::string nano::hash_or_account::to_string () const
 std::string nano::hash_or_account::to_account () const
 {
 	return account.to_account ();
-}
-
-nano::block_hash const & nano::root::previous () const
-{
-	return hash;
 }
 
 std::string nano::to_string_hex (uint64_t const value_a)
@@ -892,33 +892,3 @@ double nano::difficulty::to_multiplier (uint64_t const difficulty_a, uint64_t co
 #ifdef _WIN32
 #pragma warning(pop)
 #endif
-
-nano::public_key::operator nano::link const & () const
-{
-	return reinterpret_cast<nano::link const &> (*this);
-}
-
-nano::public_key::operator nano::root const & () const
-{
-	return reinterpret_cast<nano::root const &> (*this);
-}
-
-nano::public_key::operator nano::hash_or_account const & () const
-{
-	return reinterpret_cast<nano::hash_or_account const &> (*this);
-}
-
-nano::block_hash::operator nano::link const & () const
-{
-	return reinterpret_cast<nano::link const &> (*this);
-}
-
-nano::block_hash::operator nano::root const & () const
-{
-	return reinterpret_cast<nano::root const &> (*this);
-}
-
-nano::block_hash::operator nano::hash_or_account const & () const
-{
-	return reinterpret_cast<nano::hash_or_account const &> (*this);
-}
