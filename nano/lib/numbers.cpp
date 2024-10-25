@@ -735,6 +735,13 @@ std::ostream & nano::operator<< (std::ostream & os, const uint512_union & val)
 	return os;
 }
 
+std::ostream & nano::operator<< (std::ostream & os, const hash_or_account & val)
+{
+	// TODO: Replace with streaming implementation
+	os << val.to_string ();
+	return os;
+}
+
 #ifdef _WIN32
 #pragma warning(push)
 #pragma warning(disable : 4146) // warning C4146: unary minus operator applied to unsigned type, result still unsigned

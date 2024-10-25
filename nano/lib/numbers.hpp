@@ -189,10 +189,6 @@ public: // Keep operators inlined
 };
 static_assert (std::is_nothrow_move_constructible<uint256_union>::value, "uint256_union should be noexcept MoveConstructible");
 
-class link;
-class root;
-class hash_or_account;
-
 // All keys and hashes are 256 bit.
 class block_hash final : public uint256_union
 {
@@ -211,18 +207,6 @@ public: // Keep operators inlined
 	operator nano::uint256_t () const
 	{
 		return number ();
-	}
-	operator nano::link () const
-	{
-		return nano::link{ *this };
-	}
-	operator nano::root () const
-	{
-		return nano::root{ *this };
-	}
-	operator nano::hash_or_account () const
-	{
-		return nano::hash_or_account{ *this };
 	}
 };
 
@@ -260,18 +244,6 @@ public: // Keep operators inlined
 	{
 		return number ();
 	}
-	operator nano::link () const
-	{
-		return nano::link{ *this };
-	}
-	operator nano::root () const
-	{
-		return nano::root{ *this };
-	}
-	operator nano::hash_or_account () const
-	{
-		return nano::hash_or_account{ *this };
-	}
 };
 
 class wallet_id : public uint256_union
@@ -289,7 +261,7 @@ public:
 		account{} {};
 	hash_or_account (uint64_t value) :
 		raw{ value } {};
-	explicit hash_or_account (uint256_union const & value) :
+	hash_or_account (uint256_union const & value) :
 		raw{ value } {};
 
 	void clear ()
@@ -325,11 +297,11 @@ public: // Keep operators inlined
 	{
 		return *this <=> other == 0;
 	}
-	operator nano::uint256_t () const
+	explicit operator nano::uint256_t () const
 	{
 		return raw.number ();
 	}
-	operator nano::uint256_union () const
+	explicit operator nano::uint256_union () const
 	{
 		return raw;
 	}
@@ -399,13 +371,13 @@ class uint512_union
 {
 public:
 	uint512_union () = default;
-	uint512_union (nano::uint256_union const & upper, nano::uint256_union const & lower) :
-		uint256s{ upper, lower } {};
 	uint512_union (nano::uint512_t const & value)
 	{
 		bytes.fill (0);
 		boost::multiprecision::export_bits (value, bytes.rbegin (), 8, false);
 	}
+	uint512_union (nano::uint256_union const & upper, nano::uint256_union const & lower) :
+		uint256s{ upper, lower } {};
 
 	nano::uint512_union & operator^= (nano::uint512_union const & other)
 	{
@@ -473,7 +445,11 @@ public:
 class qualified_root : public uint512_union
 {
 public:
-	using uint512_union::uint512_union;
+	qualified_root () = default;
+	qualified_root (nano::root const & root, nano::block_hash const & previous) :
+		uint512_union{ root.as_union (), previous.as_union () } {};
+	qualified_root (nano::uint512_t const & value) :
+		uint512_union{ value } {};
 
 	nano::root root () const
 	{
@@ -501,6 +477,7 @@ bool from_string_hex (std::string const &, uint64_t &);
 std::ostream & operator<< (std::ostream &, const uint128_union &);
 std::ostream & operator<< (std::ostream &, const uint256_union &);
 std::ostream & operator<< (std::ostream &, const uint512_union &);
+std::ostream & operator<< (std::ostream &, const hash_or_account &);
 
 /**
  * Convert a double to string in fixed format
@@ -640,6 +617,11 @@ struct fmt::formatter<nano::uint256_union> : fmt::ostream_formatter
 
 template <>
 struct fmt::formatter<nano::uint512_union> : fmt::ostream_formatter
+{
+};
+
+template <>
+struct fmt::formatter<nano::hash_or_account> : fmt::ostream_formatter
 {
 };
 
