@@ -3,7 +3,10 @@
 
 #include <gtest/gtest.h>
 
+#include <boost/container_hash/hash.hpp>
+
 #include <thread>
+#include <unordered_set>
 
 namespace
 {
@@ -576,4 +579,95 @@ void check_operator_greater_than (Num lhs, Num rhs)
 	ASSERT_FALSE (lhs > lhs);
 	ASSERT_FALSE (rhs > rhs);
 }
+}
+
+namespace
+{
+template <typename Type, template <typename> class Hash>
+void test_hashing ()
+{
+	Hash<Type> hash;
+	using underlying_t = typename Type::underlying_type;
+
+	// Basic equality tests
+	ASSERT_EQ (hash (Type{}), hash (Type{}));
+	ASSERT_EQ (hash (Type{ 123 }), hash (Type{ 123 }));
+
+	// Basic inequality tests
+	ASSERT_NE (hash (Type{ 123 }), hash (Type{ 124 }));
+	ASSERT_NE (hash (Type{ 0 }), hash (Type{ 1 }));
+
+	// Boundary value tests
+	constexpr auto min_val = std::numeric_limits<underlying_t>::min ();
+	constexpr auto max_val = std::numeric_limits<underlying_t>::max ();
+
+	// Min/Max tests
+	ASSERT_EQ (hash (Type{ min_val }), hash (Type{ min_val }));
+	ASSERT_EQ (hash (Type{ max_val }), hash (Type{ max_val }));
+	ASSERT_NE (hash (Type{ min_val }), hash (Type{ max_val }));
+
+	// Near boundary tests
+	ASSERT_NE (hash (Type{ min_val }), hash (Type{ min_val + 1 }));
+	ASSERT_NE (hash (Type{ max_val }), hash (Type{ max_val - 1 }));
+	ASSERT_NE (hash (Type{ min_val + 1 }), hash (Type{ max_val }));
+	ASSERT_NE (hash (Type{ max_val - 1 }), hash (Type{ min_val }));
+
+	// Common value tests
+	std::vector<underlying_t> common_values = {
+		0, // Zero
+		1, // One
+		42, // Common test value
+		0xFF, // Byte boundary
+		0xFFFF, // Word boundary
+		min_val, // Minimum
+		max_val, // Maximum
+		max_val / 2, // Middle value
+		min_val + (max_val / 2) // Offset middle
+	};
+
+	// Test all common values against each other
+	for (size_t i = 0; i < common_values.size (); ++i)
+	{
+		for (size_t j = i + 1; j < common_values.size (); ++j)
+		{
+			if (common_values[i] != common_values[j])
+			{
+				ASSERT_NE (hash (Type{ common_values[i] }), hash (Type{ common_values[j] }));
+			}
+			else
+			{
+				ASSERT_EQ (hash (Type{ common_values[i] }), hash (Type{ common_values[j] }));
+			}
+		}
+	}
+}
+}
+
+TEST (numbers, hashing)
+{
+	// Using std::hash
+	test_hashing<nano::uint128_union, std::hash> ();
+	test_hashing<nano::uint256_union, std::hash> ();
+	test_hashing<nano::uint512_union, std::hash> ();
+	test_hashing<nano::block_hash, std::hash> ();
+	test_hashing<nano::public_key, std::hash> ();
+	test_hashing<nano::hash_or_account, std::hash> ();
+	test_hashing<nano::link, std::hash> ();
+	test_hashing<nano::root, std::hash> ();
+	test_hashing<nano::raw_key, std::hash> ();
+	test_hashing<nano::wallet_id, std::hash> ();
+	test_hashing<nano::qualified_root, std::hash> ();
+
+	// Using boost::hash
+	test_hashing<nano::uint128_union, boost::hash> ();
+	test_hashing<nano::uint256_union, boost::hash> ();
+	test_hashing<nano::uint512_union, boost::hash> ();
+	test_hashing<nano::block_hash, boost::hash> ();
+	test_hashing<nano::public_key, boost::hash> ();
+	test_hashing<nano::hash_or_account, boost::hash> ();
+	test_hashing<nano::link, boost::hash> ();
+	test_hashing<nano::root, boost::hash> ();
+	test_hashing<nano::raw_key, boost::hash> ();
+	test_hashing<nano::wallet_id, boost::hash> ();
+	test_hashing<nano::qualified_root, boost::hash> ();
 }

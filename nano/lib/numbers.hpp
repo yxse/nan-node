@@ -5,6 +5,7 @@
 
 #include <array>
 #include <compare>
+#include <limits>
 #include <ostream>
 
 #include <fmt/ostream.h>
@@ -22,6 +23,10 @@ nano::uint128_t const raw_ratio = nano::uint128_t ("1"); // 10^0
 
 class uint128_union
 {
+public:
+	// Type that is implicitly convertible to this union
+	using underlying_type = nano::uint128_t;
+
 public:
 	uint128_union () = default;
 	uint128_union (uint64_t value) :
@@ -116,10 +121,14 @@ class raw_key;
 class uint256_union
 {
 public:
+	// Type that is implicitly convertible to this union
+	using underlying_type = nano::uint256_t;
+
+public:
 	uint256_union () = default;
 	uint256_union (uint64_t value) :
 		uint256_union (nano::uint256_t{ value }){};
-	uint256_union (uint256_t const & value)
+	uint256_union (nano::uint256_t const & value)
 	{
 		bytes.fill (0);
 		boost::multiprecision::export_bits (value, bytes.rbegin (), 8, false);
@@ -257,6 +266,10 @@ using account = public_key;
 class hash_or_account
 {
 public:
+	// Type that is implicitly convertible to this union
+	using underlying_type = nano::uint256_t;
+
+public:
 	hash_or_account () :
 		account{} {};
 	hash_or_account (uint64_t value) :
@@ -369,6 +382,10 @@ public:
 
 class uint512_union
 {
+public:
+	// Type that is implicitly convertible to this union
+	using underlying_type = nano::uint512_t;
+
 public:
 	uint512_union () = default;
 	uint512_union (nano::uint512_t const & value)
@@ -499,83 +516,91 @@ namespace difficulty
 namespace std
 {
 template <>
-struct hash<::nano::uint256_union>
+struct hash<::nano::uint128_union>
 {
-	size_t operator() (::nano::uint256_union const & data_a) const
+	size_t operator() (::nano::uint128_union const & value) const noexcept
 	{
-		return data_a.qwords[0] + data_a.qwords[1] + data_a.qwords[2] + data_a.qwords[3];
+		return value.qwords[0] + value.qwords[1];
 	}
 };
 template <>
-struct hash<::nano::account>
+struct hash<::nano::uint256_union>
 {
-	size_t operator() (::nano::account const & data_a) const
+	size_t operator() (::nano::uint256_union const & value) const noexcept
 	{
-		return hash<::nano::uint256_union> () (data_a);
+		return value.qwords[0] + value.qwords[1] + value.qwords[2] + value.qwords[3];
+	}
+};
+template <>
+struct hash<::nano::public_key>
+{
+	size_t operator() (::nano::public_key const & value) const noexcept
+	{
+		return hash<::nano::uint256_union>{}(value);
 	}
 };
 template <>
 struct hash<::nano::block_hash>
 {
-	size_t operator() (::nano::block_hash const & data_a) const
+	size_t operator() (::nano::block_hash const & value) const noexcept
 	{
-		return hash<::nano::uint256_union> () (data_a);
+		return hash<::nano::uint256_union>{}(value);
 	}
 };
 template <>
 struct hash<::nano::hash_or_account>
 {
-	size_t operator() (::nano::hash_or_account const & data_a) const
+	size_t operator() (::nano::hash_or_account const & value) const noexcept
 	{
-		return hash<::nano::block_hash> () (data_a.as_block_hash ());
-	}
-};
-template <>
-struct hash<::nano::raw_key>
-{
-	size_t operator() (::nano::raw_key const & data_a) const
-	{
-		return hash<::nano::uint256_union> () (data_a);
+		return hash<::nano::block_hash>{}(value.as_block_hash ());
 	}
 };
 template <>
 struct hash<::nano::root>
 {
-	size_t operator() (::nano::root const & data_a) const
+	size_t operator() (::nano::root const & value) const noexcept
 	{
-		return hash<::nano::uint256_union> () (data_a);
+		return hash<::nano::hash_or_account>{}(value);
+	}
+};
+template <>
+struct hash<::nano::link>
+{
+	size_t operator() (::nano::link const & value) const noexcept
+	{
+		return hash<::nano::hash_or_account>{}(value);
+	}
+};
+template <>
+struct hash<::nano::raw_key>
+{
+	size_t operator() (::nano::raw_key const & value) const noexcept
+	{
+		return hash<::nano::uint256_union>{}(value);
 	}
 };
 template <>
 struct hash<::nano::wallet_id>
 {
-	size_t operator() (::nano::wallet_id const & data_a) const
+	size_t operator() (::nano::wallet_id const & value) const noexcept
 	{
-		return hash<::nano::uint256_union> () (data_a);
-	}
-};
-template <>
-struct hash<::nano::uint256_t>
-{
-	size_t operator() (::nano::uint256_t const & number_a) const
-	{
-		return number_a.convert_to<size_t> ();
+		return hash<::nano::uint256_union>{}(value);
 	}
 };
 template <>
 struct hash<::nano::uint512_union>
 {
-	size_t operator() (::nano::uint512_union const & data_a) const
+	size_t operator() (::nano::uint512_union const & value) const noexcept
 	{
-		return hash<::nano::uint256_union> () (data_a.uint256s[0]) + hash<::nano::uint256_union> () (data_a.uint256s[1]);
+		return hash<::nano::uint256_union>{}(value.uint256s[0]) + hash<::nano::uint256_union> () (value.uint256s[1]);
 	}
 };
 template <>
 struct hash<::nano::qualified_root>
 {
-	size_t operator() (::nano::qualified_root const & data_a) const
+	size_t operator() (::nano::qualified_root const & value) const noexcept
 	{
-		return hash<::nano::uint512_union> () (data_a);
+		return hash<::nano::uint512_union>{}(value);
 	}
 };
 }
@@ -583,20 +608,91 @@ struct hash<::nano::qualified_root>
 namespace boost
 {
 template <>
-struct hash<std::reference_wrapper<::nano::block_hash const>>
+struct hash<::nano::uint128_union>
 {
-	size_t operator() (std::reference_wrapper<::nano::block_hash const> const & hash_a) const
+	size_t operator() (::nano::uint128_union const & value) const noexcept
 	{
-		std::hash<::nano::block_hash> hash;
-		return hash (hash_a);
+		return std::hash<::nano::uint128_union> () (value);
+	}
+};
+template <>
+struct hash<::nano::uint256_union>
+{
+	size_t operator() (::nano::uint256_union const & value) const noexcept
+	{
+		return std::hash<::nano::uint256_union> () (value);
+	}
+};
+template <>
+struct hash<::nano::public_key>
+{
+	size_t operator() (::nano::public_key const & value) const noexcept
+	{
+		return std::hash<::nano::public_key> () (value);
+	}
+};
+template <>
+struct hash<::nano::block_hash>
+{
+	size_t operator() (::nano::block_hash const & value) const noexcept
+	{
+		return std::hash<::nano::block_hash> () (value);
+	}
+};
+template <>
+struct hash<::nano::hash_or_account>
+{
+	size_t operator() (::nano::hash_or_account const & value) const noexcept
+	{
+		return std::hash<::nano::hash_or_account> () (value);
 	}
 };
 template <>
 struct hash<::nano::root>
 {
-	size_t operator() (::nano::root const & value_a) const
+	size_t operator() (::nano::root const & value) const noexcept
 	{
-		return std::hash<::nano::root> () (value_a);
+		return std::hash<::nano::root> () (value);
+	}
+};
+template <>
+struct hash<::nano::link>
+{
+	size_t operator() (::nano::link const & value) const noexcept
+	{
+		return std::hash<::nano::link> () (value);
+	}
+};
+template <>
+struct hash<::nano::raw_key>
+{
+	size_t operator() (::nano::raw_key const & value) const noexcept
+	{
+		return std::hash<::nano::raw_key> () (value);
+	}
+};
+template <>
+struct hash<::nano::wallet_id>
+{
+	size_t operator() (::nano::wallet_id const & value) const noexcept
+	{
+		return std::hash<::nano::wallet_id> () (value);
+	}
+};
+template <>
+struct hash<::nano::uint512_union>
+{
+	size_t operator() (::nano::uint512_union const & value) const noexcept
+	{
+		return std::hash<::nano::uint512_union> () (value);
+	}
+};
+template <>
+struct hash<::nano::qualified_root>
+{
+	size_t operator() (::nano::qualified_root const & value) const noexcept
+	{
+		return std::hash<::nano::qualified_root> () (value);
 	}
 };
 }
