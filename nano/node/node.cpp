@@ -856,7 +856,7 @@ bool nano::node::collect_ledger_pruning_targets (std::deque<nano::block_hash> & 
 		read_operations += depth;
 		if (read_operations >= batch_read_size_a)
 		{
-			last_account_a = account.number () + 1;
+			last_account_a = inc_sat (account.number ());
 			finish_transaction = true;
 		}
 		else

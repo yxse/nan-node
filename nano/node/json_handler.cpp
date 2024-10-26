@@ -2173,7 +2173,7 @@ void nano::json_handler::delegators ()
 	{
 		auto transaction (node.ledger.tx_begin_read ());
 		boost::property_tree::ptree delegators;
-		for (auto i (node.store.account.begin (transaction, start_account.number () + 1)), n (node.store.account.end (transaction)); i != n && delegators.size () < count; ++i)
+		for (auto i (node.store.account.begin (transaction, inc_sat (start_account.number ()))), n (node.store.account.end (transaction)); i != n && delegators.size () < count; ++i)
 		{
 			nano::account_info const & info (i->second);
 			if (info.representative == representative)
@@ -4189,7 +4189,7 @@ void nano::json_handler::unopened ()
 					break;
 				}
 				// Skip existing accounts
-				iterator = node.store.pending.begin (transaction, nano::pending_key (account.number () + 1, 0));
+				iterator = node.store.pending.begin (transaction, nano::pending_key (inc_sat (account.number ()), 0));
 			}
 			else
 			{

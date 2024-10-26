@@ -126,7 +126,7 @@ void nano::backlog_scan::populate_backlog (nano::unique_lock<nano::mutex> & lock
 					activated.push_back (info);
 				}
 
-				next = account.number () + 1; // TODO: Prevent account overflow
+				next = inc_sat (account.number ());
 			}
 
 			done = (it == end);
