@@ -72,6 +72,7 @@ add_library(
   network_filter.cpp
   numbers.hpp
   numbers.cpp
+  numbers_templ.hpp
   object_stream.hpp
   object_stream.cpp
   object_stream_adapters.hpp
