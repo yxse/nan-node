@@ -1,5 +1,6 @@
 #pragma once
 
+#include <nano/boost/asio/ip/tcp.hpp>
 #include <nano/secure/common.hpp>
 
 #include <optional>

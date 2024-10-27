@@ -33,6 +33,7 @@ add_library(
   char_traits.hpp
   cli.hpp
   cli.cpp
+  common.hpp
   config.hpp
   config.cpp
   configbase.hpp
