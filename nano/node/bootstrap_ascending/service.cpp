@@ -3,7 +3,7 @@
 #include <nano/lib/stats_enums.hpp>
 #include <nano/lib/thread_roles.hpp>
 #include <nano/node/blockprocessor.hpp>
-#include <nano/node/bootstrap_ascending/iterators.hpp>
+#include <nano/node/bootstrap_ascending/crawlers.hpp>
 #include <nano/node/bootstrap_ascending/service.hpp>
 #include <nano/node/network.hpp>
 #include <nano/node/nodeconfig.hpp>
