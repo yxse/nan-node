@@ -1,6 +1,5 @@
 #pragma once
 
-#include <nano/lib/block_type.hpp>
 #include <nano/lib/epoch.hpp>
 #include <nano/lib/numbers.hpp>
 #include <nano/lib/stream.hpp>
@@ -11,6 +10,7 @@
 
 namespace nano
 {
+enum class block_type : uint8_t;
 class object_stream;
 }
 
