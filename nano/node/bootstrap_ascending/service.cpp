@@ -975,10 +975,10 @@ void nano::bootstrap_ascending::service::process_frontiers (std::deque<std::pair
 		}
 	}
 
-	stats.add (nano::stat::type::bootstrap_ascending, nano::stat::detail::frontiers_processed, frontiers.size ());
-	stats.add (nano::stat::type::bootstrap_ascending, nano::stat::detail::frontiers_prioritized, result.size ());
-	stats.add (nano::stat::type::bootstrap_ascending, nano::stat::detail::frontiers_outdated, outdated);
-	stats.add (nano::stat::type::bootstrap_ascending, nano::stat::detail::frontiers_pending, pending);
+	stats.add (nano::stat::type::bootstrap_ascending_frontiers, nano::stat::detail::processed, frontiers.size ());
+	stats.add (nano::stat::type::bootstrap_ascending_frontiers, nano::stat::detail::prioritized, result.size ());
+	stats.add (nano::stat::type::bootstrap_ascending_frontiers, nano::stat::detail::outdated, outdated);
+	stats.add (nano::stat::type::bootstrap_ascending_frontiers, nano::stat::detail::pending, pending);
 
 	nano::lock_guard<nano::mutex> guard{ mutex };
 

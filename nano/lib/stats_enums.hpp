@@ -140,6 +140,8 @@ enum class detail
 	empty,
 	done,
 	retry,
+	prioritized,
+	pending,
 
 	// processing queue
 	queue,
@@ -485,10 +487,6 @@ enum class detail
 	deprioritize,
 	deprioritize_failed,
 	sync_dependencies,
-	frontiers_processed,
-	frontiers_prioritized,
-	frontiers_outdated,
-	frontiers_pending,
 
 	request_blocks,
 	request_account_info,
