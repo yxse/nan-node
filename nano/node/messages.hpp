@@ -1,5 +1,6 @@
 #pragma once
 
+#include <nano/boost/asio/ip/tcp.hpp>
 #include <nano/lib/asio.hpp>
 #include <nano/lib/block_uniquer.hpp>
 #include <nano/lib/config.hpp>
@@ -11,7 +12,7 @@
 #include <nano/lib/object_stream.hpp>
 #include <nano/lib/stats_enums.hpp>
 #include <nano/lib/stream_fwd.hpp>
-#include <nano/node/common.hpp>
+#include <nano/node/endpoint.hpp>
 #include <nano/secure/common.hpp>
 
 #include <bitset>

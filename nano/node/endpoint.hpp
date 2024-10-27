@@ -1,9 +1,10 @@
 #pragma once
 
-#include <nano/boost/asio/ip/tcp.hpp>
 #include <nano/secure/common.hpp>
 
+#include <cstdint>
 #include <optional>
+#include <string>
 
 namespace boost::asio::ip
 {
@@ -19,16 +20,11 @@ bool parse_endpoint (std::string const &, nano::endpoint &);
 std::optional<nano::endpoint> parse_endpoint (std::string const &);
 bool parse_tcp_endpoint (std::string const &, nano::tcp_endpoint &);
 uint64_t ip_address_hash_raw (boost::asio::ip::address const & ip_a, uint16_t port = 0);
+uint64_t endpoint_hash_raw (nano::endpoint const & endpoint_a);
 }
 
 namespace
 {
-uint64_t endpoint_hash_raw (nano::endpoint const & endpoint_a)
-{
-	uint64_t result (nano::ip_address_hash_raw (endpoint_a.address (), endpoint_a.port ()));
-	return result;
-}
-
 template <std::size_t size>
 struct endpoint_hash
 {
@@ -39,7 +35,7 @@ struct endpoint_hash<8>
 {
 	std::size_t operator() (nano::endpoint const & endpoint_a) const
 	{
-		return endpoint_hash_raw (endpoint_a);
+		return nano::endpoint_hash_raw (endpoint_a);
 	}
 };
 
@@ -48,7 +44,7 @@ struct endpoint_hash<4>
 {
 	std::size_t operator() (nano::endpoint const & endpoint_a) const
 	{
-		uint64_t big (endpoint_hash_raw (endpoint_a));
+		uint64_t big = nano::endpoint_hash_raw (endpoint_a);
 		uint32_t result (static_cast<uint32_t> (big) ^ static_cast<uint32_t> (big >> 32));
 		return result;
 	}
@@ -83,47 +79,19 @@ struct ip_address_hash<4>
 namespace std
 {
 template <>
-struct hash<::nano::endpoint>
-{
-	std::size_t operator() (::nano::endpoint const & endpoint_a) const
-	{
-		endpoint_hash<sizeof (std::size_t)> ehash;
-		return ehash (endpoint_a);
-	}
-};
+struct hash<::nano::endpoint>;
 
 #ifndef BOOST_ASIO_HAS_STD_HASH
 template <>
-struct hash<boost::asio::ip::address>
-{
-	std::size_t operator() (boost::asio::ip::address const & ip_a) const
-	{
-		ip_address_hash<sizeof (std::size_t)> ihash;
-		return ihash (ip_a);
-	}
-};
+struct hash<boost::asio::ip::address>;
 #endif
 }
 
 namespace boost
 {
 template <>
-struct hash<::nano::endpoint>
-{
-	std::size_t operator() (::nano::endpoint const & endpoint_a) const
-	{
-		std::hash<::nano::endpoint> hash;
-		return hash (endpoint_a);
-	}
-};
+struct hash<::nano::endpoint>;
 
 template <>
-struct hash<boost::asio::ip::address>
-{
-	std::size_t operator() (boost::asio::ip::address const & ip_a) const
-	{
-		std::hash<boost::asio::ip::address> hash;
-		return hash (ip_a);
-	}
-};
+struct hash<boost::asio::ip::address>;
 }

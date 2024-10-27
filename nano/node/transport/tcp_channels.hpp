@@ -1,7 +1,7 @@
 #pragma once
 
 #include <nano/lib/random.hpp>
-#include <nano/node/common.hpp>
+#include <nano/node/endpoint.hpp>
 #include <nano/node/transport/channel.hpp>
 #include <nano/node/transport/tcp_channel.hpp>
 #include <nano/node/transport/transport.hpp>

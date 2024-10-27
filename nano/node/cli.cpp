@@ -2,8 +2,8 @@
 #include <nano/lib/cli.hpp>
 #include <nano/lib/tomlconfig.hpp>
 #include <nano/node/cli.hpp>
-#include <nano/node/common.hpp>
 #include <nano/node/daemonconfig.hpp>
+#include <nano/node/endpoint.hpp>
 #include <nano/node/inactive_node.hpp>
 #include <nano/node/node.hpp>
 #include <nano/secure/ledger.hpp>

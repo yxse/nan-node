@@ -59,8 +59,6 @@ add_library(
   bootstrap_ascending/service.cpp
   cli.hpp
   cli.cpp
-  common.hpp
-  common.cpp
   confirming_set.hpp
   confirming_set.cpp
   confirmation_solicitor.hpp
@@ -76,6 +74,9 @@ add_library(
   election_behavior.hpp
   election_insertion_result.hpp
   election_status.hpp
+  endpoint.cpp
+  endpoint.hpp
+  endpoint_templ.hpp
   epoch_upgrader.hpp
   epoch_upgrader.cpp
   fair_queue.hpp

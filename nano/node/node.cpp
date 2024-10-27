@@ -11,10 +11,10 @@
 #include <nano/node/bootstrap_ascending/service.hpp>
 #include <nano/node/bootstrap_weights_beta.hpp>
 #include <nano/node/bootstrap_weights_live.hpp>
-#include <nano/node/common.hpp>
 #include <nano/node/confirming_set.hpp>
 #include <nano/node/daemonconfig.hpp>
 #include <nano/node/election_status.hpp>
+#include <nano/node/endpoint.hpp>
 #include <nano/node/local_block_broadcaster.hpp>
 #include <nano/node/local_vote_history.hpp>
 #include <nano/node/make_store.hpp>

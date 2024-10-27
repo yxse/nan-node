@@ -6,7 +6,7 @@
 #include <nano/lib/stats.hpp>
 #include <nano/lib/utility.hpp>
 #include <nano/lib/work.hpp>
-#include <nano/node/common.hpp>
+#include <nano/node/endpoint.hpp>
 #include <nano/node/make_store.hpp>
 #include <nano/secure/common.hpp>
 #include <nano/secure/ledger.hpp>

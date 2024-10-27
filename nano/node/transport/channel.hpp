@@ -4,7 +4,7 @@
 #include <nano/lib/object_stream.hpp>
 #include <nano/lib/stats.hpp>
 #include <nano/node/bandwidth_limiter.hpp>
-#include <nano/node/common.hpp>
+#include <nano/node/endpoint.hpp>
 #include <nano/node/messages.hpp>
 #include <nano/node/transport/tcp_socket.hpp>
 
