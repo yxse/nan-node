@@ -63,6 +63,7 @@ nano::bootstrap_ascending::service::~service ()
 	debug_assert (!dependencies_thread.joinable ());
 	debug_assert (!frontiers_thread.joinable ());
 	debug_assert (!timeout_thread.joinable ());
+	debug_assert (!workers.alive ());
 }
 
 void nano::bootstrap_ascending::service::start ()
@@ -78,6 +79,8 @@ void nano::bootstrap_ascending::service::start ()
 		logger.warn (nano::log::type::bootstrap, "Ascending bootstrap is disabled");
 		return;
 	}
+
+	workers.start ();
 
 	if (config.enable_scan)
 	{
@@ -130,6 +133,8 @@ void nano::bootstrap_ascending::service::stop ()
 	nano::join_or_pass (dependencies_thread);
 	nano::join_or_pass (frontiers_thread);
 	nano::join_or_pass (timeout_thread);
+
+	workers.stop ();
 }
 
 bool nano::bootstrap_ascending::service::send (std::shared_ptr<nano::transport::channel> const & channel, async_tag tag)
@@ -622,7 +627,7 @@ void nano::bootstrap_ascending::service::run_one_frontier ()
 		return frontiers_limiter.should_pass (1);
 	});
 	wait ([this] () {
-		return workers.num_queued_tasks () < config.frontier_scan.max_pending;
+		return workers.queued_tasks () < config.frontier_scan.max_pending;
 	});
 	wait_tags ();
 	auto channel = wait_channel ();
@@ -872,9 +877,9 @@ void nano::bootstrap_ascending::service::process (const nano::asc_pull_ack::fron
 			}
 
 			// Allow some overfill to avoid unnecessarily dropping responses
-			if (workers.num_queued_tasks () < config.frontier_scan.max_pending * 4)
+			if (workers.queued_tasks () < config.frontier_scan.max_pending * 4)
 			{
-				workers.push_task ([this, frontiers = response.frontiers] {
+				workers.post ([this, frontiers = response.frontiers] {
 					process_frontiers (frontiers);
 				});
 			}
@@ -1015,7 +1020,7 @@ nano::bootstrap_ascending::service::verify_result nano::bootstrap_ascending::ser
 		case query_type::blocks_by_account:
 		{
 			// Open & state blocks always contain account field
-			if (first->account_field () != tag.start.as_account ())
+			if (first->account_field ().value_or (0) != tag.start.as_account ())
 			{
 				// TODO: Stat & log
 				return verify_result::invalid;

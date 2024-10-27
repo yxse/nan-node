@@ -18,19 +18,14 @@ void nano::store::lmdb::online_weight::del (store::write_transaction const & tra
 	store.release_assert_success (status);
 }
 
-nano::store::iterator<uint64_t, nano::amount> nano::store::lmdb::online_weight::begin (store::transaction const & transaction) const
+auto nano::store::lmdb::online_weight::begin (store::transaction const & transaction) const -> iterator
 {
-	return store.make_iterator<uint64_t, nano::amount> (transaction, tables::online_weight);
+	return iterator{ store::iterator{ lmdb::iterator::begin (store.env.tx (transaction), online_weight_handle) } };
 }
 
-nano::store::iterator<uint64_t, nano::amount> nano::store::lmdb::online_weight::rbegin (store::transaction const & transaction) const
+auto nano::store::lmdb::online_weight::end (store::transaction const & transaction_a) const -> iterator
 {
-	return store.make_iterator<uint64_t, nano::amount> (transaction, tables::online_weight, false);
-}
-
-nano::store::iterator<uint64_t, nano::amount> nano::store::lmdb::online_weight::end () const
-{
-	return store::iterator<uint64_t, nano::amount> (nullptr);
+	return iterator{ store::iterator{ lmdb::iterator::end (store.env.tx (transaction_a), online_weight_handle) } };
 }
 
 size_t nano::store::lmdb::online_weight::count (store::transaction const & transaction) const

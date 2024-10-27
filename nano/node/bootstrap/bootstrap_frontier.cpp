@@ -22,7 +22,7 @@ void nano::frontier_req_client::run (nano::account const & start_account_a, uint
 		return;
 	}
 	nano::frontier_req request{ node->network_params.network };
-	request.start = (start_account_a.is_zero () || start_account_a.number () == std::numeric_limits<nano::uint256_t>::max ()) ? start_account_a : start_account_a.number () + 1;
+	request.start = (start_account_a.is_zero () || start_account_a.number () == std::numeric_limits<nano::uint256_t>::max ()) ? start_account_a.number () : start_account_a.number () + 1;
 	request.age = frontiers_age_a;
 	request.count = count_a;
 	current = start_account_a;
@@ -70,7 +70,7 @@ void nano::frontier_req_client::receive_frontier ()
 		// we simply get a size of 0.
 		if (size_a == nano::frontier_req_client::size_frontier)
 		{
-			node->bootstrap_workers.push_task ([this_l, ec, size_a] () {
+			node->bootstrap_workers.post ([this_l, ec, size_a] () {
 				this_l->received_frontier (ec, size_a);
 			});
 		}
@@ -239,7 +239,7 @@ void nano::frontier_req_client::next ()
 	{
 		std::size_t max_size (128);
 		auto transaction (node->store.tx_begin_read ());
-		for (auto i (node->store.account.begin (transaction, current.number () + 1)), n (node->store.account.end ()); i != n && accounts.size () != max_size; ++i)
+		for (auto i (node->store.account.begin (transaction, current.number () + 1)), n (node->store.account.end (transaction)); i != n && accounts.size () != max_size; ++i)
 		{
 			nano::account_info const & info (i->second);
 			nano::account const & account (i->first);
@@ -355,7 +355,7 @@ void nano::frontier_req_server::sent_action (boost::system::error_code const & e
 	{
 		count++;
 
-		node->bootstrap_workers.push_task ([this_l = shared_from_this ()] () {
+		node->bootstrap_workers.post ([this_l = shared_from_this ()] () {
 			this_l->send_next ();
 		});
 	}
@@ -381,7 +381,7 @@ void nano::frontier_req_server::next ()
 		auto transaction (node->store.tx_begin_read ());
 		if (!send_confirmed ())
 		{
-			for (auto i (node->store.account.begin (transaction, current.number () + 1)), n (node->store.account.end ()); i != n && accounts.size () != max_size; ++i)
+			for (auto i (node->store.account.begin (transaction, current.number () + 1)), n (node->store.account.end (transaction)); i != n && accounts.size () != max_size; ++i)
 			{
 				nano::account_info const & info (i->second);
 				if (disable_age_filter || (now - info.modified) <= request->age)
@@ -393,7 +393,7 @@ void nano::frontier_req_server::next ()
 		}
 		else
 		{
-			for (auto i (node->store.confirmation_height.begin (transaction, current.number () + 1)), n (node->store.confirmation_height.end ()); i != n && accounts.size () != max_size; ++i)
+			for (auto i (node->store.confirmation_height.begin (transaction, current.number () + 1)), n (node->store.confirmation_height.end (transaction)); i != n && accounts.size () != max_size; ++i)
 			{
 				nano::confirmation_height_info const & info (i->second);
 				nano::block_hash const & confirmed_frontier (info.frontier);

@@ -277,7 +277,7 @@ void nano::vote_generator::vote (std::vector<nano::block_hash> const & hashes_a,
 void nano::vote_generator::broadcast_action (std::shared_ptr<nano::vote> const & vote_a) const
 {
 	network.flood_vote_pr (vote_a);
-	network.flood_vote (vote_a, 2.0f);
+	network.flood_vote_non_pr (vote_a, 2.0f);
 	vote_processor.vote (vote_a, inproc_channel);
 }
 
@@ -287,29 +287,34 @@ void nano::vote_generator::run ()
 	nano::unique_lock<nano::mutex> lock{ mutex };
 	while (!stopped)
 	{
-		if (candidates.size () >= nano::network::confirm_ack_hashes_max)
+		condition.wait_for (lock, config.vote_generator_delay, [this] () { return broadcast_predicate () || !requests.empty (); });
+
+		if (broadcast_predicate ())
 		{
 			broadcast (lock);
+			next_broadcast = std::chrono::steady_clock::now () + std::chrono::milliseconds (config.vote_generator_delay);
 		}
-		else if (!requests.empty ())
+
+		if (!requests.empty ())
 		{
 			auto request (requests.front ());
 			requests.pop_front ();
 			reply (lock, std::move (request));
 		}
-		else
-		{
-			condition.wait_for (lock, config.vote_generator_delay, [this] () { return this->candidates.size () >= nano::network::confirm_ack_hashes_max; });
-			if (candidates.size () >= config.vote_generator_threshold && candidates.size () < nano::network::confirm_ack_hashes_max)
-			{
-				condition.wait_for (lock, config.vote_generator_delay, [this] () { return this->candidates.size () >= nano::network::confirm_ack_hashes_max; });
-			}
-			if (!candidates.empty ())
-			{
-				broadcast (lock);
-			}
-		}
 	}
+}
+
+bool nano::vote_generator::broadcast_predicate () const
+{
+	if (candidates.size () >= nano::network::confirm_ack_hashes_max)
+	{
+		return true;
+	}
+	if (candidates.size () > 0 && std::chrono::steady_clock::now () > next_broadcast)
+	{
+		return true;
+	}
+	return false;
 }
 
 nano::container_info nano::vote_generator::container_info () const

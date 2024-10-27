@@ -19,8 +19,8 @@ struct account_database_crawler
 	account_database_crawler (nano::store::component & store, nano::store::transaction const & transaction, nano::account const & start) :
 		store{ store },
 		transaction{ transaction },
-		it{ store.account.end () },
-		end{ store.account.end () }
+		it{ store.account.end (transaction) },
+		end{ store.account.end (transaction) }
 	{
 		seek (start);
 	}
@@ -97,8 +97,8 @@ struct pending_database_crawler
 	pending_database_crawler (nano::store::component & store, nano::store::transaction const & transaction, nano::account const & start) :
 		store{ store },
 		transaction{ transaction },
-		it{ store.pending.end () },
-		end{ store.pending.end () }
+		it{ store.pending.end (transaction) },
+		end{ store.pending.end (transaction) }
 	{
 		seek (start);
 	}

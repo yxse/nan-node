@@ -45,12 +45,12 @@ void nano::store::lmdb::peer::clear (store::write_transaction const & transactio
 	store.release_assert_success (status);
 }
 
-nano::store::iterator<nano::endpoint_key, nano::millis_t> nano::store::lmdb::peer::begin (store::transaction const & transaction) const
+auto nano::store::lmdb::peer::begin (store::transaction const & transaction) const -> iterator
 {
-	return store.make_iterator<nano::endpoint_key, nano::millis_t> (transaction, tables::peers);
+	return iterator{ store::iterator{ lmdb::iterator::begin (store.env.tx (transaction), peers_handle) } };
 }
 
-nano::store::iterator<nano::endpoint_key, nano::millis_t> nano::store::lmdb::peer::end () const
+auto nano::store::lmdb::peer::end (store::transaction const & transaction_a) const -> iterator
 {
-	return store::iterator<nano::endpoint_key, nano::millis_t> (nullptr);
+	return iterator{ store::iterator{ lmdb::iterator::end (store.env.tx (transaction_a), peers_handle) } };
 }
