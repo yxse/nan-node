@@ -1,6 +1,7 @@
 #include <nano/lib/block_sideband.hpp>
 #include <nano/lib/block_type.hpp>
 #include <nano/lib/object_stream.hpp>
+#include <nano/lib/stream.hpp>
 
 #include <bitset>
 

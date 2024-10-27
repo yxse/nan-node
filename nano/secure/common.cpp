@@ -5,6 +5,7 @@
 #include <nano/lib/enum_util.hpp>
 #include <nano/lib/env.hpp>
 #include <nano/lib/numbers.hpp>
+#include <nano/lib/stream.hpp>
 #include <nano/lib/timer.hpp>
 #include <nano/lib/utility.hpp>
 #include <nano/secure/common.hpp>

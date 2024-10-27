@@ -10,7 +10,7 @@
 #include <nano/lib/numbers.hpp>
 #include <nano/lib/object_stream.hpp>
 #include <nano/lib/stats_enums.hpp>
-#include <nano/lib/stream.hpp>
+#include <nano/lib/stream_fwd.hpp>
 #include <nano/node/common.hpp>
 #include <nano/secure/common.hpp>
 

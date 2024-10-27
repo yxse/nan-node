@@ -7,7 +7,7 @@
 #include <nano/lib/errors.hpp>
 #include <nano/lib/numbers.hpp>
 #include <nano/lib/optional_ptr.hpp>
-#include <nano/lib/stream.hpp>
+#include <nano/lib/stream_fwd.hpp>
 
 #include <boost/property_tree/ptree_fwd.hpp>
 

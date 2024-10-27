@@ -97,6 +97,7 @@ add_library(
   stats_enums.cpp
   stats_sinks.hpp
   stream.hpp
+  stream_fwd.hpp
   thread_pool.hpp
   thread_roles.hpp
   thread_roles.cpp

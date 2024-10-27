@@ -1,7 +1,7 @@
 #pragma once
 
 #include <nano/lib/numbers.hpp>
-#include <nano/lib/stream.hpp>
+#include <nano/lib/stream_fwd.hpp>
 #include <nano/lib/timer.hpp>
 #include <nano/lib/uniquer.hpp>
 
