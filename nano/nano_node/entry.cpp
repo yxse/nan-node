@@ -4,6 +4,7 @@
 #include <nano/lib/cli.hpp>
 #include <nano/lib/thread_runner.hpp>
 #include <nano/lib/utility.hpp>
+#include <nano/lib/work_version.hpp>
 #include <nano/nano_node/daemon.hpp>
 #include <nano/node/active_elections.hpp>
 #include <nano/node/cli.hpp>

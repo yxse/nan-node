@@ -1,5 +1,6 @@
 #include <nano/lib/blocks.hpp>
 #include <nano/lib/stream.hpp>
+#include <nano/lib/work_version.hpp>
 #include <nano/node/endpoint.hpp>
 #include <nano/test_common/testutil.hpp>
 

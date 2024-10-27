@@ -6,6 +6,7 @@
 #include <nano/lib/numbers.hpp>
 #include <nano/lib/stream.hpp>
 #include <nano/lib/threading.hpp>
+#include <nano/lib/work_version.hpp>
 #include <nano/secure/common.hpp>
 
 #include <boost/endian/conversion.hpp>

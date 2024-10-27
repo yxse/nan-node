@@ -4,6 +4,7 @@
 #include <nano/lib/config.hpp>
 #include <nano/lib/env.hpp>
 #include <nano/lib/logging.hpp>
+#include <nano/lib/work_version.hpp>
 
 #include <boost/format.hpp>
 #include <boost/lexical_cast.hpp>

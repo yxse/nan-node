@@ -4,6 +4,7 @@
 #include <nano/lib/epoch.hpp>
 #include <nano/lib/numbers.hpp>
 #include <nano/lib/work.hpp>
+#include <nano/lib/work_version.hpp>
 #include <nano/secure/common.hpp>
 #include <nano/test_common/testutil.hpp>
 

@@ -2,7 +2,6 @@
 
 #include <nano/lib/block_sideband.hpp>
 #include <nano/lib/block_uniquer.hpp>
-#include <nano/lib/config.hpp>
 #include <nano/lib/epoch.hpp>
 #include <nano/lib/errors.hpp>
 #include <nano/lib/numbers.hpp>
@@ -18,7 +17,11 @@ namespace nano
 class block_visitor;
 class mutable_block_visitor;
 class object_stream;
+enum class work_version;
+}
 
+namespace nano
+{
 class block
 {
 public:

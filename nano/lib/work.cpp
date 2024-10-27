@@ -5,6 +5,7 @@
 #include <nano/lib/thread_roles.hpp>
 #include <nano/lib/threading.hpp>
 #include <nano/lib/work.hpp>
+#include <nano/lib/work_version.hpp>
 #include <nano/node/xorshift.hpp>
 
 #include <future>

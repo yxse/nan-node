@@ -6,6 +6,7 @@
 #include <nano/lib/rpcconfig.hpp>
 #include <nano/lib/thread_runner.hpp>
 #include <nano/lib/threading.hpp>
+#include <nano/lib/work_version.hpp>
 #include <nano/node/active_elections.hpp>
 #include <nano/node/confirming_set.hpp>
 #include <nano/node/election.hpp>

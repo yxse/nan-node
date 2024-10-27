@@ -115,7 +115,8 @@ add_library(
   walletconfig.hpp
   walletconfig.cpp
   work.hpp
-  work.cpp)
+  work.cpp
+  work_version.hpp)
 
 include_directories(${CMAKE_SOURCE_DIR}/submodules)
 include_directories(
