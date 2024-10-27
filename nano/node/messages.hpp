@@ -4,7 +4,6 @@
 #include <nano/lib/block_uniquer.hpp>
 #include <nano/lib/config.hpp>
 #include <nano/lib/errors.hpp>
-#include <nano/lib/jsonconfig.hpp>
 #include <nano/lib/logging.hpp>
 #include <nano/lib/memory.hpp>
 #include <nano/lib/network_filter.hpp>
@@ -21,6 +20,11 @@
 #include <string>
 #include <variant>
 #include <vector>
+
+namespace nano
+{
+class jsonconfig;
+}
 
 namespace nano
 {

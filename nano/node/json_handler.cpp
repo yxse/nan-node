@@ -2,6 +2,7 @@
 #include <nano/lib/blocks.hpp>
 #include <nano/lib/config.hpp>
 #include <nano/lib/json_error_response.hpp>
+#include <nano/lib/jsonconfig.hpp>
 #include <nano/lib/stats_sinks.hpp>
 #include <nano/lib/timer.hpp>
 #include <nano/node/active_elections.hpp>

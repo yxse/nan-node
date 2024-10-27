@@ -3,6 +3,7 @@
 #include <nano/boost/asio/strand.hpp>
 #include <nano/lib/block_type.hpp>
 #include <nano/lib/blocks.hpp>
+#include <nano/lib/jsonconfig.hpp>
 #include <nano/lib/logging.hpp>
 #include <nano/lib/work.hpp>
 #include <nano/node/election_status.hpp>
