@@ -44,6 +44,8 @@ add_library(
   env.cpp
   epoch.hpp
   epoch.cpp
+  epochs.cpp
+  epochs.hpp
   errors.hpp
   errors.cpp
   id_dispenser.hpp

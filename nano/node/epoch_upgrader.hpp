@@ -1,22 +1,26 @@
 #pragma once
 
-#include <nano/lib/epoch.hpp>
 #include <nano/lib/locks.hpp>
 #include <nano/lib/logging.hpp>
 #include <nano/lib/numbers.hpp>
 
+#include <cstdint>
 #include <future>
 
 namespace nano
 {
+enum class epoch : uint8_t;
+class network_params;
 class node;
 class ledger;
-namespace store
-{
-	class component;
 }
-class network_params;
+namespace nano::store
+{
+class component;
+}
 
+namespace nano
+{
 class epoch_upgrader final
 {
 public:
