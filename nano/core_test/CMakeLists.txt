@@ -37,6 +37,7 @@ add_executable(
   node.cpp
   numbers.cpp
   object_stream.cpp
+  observer_set.cpp
   optimistic_scheduler.cpp
   processing_queue.cpp
   processor_service.cpp
