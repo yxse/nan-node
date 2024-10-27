@@ -13,11 +13,6 @@
 #include <nano/secure/rep_weights.hpp>
 #include <nano/secure/vote.hpp>
 
-#include <boost/iterator/transform_iterator.hpp>
-#include <boost/optional/optional.hpp>
-#include <boost/property_tree/ptree_fwd.hpp>
-#include <boost/variant/variant.hpp>
-
 #include <array>
 #include <unordered_map>
 
