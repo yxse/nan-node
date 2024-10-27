@@ -1582,7 +1582,7 @@ std::shared_ptr<nano::block> nano::deserialize_block_json (boost::property_tree:
 
 void nano::serialize_block (nano::stream & stream_a, nano::block const & block_a)
 {
-	nano::serialize_block_type (stream_a, block_a.type ());
+	nano::write (stream_a, block_a.type ());
 	block_a.serialize (stream_a);
 }
 

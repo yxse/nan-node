@@ -1873,7 +1873,7 @@ void nano::asc_pull_ack::blocks_payload::serialize (nano::stream & stream) const
 		nano::serialize_block (stream, *block);
 	}
 	// For convenience, end with null block terminator
-	nano::serialize_block_type (stream, nano::block_type::not_a_block);
+	nano::write (stream, nano::block_type::not_a_block);
 }
 
 void nano::asc_pull_ack::blocks_payload::deserialize (nano::stream & stream)
