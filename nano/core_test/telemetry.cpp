@@ -1,4 +1,5 @@
 #include <nano/node/telemetry.hpp>
+#include <nano/node/transport/fake.hpp>
 #include <nano/test_common/network.hpp>
 #include <nano/test_common/system.hpp>
 #include <nano/test_common/telemetry.hpp>
