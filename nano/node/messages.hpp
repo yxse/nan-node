@@ -2,7 +2,6 @@
 
 #include <nano/boost/asio/ip/tcp.hpp>
 #include <nano/lib/asio.hpp>
-#include <nano/lib/block_uniquer.hpp>
 #include <nano/lib/config.hpp>
 #include <nano/lib/errors.hpp>
 #include <nano/lib/logging.hpp>
@@ -24,7 +23,12 @@
 
 namespace nano
 {
+class block;
 class jsonconfig;
+template <typename Key, typename Value>
+class uniquer;
+
+using block_uniquer = uniquer<nano::uint256_union, nano::block>;
 }
 
 namespace nano
