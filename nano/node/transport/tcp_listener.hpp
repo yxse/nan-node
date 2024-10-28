@@ -20,6 +20,11 @@
 namespace mi = boost::multi_index;
 namespace asio = boost::asio;
 
+namespace nano::stat
+{
+enum class dir;
+}
+
 namespace nano::transport
 {
 class tcp_config

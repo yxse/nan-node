@@ -26,6 +26,7 @@ namespace nano
 class node;
 class active_elections;
 class election;
+class stats;
 class vote;
 enum class vote_code;
 enum class vote_source;
