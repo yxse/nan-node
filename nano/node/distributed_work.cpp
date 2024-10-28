@@ -4,6 +4,7 @@
 #include <nano/node/websocket.hpp>
 
 #include <boost/algorithm/string/erase.hpp>
+#include <boost/format.hpp>
 
 std::shared_ptr<request_type> nano::distributed_work::peer_request::get_prepared_json_request (std::string const & request_string_a) const
 {
@@ -400,10 +401,9 @@ void nano::distributed_work::handle_failure ()
 
 			status = work_generation_status::failure_peers;
 
-			auto now (std::chrono::steady_clock::now ());
 			std::weak_ptr<nano::node> node_weak (node.shared ());
 			auto next_backoff (std::min (backoff * 2, std::chrono::seconds (5 * 60)));
-			node.workers.add_timed_task (now + std::chrono::seconds (backoff), [node_weak, request_l = request, next_backoff] {
+			node.workers.post_delayed (std::chrono::seconds (backoff), [node_weak, request_l = request, next_backoff] {
 				bool error_l{ true };
 				if (auto node_l = node_weak.lock ())
 				{

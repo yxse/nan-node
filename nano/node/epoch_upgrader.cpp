@@ -116,7 +116,7 @@ void nano::epoch_upgrader::upgrade_impl (nano::raw_key const & prv_a, nano::epoc
 			{
 				auto transaction (store.tx_begin_read ());
 				// Collect accounts to upgrade
-				for (auto i (store.account.begin (transaction)), n (store.account.end ()); i != n && accounts_list.size () < count_limit; ++i)
+				for (auto i (store.account.begin (transaction)), n (store.account.end (transaction)); i != n && accounts_list.size () < count_limit; ++i)
 				{
 					nano::account const & account (i->first);
 					nano::account_info const & info (i->second);
@@ -161,7 +161,7 @@ void nano::epoch_upgrader::upgrade_impl (nano::raw_key const & prv_a, nano::epoc
 								upgrader_condition.wait (lock);
 							}
 						}
-						node.workers.push_task ([&upgrader_process, &upgrader_mutex, &upgrader_condition, &upgraded_accounts, &workers, epoch, difficulty, signer, root, account] () {
+						node.workers.post ([&upgrader_process, &upgrader_mutex, &upgrader_condition, &upgraded_accounts, &workers, epoch, difficulty, signer, root, account] () {
 							upgrader_process (upgraded_accounts, epoch, difficulty, signer, root, account);
 							{
 								nano::lock_guard<nano::mutex> lock{ upgrader_mutex };
@@ -241,7 +241,7 @@ void nano::epoch_upgrader::upgrade_impl (nano::raw_key const & prv_a, nano::epoc
 									upgrader_condition.wait (lock);
 								}
 							}
-							node.workers.push_task ([&upgrader_process, &upgrader_mutex, &upgrader_condition, &upgraded_pending, &workers, epoch, difficulty, signer, root, account] () {
+							node.workers.post ([&upgrader_process, &upgrader_mutex, &upgrader_condition, &upgraded_pending, &workers, epoch, difficulty, signer, root, account] () {
 								upgrader_process (upgraded_pending, epoch, difficulty, signer, root, account);
 								{
 									nano::lock_guard<nano::mutex> lock{ upgrader_mutex };

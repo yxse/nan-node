@@ -2,6 +2,7 @@
 #include <nano/secure/parallel_traversal.hpp>
 #include <nano/store/rocksdb/rep_weight.hpp>
 #include <nano/store/rocksdb/rocksdb.hpp>
+#include <nano/store/rocksdb/utility.hpp>
 
 #include <stdexcept>
 
@@ -42,26 +43,27 @@ void nano::store::rocksdb::rep_weight::del (store::write_transaction const & txn
 	store.release_assert_success (status);
 }
 
-nano::store::iterator<nano::account, nano::uint128_union> nano::store::rocksdb::rep_weight::begin (store::transaction const & txn_a, nano::account const & representative_a) const
+auto nano::store::rocksdb::rep_weight::begin (store::transaction const & txn_a, nano::account const & representative_a) const -> iterator
 {
-	return store.make_iterator<nano::account, nano::uint128_union> (txn_a, tables::rep_weights, representative_a);
+	rocksdb::db_val val{ representative_a };
+	return iterator{ store::iterator{ rocksdb::iterator::lower_bound (store.db.get (), rocksdb::tx (txn_a), store.table_to_column_family (tables::rep_weights), val) } };
 }
 
-nano::store::iterator<nano::account, nano::uint128_union> nano::store::rocksdb::rep_weight::begin (store::transaction const & txn_a) const
+auto nano::store::rocksdb::rep_weight::begin (store::transaction const & txn_a) const -> iterator
 {
-	return store.make_iterator<nano::account, nano::uint128_union> (txn_a, tables::rep_weights);
+	return iterator{ store::iterator{ rocksdb::iterator::begin (store.db.get (), rocksdb::tx (txn_a), store.table_to_column_family (tables::rep_weights)) } };
 }
 
-nano::store::iterator<nano::account, nano::uint128_union> nano::store::rocksdb::rep_weight::end () const
+auto nano::store::rocksdb::rep_weight::end (store::transaction const & transaction_a) const -> iterator
 {
-	return store::iterator<nano::account, nano::uint128_union> (nullptr);
+	return iterator{ store::iterator{ rocksdb::iterator::end (store.db.get (), rocksdb::tx (transaction_a), store.table_to_column_family (tables::rep_weights)) } };
 }
 
-void nano::store::rocksdb::rep_weight::for_each_par (std::function<void (store::read_transaction const &, store::iterator<nano::account, nano::uint128_union>, store::iterator<nano::account, nano::uint128_union>)> const & action_a) const
+void nano::store::rocksdb::rep_weight::for_each_par (std::function<void (store::read_transaction const &, iterator, iterator)> const & action_a) const
 {
 	parallel_traversal<nano::uint256_t> (
 	[&action_a, this] (nano::uint256_t const & start, nano::uint256_t const & end, bool const is_last) {
 		auto transaction (this->store.tx_begin_read ());
-		action_a (transaction, this->begin (transaction, start), !is_last ? this->begin (transaction, end) : this->end ());
+		action_a (transaction, this->begin (transaction, start), !is_last ? this->begin (transaction, end) : this->end (transaction));
 	});
 }

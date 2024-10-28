@@ -1,6 +1,7 @@
 #pragma once
 
 #include <nano/lib/logging.hpp>
+#include <nano/lib/thread_pool.hpp>
 #include <nano/node/fair_queue.hpp>
 #include <nano/node/fwd.hpp>
 #include <nano/secure/common.hpp>
@@ -46,6 +47,9 @@ public:
 	size_t priority_live{ 1 };
 	size_t priority_bootstrap{ 8 };
 	size_t priority_local{ 16 };
+
+	size_t batch_size{ 256 };
+	size_t max_queued_notifications{ 8 };
 };
 
 /**
@@ -89,7 +93,6 @@ public:
 	bool add (std::shared_ptr<nano::block> const &, nano::block_source = nano::block_source::live, std::shared_ptr<nano::transport::channel> const & channel = nullptr, std::function<void (nano::block_status)> callback = {});
 	std::optional<nano::block_status> add_blocking (std::shared_ptr<nano::block> const & block, nano::block_source);
 	void force (std::shared_ptr<nano::block> const &);
-	bool should_log ();
 
 	nano::container_info container_info () const;
 
@@ -127,11 +130,11 @@ private:
 private:
 	nano::fair_queue<context, nano::block_source> queue;
 
-	std::chrono::steady_clock::time_point next_log{ std::chrono::steady_clock::now () };
-
 	bool stopped{ false };
 	nano::condition_variable condition;
 	mutable nano::mutex mutex{ mutex_identifier (mutexes::block_processor) };
 	std::thread thread;
+
+	nano::thread_pool workers;
 };
 }

@@ -2406,7 +2406,7 @@ TEST (ledger, state_account)
 				 .work (*pool.generate (nano::dev::genesis->hash ()))
 				 .build ();
 	ASSERT_EQ (nano::block_status::progress, ledger.process (transaction, send1));
-	ASSERT_EQ (nano::dev::genesis_key.pub, ledger.any.block_account (transaction, send1->hash ()));
+	ASSERT_EQ (nano::dev::genesis_key.pub, ledger.any.block_account (transaction, send1->hash ()).value ());
 }
 
 TEST (ledger, state_send_receive)
@@ -5464,7 +5464,7 @@ TEST (ledger, migrate_lmdb_to_rocksdb)
 
 	ASSERT_TRUE (rocksdb_store.pending.get (rocksdb_transaction, nano::pending_key (nano::dev::genesis_key.pub, send->hash ())));
 
-	for (auto i = rocksdb_store.online_weight.begin (rocksdb_transaction); i != rocksdb_store.online_weight.end (); ++i)
+	for (auto i = rocksdb_store.online_weight.begin (rocksdb_transaction); i != rocksdb_store.online_weight.end (rocksdb_transaction); ++i)
 	{
 		ASSERT_EQ (i->first, 100);
 		ASSERT_EQ (i->second, 2);

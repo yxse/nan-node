@@ -37,7 +37,7 @@ size_t manually_count_pruned_blocks (nano::store::component & store)
 	size_t count = 0;
 	auto transaction = store.tx_begin_read ();
 	auto i = store.pruned.begin (transaction);
-	for (; i != store.pruned.end (); ++i)
+	for (; i != store.pruned.end (transaction); ++i)
 	{
 		++count;
 	}
@@ -54,7 +54,7 @@ TEST (system, generate_mass_activity)
 	uint32_t count (20);
 	system.generate_mass_activity (count, *system.nodes[0]);
 	auto transaction (system.nodes[0]->store.tx_begin_read ());
-	for (auto i (system.nodes[0]->store.account.begin (transaction)), n (system.nodes[0]->store.account.end ()); i != n; ++i)
+	for (auto i (system.nodes[0]->store.account.begin (transaction)), n (system.nodes[0]->store.account.end (transaction)); i != n; ++i)
 	{
 	}
 }
@@ -76,7 +76,7 @@ TEST (system, generate_mass_activity_long)
 	}
 	system.generate_mass_activity (count, *system.nodes[0]);
 	auto transaction (system.nodes[0]->store.tx_begin_read ());
-	for (auto i (system.nodes[0]->store.account.begin (transaction)), n (system.nodes[0]->store.account.end ()); i != n; ++i)
+	for (auto i (system.nodes[0]->store.account.begin (transaction)), n (system.nodes[0]->store.account.end (transaction)); i != n; ++i)
 	{
 	}
 	system.stop ();
@@ -104,7 +104,7 @@ TEST (system, receive_while_synchronizing)
 		node1->start ();
 		system.nodes.push_back (node1);
 		ASSERT_NE (nullptr, nano::test::establish_tcp (system, *node1, node->network.endpoint ()));
-		node1->workers.add_timed_task (std::chrono::steady_clock::now () + std::chrono::milliseconds (200), ([&system, &key] () {
+		node1->workers.post_delayed (std::chrono::milliseconds (200), ([&system, &key] () {
 			auto hash (system.wallet (0)->send_sync (nano::dev::genesis_key.pub, key.pub, system.nodes[0]->config.receive_minimum.number ()));
 			auto transaction = system.nodes[0]->ledger.tx_begin_read ();
 			auto block = system.nodes[0]->ledger.any.block_get (transaction, hash);
@@ -694,7 +694,7 @@ TEST (confirmation_height, many_accounts_single_confirmation)
 
 	// All frontiers (except last) should have 2 blocks and both should be confirmed
 	auto transaction = node->store.tx_begin_read ();
-	for (auto i (node->store.account.begin (transaction)), n (node->store.account.end ()); i != n; ++i)
+	for (auto i (node->store.account.begin (transaction)), n (node->store.account.end (transaction)); i != n; ++i)
 	{
 		auto & account = i->first;
 		auto & account_info = i->second;
@@ -706,7 +706,7 @@ TEST (confirmation_height, many_accounts_single_confirmation)
 	}
 
 	size_t cemented_count = 0;
-	for (auto i (node->ledger.store.confirmation_height.begin (transaction)), n (node->ledger.store.confirmation_height.end ()); i != n; ++i)
+	for (auto i (node->ledger.store.confirmation_height.begin (transaction)), n (node->ledger.store.confirmation_height.end (transaction)); i != n; ++i)
 	{
 		cemented_count += i->second.height;
 	}
@@ -782,7 +782,7 @@ TEST (confirmation_height, many_accounts_many_confirmations)
 
 	auto transaction = node->store.tx_begin_read ();
 	size_t cemented_count = 0;
-	for (auto i (node->ledger.store.confirmation_height.begin (transaction)), n (node->ledger.store.confirmation_height.end ()); i != n; ++i)
+	for (auto i (node->ledger.store.confirmation_height.begin (transaction)), n (node->ledger.store.confirmation_height.end (transaction)); i != n; ++i)
 	{
 		cemented_count += i->second.height;
 	}
@@ -925,7 +925,7 @@ TEST (confirmation_height, long_chains)
 	ASSERT_EQ (num_blocks + 1, info->block_count);
 
 	size_t cemented_count = 0;
-	for (auto i (node->ledger.store.confirmation_height.begin (transaction)), n (node->ledger.store.confirmation_height.end ()); i != n; ++i)
+	for (auto i (node->ledger.store.confirmation_height.begin (transaction)), n (node->ledger.store.confirmation_height.end (transaction)); i != n; ++i)
 	{
 		cemented_count += i->second.height;
 	}
@@ -1098,7 +1098,7 @@ TEST (confirmation_height, many_accounts_send_receive_self)
 
 	auto transaction = node->store.tx_begin_read ();
 	size_t cemented_count = 0;
-	for (auto i (node->ledger.store.confirmation_height.begin (transaction)), n (node->ledger.store.confirmation_height.end ()); i != n; ++i)
+	for (auto i (node->ledger.store.confirmation_height.begin (transaction)), n (node->ledger.store.confirmation_height.end (transaction)); i != n; ++i)
 	{
 		cemented_count += i->second.height;
 	}
@@ -1256,7 +1256,7 @@ TEST (confirmation_height, many_accounts_send_receive_self_no_elections)
 
 	auto transaction = store->tx_begin_read ();
 	size_t cemented_count = 0;
-	for (auto i (store->confirmation_height.begin (transaction)), n (store->confirmation_height.end ()); i != n; ++i)
+	for (auto i (store->confirmation_height.begin (transaction)), n (store->confirmation_height.end (transaction)); i != n; ++i)
 	{
 		cemented_count += i->second.height;
 	}
@@ -1378,7 +1378,7 @@ namespace transport
 							// Pick first peer to be consistent
 							auto peer = data.node->network.tcp_channels.channels[0].channel;
 
-							auto maybe_telemetry = data.node->telemetry.get_telemetry (peer->get_endpoint ());
+							auto maybe_telemetry = data.node->telemetry.get_telemetry (peer->get_remote_endpoint ());
 							if (maybe_telemetry)
 							{
 								callback_process (shared_data, data, node_data, maybe_telemetry->timestamp);
@@ -1508,7 +1508,7 @@ TEST (telemetry, cache_read_and_timeout)
 	ASSERT_NE (channel, nullptr);
 
 	node_client->telemetry.trigger ();
-	ASSERT_TIMELY (5s, telemetry_data = node_client->telemetry.get_telemetry (channel->get_endpoint ()));
+	ASSERT_TIMELY (5s, telemetry_data = node_client->telemetry.get_telemetry (channel->get_remote_endpoint ()));
 
 	auto responses = node_client->telemetry.get_all_telemetries ();
 	ASSERT_TRUE (!responses.empty ());
@@ -1531,7 +1531,7 @@ TEST (telemetry, cache_read_and_timeout)
 
 	// Request telemetry metrics again
 	node_client->telemetry.trigger ();
-	ASSERT_TIMELY (5s, telemetry_data = node_client->telemetry.get_telemetry (channel->get_endpoint ()));
+	ASSERT_TIMELY (5s, telemetry_data = node_client->telemetry.get_telemetry (channel->get_remote_endpoint ()));
 
 	responses = node_client->telemetry.get_all_telemetries ();
 	ASSERT_TRUE (!responses.empty ());
@@ -1606,7 +1606,7 @@ TEST (telemetry, many_nodes)
 	for (auto const & peer : peers)
 	{
 		std::optional<nano::telemetry_data> telemetry_data;
-		ASSERT_TIMELY (5s, telemetry_data = node_client->telemetry.get_telemetry (peer->get_endpoint ()));
+		ASSERT_TIMELY (5s, telemetry_data = node_client->telemetry.get_telemetry (peer->get_remote_endpoint ()));
 		telemetry_datas.push_back (*telemetry_data);
 	}
 
@@ -1750,7 +1750,7 @@ TEST (node, mass_epoch_upgrader)
 		{
 			auto transaction (node.store.tx_begin_read ());
 			size_t block_count_sum = 0;
-			for (auto i (node.store.account.begin (transaction)); i != node.store.account.end (); ++i)
+			for (auto i (node.store.account.begin (transaction)); i != node.store.account.end (transaction); ++i)
 			{
 				nano::account_info info (i->second);
 				ASSERT_EQ (info.epoch (), nano::epoch::epoch_1);
