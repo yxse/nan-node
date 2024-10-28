@@ -2,6 +2,8 @@
 
 #include <nano/node/bootstrap/bootstrap.hpp>
 
+#include <boost/property_tree/ptree.hpp>
+
 #include <atomic>
 #include <future>
 

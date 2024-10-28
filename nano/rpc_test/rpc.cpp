@@ -25,6 +25,7 @@
 #include <nano/secure/ledger.hpp>
 #include <nano/secure/ledger_set_any.hpp>
 #include <nano/secure/ledger_set_confirmed.hpp>
+#include <nano/secure/vote.hpp>
 #include <nano/test_common/chains.hpp>
 #include <nano/test_common/network.hpp>
 #include <nano/test_common/system.hpp>

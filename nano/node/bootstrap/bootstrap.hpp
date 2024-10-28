@@ -1,5 +1,6 @@
 #pragma once
 
+#include <nano/lib/numbers.hpp>
 #include <nano/node/bootstrap/bootstrap_connections.hpp>
 #include <nano/node/endpoint.hpp>
 

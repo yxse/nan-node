@@ -13,6 +13,7 @@
 #include <nano/node/wallet.hpp>
 #include <nano/node/websocket.hpp>
 #include <nano/secure/ledger.hpp>
+#include <nano/secure/vote.hpp>
 
 #include <boost/algorithm/string.hpp>
 #include <boost/property_tree/json_parser.hpp>

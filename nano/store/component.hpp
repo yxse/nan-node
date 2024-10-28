@@ -10,6 +10,7 @@
 
 #include <boost/endian/conversion.hpp>
 #include <boost/polymorphic_cast.hpp>
+#include <boost/property_tree/ptree.hpp>
 
 #include <stack>
 
@@ -25,10 +26,15 @@ namespace store
 	class peer;
 	class pending;
 	class pruned;
-	class version;
+	class read_transaction;
 	class rep_weight;
+	class transaction;
+	class version;
+	class write_transaction;
 }
 class ledger_cache;
+class ledger_constants;
+enum class tables;
 
 namespace store
 {
@@ -89,8 +95,8 @@ namespace store
 		virtual void rebuild_db (write_transaction const & transaction_a) = 0;
 
 		/** Not applicable to all sub-classes */
-		virtual void serialize_mdb_tracker (boost::property_tree::ptree &, std::chrono::milliseconds, std::chrono::milliseconds){};
-		virtual void serialize_memory_stats (boost::property_tree::ptree &) = 0;
+		virtual void serialize_mdb_tracker (::boost::property_tree::ptree &, std::chrono::milliseconds, std::chrono::milliseconds){};
+		virtual void serialize_memory_stats (::boost::property_tree::ptree &) = 0;
 
 		virtual bool init_error () const = 0;
 

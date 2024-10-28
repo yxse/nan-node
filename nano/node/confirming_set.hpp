@@ -22,6 +22,14 @@ namespace mi = boost::multi_index;
 
 namespace nano
 {
+class election;
+class ledger;
+class logger;
+class stats;
+}
+
+namespace nano
+{
 class confirming_set_config final
 {
 public:

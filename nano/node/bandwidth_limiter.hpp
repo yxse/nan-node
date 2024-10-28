@@ -6,6 +6,11 @@
 
 namespace nano
 {
+class node_config;
+}
+
+namespace nano
+{
 class bandwidth_limiter_config final
 {
 public:

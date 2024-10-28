@@ -8,10 +8,10 @@
 #include <nano/lib/numbers.hpp>
 #include <nano/lib/object_stream.hpp>
 #include <nano/lib/stats.hpp>
+#include <nano/lib/stream_fwd.hpp>
 #include <nano/lib/timer.hpp>
 #include <nano/lib/utility.hpp>
 #include <nano/secure/rep_weights.hpp>
-#include <nano/secure/vote.hpp>
 
 #include <array>
 #include <unordered_map>

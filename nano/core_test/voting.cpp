@@ -4,6 +4,7 @@
 #include <nano/node/vote_generator.hpp>
 #include <nano/node/vote_spacing.hpp>
 #include <nano/secure/ledger.hpp>
+#include <nano/secure/vote.hpp>
 #include <nano/test_common/system.hpp>
 #include <nano/test_common/testutil.hpp>
 

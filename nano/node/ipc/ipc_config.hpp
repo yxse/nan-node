@@ -7,7 +7,12 @@
 
 namespace nano
 {
+class network_constants;
 class tomlconfig;
+}
+
+namespace nano
+{
 namespace ipc
 {
 	/** Base class for transport configurations */
@@ -46,11 +51,7 @@ namespace ipc
 	class ipc_config_tcp_socket : public ipc_config_transport
 	{
 	public:
-		ipc_config_tcp_socket (nano::network_constants & network_constants) :
-			network_constants{ network_constants },
-			port{ network_constants.default_ipc_port }
-		{
-		}
+		ipc_config_tcp_socket (nano::network_constants & network_constants);
 		nano::network_constants & network_constants;
 		/** Listening port */
 		uint16_t port;

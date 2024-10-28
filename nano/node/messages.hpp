@@ -27,8 +27,10 @@ class block;
 class jsonconfig;
 template <typename Key, typename Value>
 class uniquer;
+class vote;
 
 using block_uniquer = uniquer<nano::uint256_union, nano::block>;
+using vote_uniquer = uniquer<nano::block_hash, nano::vote>;
 }
 
 namespace nano

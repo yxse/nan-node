@@ -39,6 +39,7 @@
 #include <nano/secure/ledger.hpp>
 #include <nano/secure/ledger_set_any.hpp>
 #include <nano/secure/ledger_set_confirmed.hpp>
+#include <nano/secure/vote.hpp>
 #include <nano/store/component.hpp>
 #include <nano/store/rocksdb/rocksdb.hpp>
 
