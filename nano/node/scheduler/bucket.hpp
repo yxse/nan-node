@@ -2,6 +2,7 @@
 
 #include <nano/lib/errors.hpp>
 #include <nano/lib/numbers.hpp>
+#include <nano/lib/numbers_templ.hpp>
 #include <nano/node/fwd.hpp>
 #include <nano/secure/common.hpp>
 

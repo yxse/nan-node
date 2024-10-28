@@ -1,6 +1,7 @@
 #pragma once
 
 #include <nano/lib/numbers.hpp>
+#include <nano/lib/numbers_templ.hpp>
 #include <nano/lib/observer_set.hpp>
 #include <nano/lib/thread_pool.hpp>
 #include <nano/node/fwd.hpp>

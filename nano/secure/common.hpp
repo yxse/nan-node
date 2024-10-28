@@ -10,7 +10,6 @@
 #include <nano/lib/stream_fwd.hpp>
 #include <nano/lib/timer.hpp>
 #include <nano/lib/utility.hpp>
-#include <nano/secure/rep_weights.hpp>
 
 #include <array>
 #include <unordered_map>

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <nano/lib/numbers_templ.hpp>
 #include <nano/lib/random.hpp>
 #include <nano/node/endpoint.hpp>
 #include <nano/node/transport/channel.hpp>
