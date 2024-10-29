@@ -1,6 +1,6 @@
 #include <nano/lib/blocks.hpp>
 #include <nano/lib/stream.hpp>
-#include <nano/node/bootstrap/block_deserializer.hpp>
+#include <nano/node/transport/block_deserializer.hpp>
 #include <nano/node/transport/tcp_socket.hpp>
 
 nano::bootstrap::block_deserializer::block_deserializer () :

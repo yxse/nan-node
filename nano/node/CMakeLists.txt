@@ -24,8 +24,6 @@ add_library(
   blockprocessor.cpp
   bootstrap_weights_beta.hpp
   bootstrap_weights_live.hpp
-  bootstrap/block_deserializer.hpp
-  bootstrap/block_deserializer.cpp
   bootstrap/bootstrap_config.hpp
   bootstrap/bootstrap_config.cpp
   bootstrap/bootstrap_server.hpp
@@ -145,6 +143,8 @@ add_library(
   scheduler/priority.cpp
   telemetry.hpp
   telemetry.cpp
+  transport/block_deserializer.hpp
+  transport/block_deserializer.cpp
   transport/channel.hpp
   transport/channel.cpp
   transport/tcp_channel.hpp
