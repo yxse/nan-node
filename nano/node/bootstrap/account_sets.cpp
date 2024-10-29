@@ -1,7 +1,7 @@
 #include <nano/lib/stats.hpp>
 #include <nano/lib/utility.hpp>
+#include <nano/node/bootstrap/account_sets.hpp>
 #include <nano/node/bootstrap/bootstrap_config.hpp>
-#include <nano/node/bootstrap_ascending/account_sets.hpp>
 
 #include <algorithm>
 #include <memory>

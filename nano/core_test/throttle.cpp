@@ -1,4 +1,4 @@
-#include <nano/node/bootstrap_ascending/throttle.hpp>
+#include <nano/node/bootstrap/throttle.hpp>
 
 #include <gtest/gtest.h>
 

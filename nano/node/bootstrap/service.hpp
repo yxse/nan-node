@@ -7,14 +7,14 @@
 #include <nano/lib/random.hpp>
 #include <nano/lib/rate_limiting.hpp>
 #include <nano/lib/thread_pool.hpp>
-#include <nano/lib/timer.hpp>
+#include <nano/node/bootstrap/account_sets.hpp>
 #include <nano/node/bootstrap/bootstrap_config.hpp>
-#include <nano/node/bootstrap_ascending/account_sets.hpp>
-#include <nano/node/bootstrap_ascending/common.hpp>
-#include <nano/node/bootstrap_ascending/database_scan.hpp>
-#include <nano/node/bootstrap_ascending/frontier_scan.hpp>
-#include <nano/node/bootstrap_ascending/peer_scoring.hpp>
-#include <nano/node/bootstrap_ascending/throttle.hpp>
+#include <nano/node/bootstrap/common.hpp>
+#include <nano/node/bootstrap/database_scan.hpp>
+#include <nano/node/bootstrap/frontier_scan.hpp>
+#include <nano/node/bootstrap/peer_scoring.hpp>
+#include <nano/node/bootstrap/throttle.hpp>
+#include <nano/node/fwd.hpp>
 
 #include <boost/multi_index/hashed_index.hpp>
 #include <boost/multi_index/member.hpp>

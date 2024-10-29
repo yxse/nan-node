@@ -1,4 +1,4 @@
-#include <nano/node/bootstrap_ascending/frontier_scan.hpp>
+#include <nano/node/bootstrap/frontier_scan.hpp>
 
 #include <boost/multiprecision/cpp_dec_float.hpp>
 #include <boost/multiprecision/cpp_int.hpp>

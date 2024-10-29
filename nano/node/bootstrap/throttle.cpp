@@ -1,5 +1,5 @@
 #include <nano/lib/utility.hpp>
-#include <nano/node/bootstrap_ascending/throttle.hpp>
+#include <nano/node/bootstrap/throttle.hpp>
 
 nano::bootstrap_ascending::throttle::throttle (std::size_t size) :
 	successes_m{ size }

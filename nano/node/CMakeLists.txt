@@ -24,23 +24,23 @@ add_library(
   blockprocessor.cpp
   bootstrap_weights_beta.hpp
   bootstrap_weights_live.hpp
+  bootstrap/account_sets.hpp
+  bootstrap/account_sets.cpp
   bootstrap/bootstrap_config.hpp
   bootstrap/bootstrap_config.cpp
   bootstrap/bootstrap_server.hpp
   bootstrap/bootstrap_server.cpp
-  bootstrap_ascending/account_sets.hpp
-  bootstrap_ascending/account_sets.cpp
-  bootstrap_ascending/database_scan.hpp
-  bootstrap_ascending/database_scan.cpp
-  bootstrap_ascending/common.hpp
-  bootstrap_ascending/frontier_scan.hpp
-  bootstrap_ascending/frontier_scan.cpp
-  bootstrap_ascending/throttle.hpp
-  bootstrap_ascending/throttle.cpp
-  bootstrap_ascending/peer_scoring.hpp
-  bootstrap_ascending/peer_scoring.cpp
-  bootstrap_ascending/service.hpp
-  bootstrap_ascending/service.cpp
+  bootstrap/common.hpp
+  bootstrap/throttle.hpp
+  bootstrap/throttle.cpp
+  bootstrap/database_scan.hpp
+  bootstrap/database_scan.cpp
+  bootstrap/frontier_scan.hpp
+  bootstrap/frontier_scan.cpp
+  bootstrap/peer_scoring.hpp
+  bootstrap/peer_scoring.cpp
+  bootstrap/service.hpp
+  bootstrap/service.cpp
   cli.hpp
   cli.cpp
   common.hpp
