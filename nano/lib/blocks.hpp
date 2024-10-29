@@ -9,6 +9,8 @@
 
 #include <boost/property_tree/ptree_fwd.hpp>
 
+#include <optional>
+
 typedef struct blake2b_state__ blake2b_state;
 
 namespace nano
