@@ -121,8 +121,9 @@ TEST (active_elections, confirm_frontier)
 		nano::node_flags node_flags;
 		node_flags.disable_request_loop = true;
 		node_flags.disable_ongoing_bootstrap = true;
-		node_flags.disable_ascending_bootstrap = true;
-		auto & node1 = *system.add_node (node_flags);
+		nano::node_config node_config;
+		node_config.bootstrap.enable = false;
+		auto & node1 = *system.add_node (node_config, node_flags);
 		system.wallet (0)->insert_adhoc (nano::dev::genesis_key.prv);
 
 		// we cannot use the same block instance on 2 different nodes, so make a copy
@@ -134,10 +135,11 @@ TEST (active_elections, confirm_frontier)
 	// The rep crawler would otherwise request confirmations in order to find representatives
 	nano::node_flags node_flags2;
 	node_flags2.disable_ongoing_bootstrap = true;
-	node_flags2.disable_ascending_bootstrap = true;
 	node_flags2.disable_rep_crawler = true;
+	nano::node_config node_config2;
+	node_config2.bootstrap.enable = false;
 	// start node2 later so that we do not get the gossip traffic
-	auto & node2 = *system.add_node (node_flags2);
+	auto & node2 = *system.add_node (node_config2, node_flags2);
 
 	// Add representative to disabled rep crawler
 	auto peers (node2.network.random_set (1));

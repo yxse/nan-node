@@ -71,12 +71,12 @@ TEST (bootstrap, profile)
 	nano::node_config config_server{ network_params };
 	config_server.preconfigured_peers.clear ();
 	config_server.bandwidth_limit = 0; // Unlimited server bandwidth
+	config_server.bootstrap.enable = false;
 	nano::node_flags flags_server;
 	flags_server.disable_legacy_bootstrap = true;
 	flags_server.disable_wallet_bootstrap = true;
 	flags_server.disable_add_initial_peers = true;
 	flags_server.disable_ongoing_bootstrap = true;
-	flags_server.disable_ascending_bootstrap = true;
 	auto data_path_server = nano::working_path (network);
 	// auto data_path_server = "";
 	auto server = std::make_shared<nano::node> (system.io_ctx, data_path_server, config_server, system.work, flags_server);

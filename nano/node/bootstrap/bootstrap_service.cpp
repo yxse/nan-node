@@ -72,7 +72,7 @@ void nano::bootstrap_service::start ()
 
 	if (!config.enable)
 	{
-		logger.warn (nano::log::type::bootstrap, "Ascending bootstrap is disabled");
+		logger.warn (nano::log::type::bootstrap, "Bootstrap is disabled, node will not be able to synchronize with the network");
 		return;
 	}
 

@@ -624,10 +624,7 @@ void nano::node::start ()
 	aggregator.start ();
 	backlog.start ();
 	bootstrap_server.start ();
-	if (!flags.disable_ascending_bootstrap)
-	{
-		bootstrap.start ();
-	}
+	bootstrap.start ();
 	websocket.start ();
 	telemetry.start ();
 	stats.start ();
