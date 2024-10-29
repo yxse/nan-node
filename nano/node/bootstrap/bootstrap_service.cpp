@@ -32,7 +32,7 @@ nano::bootstrap_service::bootstrap_service (nano::node_config const & node_confi
 	scoring{ config, node_config_a.network_params.network },
 	database_limiter{ config.database_rate_limit },
 	frontiers_limiter{ config.frontier_rate_limit },
-	workers{ 1, nano::thread_role::name::ascending_bootstrap_worker }
+	workers{ 1, nano::thread_role::name::bootstrap_worker }
 {
 	block_processor.batch_processed.add ([this] (auto const & batch) {
 		{
@@ -81,7 +81,7 @@ void nano::bootstrap_service::start ()
 	if (config.enable_scan)
 	{
 		priorities_thread = std::thread ([this] () {
-			nano::thread_role::set (nano::thread_role::name::ascending_bootstrap);
+			nano::thread_role::set (nano::thread_role::name::bootstrap);
 			run_priorities ();
 		});
 	}
@@ -89,7 +89,7 @@ void nano::bootstrap_service::start ()
 	if (config.enable_database_scan)
 	{
 		database_thread = std::thread ([this] () {
-			nano::thread_role::set (nano::thread_role::name::ascending_bootstrap);
+			nano::thread_role::set (nano::thread_role::name::bootstrap_database_scan);
 			run_database ();
 		});
 	}
@@ -97,7 +97,7 @@ void nano::bootstrap_service::start ()
 	if (config.enable_dependency_walker)
 	{
 		dependencies_thread = std::thread ([this] () {
-			nano::thread_role::set (nano::thread_role::name::ascending_bootstrap);
+			nano::thread_role::set (nano::thread_role::name::bootstrap_dependendy_walker);
 			run_dependencies ();
 		});
 	}
@@ -105,13 +105,13 @@ void nano::bootstrap_service::start ()
 	if (config.enable_frontier_scan)
 	{
 		frontiers_thread = std::thread ([this] () {
-			nano::thread_role::set (nano::thread_role::name::ascending_bootstrap);
+			nano::thread_role::set (nano::thread_role::name::bootstrap_frontier_scan);
 			run_frontiers ();
 		});
 	}
 
 	timeout_thread = std::thread ([this] () {
-		nano::thread_role::set (nano::thread_role::name::ascending_bootstrap);
+		nano::thread_role::set (nano::thread_role::name::bootstrap_cleanup);
 		run_timeouts ();
 	});
 }
