@@ -113,8 +113,6 @@ private:
 	/* Waits for a condition to be satisfied with incremental backoff */
 	void wait (std::function<bool ()> const & predicate) const;
 
-	/* Avoid too many in-flight requests */
-	void wait_tags () const;
 	/* Ensure there is enough space in blockprocessor for queuing new blocks */
 	void wait_blockprocessor () const;
 	/* Waits for a channel that is not full */
@@ -191,6 +189,8 @@ private:
 	// clang-format on
 	ordered_tags tags;
 
+	// Rate limiter for all types of requests
+	nano::rate_limiter limiter;
 	// Requests for accounts from database have much lower hitrate and could introduce strain on the network
 	// A separate (lower) limiter ensures that we always reserve resources for querying accounts from priority queue
 	nano::rate_limiter database_limiter;

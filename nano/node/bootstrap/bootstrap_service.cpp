@@ -30,6 +30,7 @@ nano::bootstrap_service::bootstrap_service (nano::node_config const & node_confi
 	frontiers{ config.frontier_scan, stats },
 	throttle{ compute_throttle_size () },
 	scoring{ config, node_config_a.network_params.network },
+	limiter{ config.rate_limit },
 	database_limiter{ config.database_rate_limit },
 	frontiers_limiter{ config.frontier_rate_limit },
 	workers{ 1, nano::thread_role::name::bootstrap_worker }
@@ -301,14 +302,6 @@ void nano::bootstrap_service::wait (std::function<bool ()> const & predicate) co
 	}
 }
 
-void nano::bootstrap_service::wait_tags () const
-{
-	wait ([this] () {
-		debug_assert (!mutex.try_lock ());
-		return tags.size () < config.max_requests;
-	});
-}
-
 void nano::bootstrap_service::wait_blockprocessor () const
 {
 	wait ([this] () {
@@ -318,9 +311,19 @@ void nano::bootstrap_service::wait_blockprocessor () const
 
 std::shared_ptr<nano::transport::channel> nano::bootstrap_service::wait_channel ()
 {
+	// Limit the number of in-flight requests
+	wait ([this] () {
+		return tags.size () < config.max_requests;
+	});
+
+	// Wait until more requests can be sent
+	wait ([this] () {
+		return limiter.should_pass (1);
+	});
+
+	// Wait until a channel is available
 	std::shared_ptr<nano::transport::channel> channel;
 	wait ([this, &channel] () {
-		debug_assert (!mutex.try_lock ());
 		channel = scoring.channel ();
 		return channel != nullptr; // Wait until a channel is available
 	});
@@ -528,7 +531,6 @@ bool nano::bootstrap_service::request_frontiers (nano::account start, std::share
 
 void nano::bootstrap_service::run_one_priority ()
 {
-	wait_tags ();
 	wait_blockprocessor ();
 	auto channel = wait_channel ();
 	if (!channel)
@@ -559,7 +561,6 @@ void nano::bootstrap_service::run_priorities ()
 
 void nano::bootstrap_service::run_one_database (bool should_throttle)
 {
-	wait_tags ();
 	wait_blockprocessor ();
 	auto channel = wait_channel ();
 	if (!channel)
@@ -590,8 +591,7 @@ void nano::bootstrap_service::run_database ()
 
 void nano::bootstrap_service::run_one_blocking ()
 {
-	wait_tags ();
-	wait_blockprocessor ();
+	// No need to wait for blockprocessor, as we are not processing blocks
 	auto channel = wait_channel ();
 	if (!channel)
 	{
@@ -619,6 +619,7 @@ void nano::bootstrap_service::run_dependencies ()
 
 void nano::bootstrap_service::run_one_frontier ()
 {
+	// No need to wait for blockprocessor, as we are not processing blocks
 	wait ([this] () {
 		return !accounts.priority_half_full ();
 	});
@@ -628,7 +629,6 @@ void nano::bootstrap_service::run_one_frontier ()
 	wait ([this] () {
 		return workers.queued_tasks () < config.frontier_scan.max_pending;
 	});
-	wait_tags ();
 	auto channel = wait_channel ();
 	if (!channel)
 	{
