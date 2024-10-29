@@ -107,67 +107,7 @@ TEST (bootstrap_ascending, profile)
 	auto client_rpc = start_rpc (system, *server, 55000);
 	auto server_rpc = start_rpc (system, *client, 55001);
 
-	struct entry
-	{
-		nano::bootstrap_ascending::service::async_tag tag;
-		std::shared_ptr<nano::transport::channel> request_channel;
-		std::shared_ptr<nano::transport::channel> reply_channel;
-
-		bool replied{ false };
-		bool received{ false };
-	};
-
 	nano::mutex mutex;
-	std::unordered_map<uint64_t, entry> requests;
-
-	server->bootstrap_server.on_response.add ([&] (auto & response, auto & channel) {
-		nano::lock_guard<nano::mutex> lock{ mutex };
-
-		if (requests.count (response.id))
-		{
-			requests[response.id].replied = true;
-			requests[response.id].reply_channel = channel;
-		}
-		else
-		{
-			std::cerr << "unknown response: " << response.id << std::endl;
-		}
-	});
-
-	client->ascendboot.on_request.add ([&] (auto & tag, auto & channel) {
-		nano::lock_guard<nano::mutex> lock{ mutex };
-
-		requests[tag.id] = { tag, channel };
-	});
-
-	client->ascendboot.on_reply.add ([&] (auto & tag) {
-		nano::lock_guard<nano::mutex> lock{ mutex };
-
-		requests[tag.id].received = true;
-	});
-
-	/*client->ascendboot.on_timeout.add ([&] (auto & tag) {
-		nano::lock_guard<nano::mutex> lock{ mutex };
-
-		if (requests.count (tag.id))
-		{
-			auto entry = requests[tag.id];
-
-			std::cerr << "timeout: "
-					  << "replied: " << entry.replied
-					  << " | "
-					  << "recevied: " << entry.received
-					  << " | "
-					  << "request: " << entry.request_channel->to_string ()
-					  << " ||| "
-					  << "reply: " << (entry.reply_channel ? entry.reply_channel->to_string () : "null")
-					  << std::endl;
-		}
-		else
-		{
-			std::cerr << "unknown timeout: " << tag.id << std::endl;
-		}
-	});*/
 
 	std::cout << "server count: " << server->ledger.block_count () << std::endl;
 

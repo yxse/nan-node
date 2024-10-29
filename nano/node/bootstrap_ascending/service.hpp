@@ -94,11 +94,6 @@ namespace bootstrap_ascending
 			std::chrono::steady_clock::time_point timestamp{ std::chrono::steady_clock::now () };
 		};
 
-	public: // Events
-		nano::observer_set<async_tag const &, std::shared_ptr<nano::transport::channel> const &> on_request;
-		nano::observer_set<async_tag const &> on_reply;
-		nano::observer_set<async_tag const &> on_timeout;
-
 	private:
 		/* Inspects a block that has been processed by the block processor */
 		void inspect (secure::transaction const &, nano::block_status const & result, nano::block const & block, nano::block_source);

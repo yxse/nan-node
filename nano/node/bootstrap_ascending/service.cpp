@@ -148,8 +148,6 @@ bool nano::bootstrap_ascending::service::send (std::shared_ptr<nano::transport::
 		tags.get<tag_id> ().insert (tag);
 	}
 
-	on_request.notify (tag, channel);
-
 	nano::asc_pull_req request{ network_constants };
 	request.id = tag.id;
 
@@ -299,7 +297,6 @@ void nano::bootstrap_ascending::service::inspect (secure::transaction const & tx
 void nano::bootstrap_ascending::service::wait (std::function<bool ()> const & predicate) const
 {
 	std::unique_lock<nano::mutex> lock{ mutex };
-
 	std::chrono::milliseconds interval = 5ms;
 	while (!stopped && !predicate ())
 	{
@@ -326,13 +323,11 @@ void nano::bootstrap_ascending::service::wait_blockprocessor () const
 std::shared_ptr<nano::transport::channel> nano::bootstrap_ascending::service::wait_channel ()
 {
 	std::shared_ptr<nano::transport::channel> channel;
-
 	wait ([this, &channel] () {
 		debug_assert (!mutex.try_lock ());
 		channel = scoring.channel ();
 		return channel != nullptr; // Wait until a channel is available
 	});
-
 	return channel;
 }
 
@@ -357,15 +352,12 @@ std::pair<nano::account, double> nano::bootstrap_ascending::service::next_priori
 	auto account = accounts.next_priority ([this] (nano::account const & account) {
 		return count_tags (account, query_source::priority) < 4;
 	});
-
 	if (account.is_zero ())
 	{
 		return {};
 	}
-
 	stats.inc (nano::stat::type::bootstrap_ascending_next, nano::stat::detail::next_priority);
 	accounts.timestamp_set (account);
-
 	// TODO: Priority could be returned by the accounts.next_priority() call
 	return { account, accounts.priority (account) };
 }
@@ -373,7 +365,6 @@ std::pair<nano::account, double> nano::bootstrap_ascending::service::next_priori
 std::pair<nano::account, double> nano::bootstrap_ascending::service::wait_priority ()
 {
 	std::pair<nano::account, double> result{ 0, 0 };
-
 	wait ([this, &result] () {
 		debug_assert (!mutex.try_lock ());
 		result = next_priority ();
@@ -383,7 +374,6 @@ std::pair<nano::account, double> nano::bootstrap_ascending::service::wait_priori
 		}
 		return false;
 	});
-
 	return result;
 }
 
@@ -397,16 +387,13 @@ nano::account nano::bootstrap_ascending::service::next_database (bool should_thr
 	{
 		return { 0 };
 	}
-
 	auto account = database_scan.next ([this] (nano::account const & account) {
 		return count_tags (account, query_source::database) == 0;
 	});
-
 	if (account.is_zero ())
 	{
 		return { 0 };
 	}
-
 	stats.inc (nano::stat::type::bootstrap_ascending_next, nano::stat::detail::next_database);
 	return account;
 }
@@ -414,7 +401,6 @@ nano::account nano::bootstrap_ascending::service::next_database (bool should_thr
 nano::account nano::bootstrap_ascending::service::wait_database (bool should_throttle)
 {
 	nano::account result{ 0 };
-
 	wait ([this, &result, should_throttle] () {
 		debug_assert (!mutex.try_lock ());
 		result = next_database (should_throttle);
@@ -424,7 +410,6 @@ nano::account nano::bootstrap_ascending::service::wait_database (bool should_thr
 		}
 		return false;
 	});
-
 	return result;
 }
 
@@ -435,12 +420,10 @@ nano::block_hash nano::bootstrap_ascending::service::next_blocking ()
 	auto blocking = accounts.next_blocking ([this] (nano::block_hash const & hash) {
 		return count_tags (hash, query_source::blocking) == 0;
 	});
-
 	if (blocking.is_zero ())
 	{
 		return { 0 };
 	}
-
 	stats.inc (nano::stat::type::bootstrap_ascending_next, nano::stat::detail::next_blocking);
 	return blocking;
 }
@@ -448,7 +431,6 @@ nano::block_hash nano::bootstrap_ascending::service::next_blocking ()
 nano::block_hash nano::bootstrap_ascending::service::wait_blocking ()
 {
 	nano::block_hash result{ 0 };
-
 	wait ([this, &result] () {
 		debug_assert (!mutex.try_lock ());
 		result = next_blocking ();
@@ -458,14 +440,12 @@ nano::block_hash nano::bootstrap_ascending::service::wait_blocking ()
 		}
 		return false;
 	});
-
 	return result;
 }
 
 nano::account nano::bootstrap_ascending::service::wait_frontier ()
 {
 	nano::account result{ 0 };
-
 	wait ([this, &result] () {
 		debug_assert (!mutex.try_lock ());
 		result = frontiers.next ();
@@ -476,7 +456,6 @@ nano::account nano::bootstrap_ascending::service::wait_frontier ()
 		}
 		return false;
 	});
-
 	return result;
 }
 
@@ -539,7 +518,6 @@ bool nano::bootstrap_ascending::service::request_info (nano::block_hash hash, st
 	tag.source = source;
 	tag.start = hash;
 	tag.hash = hash;
-
 	return send (channel, tag);
 }
 
@@ -549,7 +527,6 @@ bool nano::bootstrap_ascending::service::request_frontiers (nano::account start,
 	tag.type = query_type::frontiers;
 	tag.source = source;
 	tag.start = start;
-
 	return send (channel, tag);
 }
 
@@ -700,7 +677,6 @@ void nano::bootstrap_ascending::service::cleanup_and_sync ()
 	{
 		auto tag = tags_by_order.front ();
 		tags_by_order.pop_front ();
-		on_timeout.notify (tag);
 		stats.inc (nano::stat::type::bootstrap_ascending, nano::stat::detail::timeout);
 	}
 
@@ -776,8 +752,6 @@ void nano::bootstrap_ascending::service::process (nano::asc_pull_ack const & mes
 	scoring.received_message (channel);
 
 	lock.unlock ();
-
-	on_reply.notify (tag);
 
 	// Process the response payload
 	std::visit ([this, &tag] (auto && request) { return process (request, tag); }, message.payload);
