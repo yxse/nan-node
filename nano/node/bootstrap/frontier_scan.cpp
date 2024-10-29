@@ -34,7 +34,7 @@ nano::account nano::bootstrap::frontier_scan::next ()
 
 		if (head.requests < config.consideration_count || head.timestamp < cutoff)
 		{
-			stats.inc (nano::stat::type::bootstrap_ascending_frontiers, (head.requests < config.consideration_count) ? nano::stat::detail::next_by_requests : nano::stat::detail::next_by_timestamp);
+			stats.inc (nano::stat::type::bootstrap_frontier_scan, (head.requests < config.consideration_count) ? nano::stat::detail::next_by_requests : nano::stat::detail::next_by_timestamp);
 
 			debug_assert (head.next.number () >= head.start.number ());
 			debug_assert (head.next.number () < head.end.number ());
@@ -50,7 +50,7 @@ nano::account nano::bootstrap::frontier_scan::next ()
 		}
 	}
 
-	stats.inc (nano::stat::type::bootstrap_ascending_frontiers, nano::stat::detail::next_none);
+	stats.inc (nano::stat::type::bootstrap_frontier_scan, nano::stat::detail::next_none);
 	return { 0 };
 }
 
@@ -58,7 +58,7 @@ bool nano::bootstrap::frontier_scan::process (nano::account start, std::deque<st
 {
 	debug_assert (std::all_of (response.begin (), response.end (), [&] (auto const & pair) { return pair.first.number () >= start.number (); }));
 
-	stats.inc (nano::stat::type::bootstrap_ascending_frontiers, nano::stat::detail::process);
+	stats.inc (nano::stat::type::bootstrap_frontier_scan, nano::stat::detail::process);
 
 	// Find the first head with head.start <= start
 	auto & heads_by_start = heads.get<tag_start> ();
@@ -89,14 +89,14 @@ bool nano::bootstrap::frontier_scan::process (nano::account start, std::deque<st
 		// Special case for the last frontier head that won't receive larger than max frontier
 		if (entry.completed >= config.consideration_count * 2 && entry.candidates.empty ())
 		{
-			stats.inc (nano::stat::type::bootstrap_ascending_frontiers, nano::stat::detail::done_empty);
+			stats.inc (nano::stat::type::bootstrap_frontier_scan, nano::stat::detail::done_empty);
 			entry.candidates.insert (entry.end);
 		}
 
 		// Check if done
 		if (entry.completed >= config.consideration_count && !entry.candidates.empty ())
 		{
-			stats.inc (nano::stat::type::bootstrap_ascending_frontiers, nano::stat::detail::done);
+			stats.inc (nano::stat::type::bootstrap_frontier_scan, nano::stat::detail::done);
 
 			// Take the last candidate as the next frontier
 			release_assert (!entry.candidates.empty ());
@@ -113,7 +113,7 @@ bool nano::bootstrap::frontier_scan::process (nano::account start, std::deque<st
 			// Bound the search range
 			if (entry.next.number () >= entry.end.number ())
 			{
-				stats.inc (nano::stat::type::bootstrap_ascending_frontiers, nano::stat::detail::done_range);
+				stats.inc (nano::stat::type::bootstrap_frontier_scan, nano::stat::detail::done_range);
 				entry.next = entry.start;
 			}
 

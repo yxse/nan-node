@@ -26,7 +26,7 @@ void nano::bootstrap::account_sets::priority_up (nano::account const & account)
 
 	if (!blocked (account))
 	{
-		stats.inc (nano::stat::type::bootstrap_ascending_accounts, nano::stat::detail::prioritize);
+		stats.inc (nano::stat::type::bootstrap_account_sets, nano::stat::detail::prioritize);
 
 		auto iter = priorities.get<tag_account> ().find (account);
 		if (iter != priorities.get<tag_account> ().end ())
@@ -37,14 +37,14 @@ void nano::bootstrap::account_sets::priority_up (nano::account const & account)
 		}
 		else
 		{
-			stats.inc (nano::stat::type::bootstrap_ascending_accounts, nano::stat::detail::priority_insert);
+			stats.inc (nano::stat::type::bootstrap_account_sets, nano::stat::detail::priority_insert);
 			priorities.get<tag_account> ().insert ({ account, account_sets::priority_initial });
 			trim_overflow ();
 		}
 	}
 	else
 	{
-		stats.inc (nano::stat::type::bootstrap_ascending_accounts, nano::stat::detail::prioritize_failed);
+		stats.inc (nano::stat::type::bootstrap_account_sets, nano::stat::detail::prioritize_failed);
 	}
 }
 
@@ -58,12 +58,12 @@ void nano::bootstrap::account_sets::priority_down (nano::account const & account
 	auto iter = priorities.get<tag_account> ().find (account);
 	if (iter != priorities.get<tag_account> ().end ())
 	{
-		stats.inc (nano::stat::type::bootstrap_ascending_accounts, nano::stat::detail::deprioritize);
+		stats.inc (nano::stat::type::bootstrap_account_sets, nano::stat::detail::deprioritize);
 
 		auto priority_new = iter->priority / account_sets::priority_divide;
 		if (priority_new <= account_sets::priority_cutoff)
 		{
-			stats.inc (nano::stat::type::bootstrap_ascending_accounts, nano::stat::detail::priority_erase_by_threshold);
+			stats.inc (nano::stat::type::bootstrap_account_sets, nano::stat::detail::priority_erase_by_threshold);
 			priorities.get<tag_account> ().erase (iter);
 		}
 		else
@@ -75,7 +75,7 @@ void nano::bootstrap::account_sets::priority_down (nano::account const & account
 	}
 	else
 	{
-		stats.inc (nano::stat::type::bootstrap_ascending_accounts, nano::stat::detail::deprioritize_failed);
+		stats.inc (nano::stat::type::bootstrap_account_sets, nano::stat::detail::deprioritize_failed);
 	}
 }
 
@@ -91,14 +91,14 @@ void nano::bootstrap::account_sets::priority_set (nano::account const & account)
 		auto iter = priorities.get<tag_account> ().find (account);
 		if (iter == priorities.get<tag_account> ().end ())
 		{
-			stats.inc (nano::stat::type::bootstrap_ascending_accounts, nano::stat::detail::priority_insert);
+			stats.inc (nano::stat::type::bootstrap_account_sets, nano::stat::detail::priority_insert);
 			priorities.get<tag_account> ().insert ({ account, account_sets::priority_initial });
 			trim_overflow ();
 		}
 	}
 	else
 	{
-		stats.inc (nano::stat::type::bootstrap_ascending_accounts, nano::stat::detail::prioritize_failed);
+		stats.inc (nano::stat::type::bootstrap_account_sets, nano::stat::detail::prioritize_failed);
 	}
 }
 
@@ -106,16 +106,16 @@ void nano::bootstrap::account_sets::block (nano::account const & account, nano::
 {
 	debug_assert (!account.is_zero ());
 
-	stats.inc (nano::stat::type::bootstrap_ascending_accounts, nano::stat::detail::block);
+	stats.inc (nano::stat::type::bootstrap_account_sets, nano::stat::detail::block);
 
 	auto existing = priorities.get<tag_account> ().find (account);
 	auto entry = (existing == priorities.get<tag_account> ().end ()) ? priority_entry{ account, 0 } : *existing;
 
 	priorities.get<tag_account> ().erase (account);
-	stats.inc (nano::stat::type::bootstrap_ascending_accounts, nano::stat::detail::priority_erase_by_blocking);
+	stats.inc (nano::stat::type::bootstrap_account_sets, nano::stat::detail::priority_erase_by_blocking);
 
 	blocking.get<tag_account> ().insert ({ entry, dependency });
-	stats.inc (nano::stat::type::bootstrap_ascending_accounts, nano::stat::detail::blocking_insert);
+	stats.inc (nano::stat::type::bootstrap_account_sets, nano::stat::detail::blocking_insert);
 
 	trim_overflow ();
 }
@@ -131,7 +131,7 @@ void nano::bootstrap::account_sets::unblock (nano::account const & account, std:
 	auto existing = blocking.get<tag_account> ().find (account);
 	if (existing != blocking.get<tag_account> ().end () && (!hash || existing->dependency == *hash))
 	{
-		stats.inc (nano::stat::type::bootstrap_ascending_accounts, nano::stat::detail::unblock);
+		stats.inc (nano::stat::type::bootstrap_account_sets, nano::stat::detail::unblock);
 
 		debug_assert (priorities.get<tag_account> ().count (account) == 0);
 		if (!existing->original_entry.account.is_zero ())
@@ -149,7 +149,7 @@ void nano::bootstrap::account_sets::unblock (nano::account const & account, std:
 	}
 	else
 	{
-		stats.inc (nano::stat::type::bootstrap_ascending_accounts, nano::stat::detail::unblock_failed);
+		stats.inc (nano::stat::type::bootstrap_account_sets, nano::stat::detail::unblock_failed);
 	}
 }
 
@@ -190,7 +190,7 @@ void nano::bootstrap::account_sets::dependency_update (nano::block_hash const & 
 		{
 			if (it->dependency_account != dependency_account)
 			{
-				stats.inc (nano::stat::type::bootstrap_ascending_accounts, nano::stat::detail::dependency_update);
+				stats.inc (nano::stat::type::bootstrap_account_sets, nano::stat::detail::dependency_update);
 
 				blocking.get<tag_dependency> ().modify (it++, [dependency_account] (auto & entry) {
 					entry.dependency_account = dependency_account;
@@ -204,7 +204,7 @@ void nano::bootstrap::account_sets::dependency_update (nano::block_hash const & 
 	}
 	else
 	{
-		stats.inc (nano::stat::type::bootstrap_ascending_accounts, nano::stat::detail::dependency_update_failed);
+		stats.inc (nano::stat::type::bootstrap_account_sets, nano::stat::detail::dependency_update_failed);
 	}
 }
 
@@ -214,13 +214,13 @@ void nano::bootstrap::account_sets::trim_overflow ()
 	{
 		// Erase the oldest entry
 		priorities.pop_front ();
-		stats.inc (nano::stat::type::bootstrap_ascending_accounts, nano::stat::detail::priority_erase_overflow);
+		stats.inc (nano::stat::type::bootstrap_account_sets, nano::stat::detail::priority_erase_overflow);
 	}
 	while (blocking.size () > config.blocking_max)
 	{
 		// Erase the oldest entry
 		blocking.pop_front ();
-		stats.inc (nano::stat::type::bootstrap_ascending_accounts, nano::stat::detail::blocking_erase_overflow);
+		stats.inc (nano::stat::type::bootstrap_account_sets, nano::stat::detail::blocking_erase_overflow);
 	}
 }
 
@@ -288,7 +288,7 @@ void nano::bootstrap::account_sets::sync_dependencies ()
 
 		if (!blocked (entry.dependency_account) && !prioritized (entry.dependency_account))
 		{
-			stats.inc (nano::stat::type::bootstrap_ascending_accounts, nano::stat::detail::sync_dependencies);
+			stats.inc (nano::stat::type::bootstrap_account_sets, nano::stat::detail::sync_dependencies);
 			priority_set (entry.dependency_account);
 		}
 	}

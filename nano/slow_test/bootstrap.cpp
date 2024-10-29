@@ -117,9 +117,9 @@ TEST (bootstrap, profile)
 	rate.observe ("block_processor", [&] () { return client->block_processor.size (); });
 	rate.observe ("priority", [&] () { return client->bootstrap.priority_size (); });
 	rate.observe ("blocking", [&] () { return client->bootstrap.blocked_size (); });
-	rate.observe (*client, nano::stat::type::bootstrap_ascending, nano::stat::detail::request, nano::stat::dir::out);
-	rate.observe (*client, nano::stat::type::bootstrap_ascending, nano::stat::detail::reply, nano::stat::dir::in);
-	rate.observe (*client, nano::stat::type::bootstrap_ascending, nano::stat::detail::blocks, nano::stat::dir::in);
+	rate.observe (*client, nano::stat::type::bootstrap, nano::stat::detail::request, nano::stat::dir::out);
+	rate.observe (*client, nano::stat::type::bootstrap, nano::stat::detail::reply, nano::stat::dir::in);
+	rate.observe (*client, nano::stat::type::bootstrap, nano::stat::detail::blocks, nano::stat::dir::in);
 	rate.observe (*server, nano::stat::type::bootstrap_server, nano::stat::detail::blocks, nano::stat::dir::out);
 	rate.observe (*client, nano::stat::type::ledger, nano::stat::detail::old, nano::stat::dir::in);
 	rate.observe (*client, nano::stat::type::ledger, nano::stat::detail::gap_epoch_open_pending, nano::stat::dir::in);

@@ -116,7 +116,7 @@ public:
 	std::size_t bandwidth_limit{ 10 * 1024 * 1024 };
 	/** By default, allow bursts of 15MB/s (not sustainable) */
 	double bandwidth_limit_burst_ratio{ 3. };
-	/** Default boostrap outbound traffic limit is 5MB/s */
+	/** Default bootstrap outbound traffic limit is 5MB/s */
 	std::size_t bootstrap_bandwidth_limit{ 5 * 1024 * 1024 };
 	/** Bootstrap traffic does not need bursts */
 	double bootstrap_bandwidth_burst_ratio{ 1. };

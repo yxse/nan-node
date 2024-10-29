@@ -187,8 +187,8 @@ bool nano::bootstrap_service::send (std::shared_ptr<nano::transport::channel> co
 
 	request.update_header ();
 
-	stats.inc (nano::stat::type::bootstrap_ascending, nano::stat::detail::request, nano::stat::dir::out);
-	stats.inc (nano::stat::type::bootstrap_ascending_request, to_stat_detail (tag.type));
+	stats.inc (nano::stat::type::bootstrap, nano::stat::detail::request, nano::stat::dir::out);
+	stats.inc (nano::stat::type::bootstrap_request, to_stat_detail (tag.type));
 
 	// TODO: There is no feedback mechanism if bandwidth limiter starts dropping our requests
 	channel->send (
@@ -352,7 +352,7 @@ std::pair<nano::account, double> nano::bootstrap_service::next_priority ()
 	{
 		return {};
 	}
-	stats.inc (nano::stat::type::bootstrap_ascending_next, nano::stat::detail::next_priority);
+	stats.inc (nano::stat::type::bootstrap_next, nano::stat::detail::next_priority);
 	accounts.timestamp_set (account);
 	// TODO: Priority could be returned by the accounts.next_priority() call
 	return { account, accounts.priority (account) };
@@ -390,7 +390,7 @@ nano::account nano::bootstrap_service::next_database (bool should_throttle)
 	{
 		return { 0 };
 	}
-	stats.inc (nano::stat::type::bootstrap_ascending_next, nano::stat::detail::next_database);
+	stats.inc (nano::stat::type::bootstrap_next, nano::stat::detail::next_database);
 	return account;
 }
 
@@ -420,7 +420,7 @@ nano::block_hash nano::bootstrap_service::next_blocking ()
 	{
 		return { 0 };
 	}
-	stats.inc (nano::stat::type::bootstrap_ascending_next, nano::stat::detail::next_blocking);
+	stats.inc (nano::stat::type::bootstrap_next, nano::stat::detail::next_blocking);
 	return blocking;
 }
 
@@ -447,7 +447,7 @@ nano::account nano::bootstrap_service::wait_frontier ()
 		result = frontiers.next ();
 		if (!result.is_zero ())
 		{
-			stats.inc (nano::stat::type::bootstrap_ascending_next, nano::stat::detail::next_frontier);
+			stats.inc (nano::stat::type::bootstrap_next, nano::stat::detail::next_frontier);
 			return true;
 		}
 		return false;
@@ -484,21 +484,21 @@ bool nano::bootstrap_service::request (nano::account account, size_t count, std:
 			{
 				if (auto conf_info = ledger.store.confirmation_height.get (transaction, account))
 				{
-					stats.inc (nano::stat::type::bootstrap_ascending_request_blocks, nano::stat::detail::safe);
+					stats.inc (nano::stat::type::bootstrap_request_blocks, nano::stat::detail::safe);
 					tag.start = conf_info->frontier;
 					tag.hash = conf_info->height;
 				}
 			}
 			if (tag.start.is_zero ())
 			{
-				stats.inc (nano::stat::type::bootstrap_ascending_request_blocks, nano::stat::detail::optimistic);
+				stats.inc (nano::stat::type::bootstrap_request_blocks, nano::stat::detail::optimistic);
 				tag.start = info->head;
 				tag.hash = info->head;
 			}
 		}
 		else
 		{
-			stats.inc (nano::stat::type::bootstrap_ascending_request_blocks, nano::stat::detail::base);
+			stats.inc (nano::stat::type::bootstrap_request_blocks, nano::stat::detail::base);
 			tag.type = query_type::blocks_by_account;
 			tag.start = account;
 		}
@@ -551,7 +551,7 @@ void nano::bootstrap_service::run_priorities ()
 	while (!stopped)
 	{
 		lock.unlock ();
-		stats.inc (nano::stat::type::bootstrap_ascending, nano::stat::detail::loop);
+		stats.inc (nano::stat::type::bootstrap, nano::stat::detail::loop);
 		run_one_priority ();
 		lock.lock ();
 	}
@@ -582,7 +582,7 @@ void nano::bootstrap_service::run_database ()
 		// Avoid high churn rate of database requests
 		bool should_throttle = !database_scan.warmed_up () && throttle.throttled ();
 		lock.unlock ();
-		stats.inc (nano::stat::type::bootstrap_ascending, nano::stat::detail::loop_database);
+		stats.inc (nano::stat::type::bootstrap, nano::stat::detail::loop_database);
 		run_one_database (should_throttle);
 		lock.lock ();
 	}
@@ -611,7 +611,7 @@ void nano::bootstrap_service::run_dependencies ()
 	while (!stopped)
 	{
 		lock.unlock ();
-		stats.inc (nano::stat::type::bootstrap_ascending, nano::stat::detail::loop_dependencies);
+		stats.inc (nano::stat::type::bootstrap, nano::stat::detail::loop_dependencies);
 		run_one_blocking ();
 		lock.lock ();
 	}
@@ -648,7 +648,7 @@ void nano::bootstrap_service::run_frontiers ()
 	while (!stopped)
 	{
 		lock.unlock ();
-		stats.inc (nano::stat::type::bootstrap_ascending, nano::stat::detail::loop_frontiers);
+		stats.inc (nano::stat::type::bootstrap, nano::stat::detail::loop_frontiers);
 		run_one_frontier ();
 		lock.lock ();
 	}
@@ -673,12 +673,12 @@ void nano::bootstrap_service::cleanup_and_sync ()
 	{
 		auto tag = tags_by_order.front ();
 		tags_by_order.pop_front ();
-		stats.inc (nano::stat::type::bootstrap_ascending, nano::stat::detail::timeout);
+		stats.inc (nano::stat::type::bootstrap, nano::stat::detail::timeout);
 	}
 
 	if (sync_dependencies_interval.elapsed (60s))
 	{
-		stats.inc (nano::stat::type::bootstrap_ascending, nano::stat::detail::sync_dependencies);
+		stats.inc (nano::stat::type::bootstrap, nano::stat::detail::sync_dependencies);
 		accounts.sync_dependencies ();
 	}
 }
@@ -688,7 +688,7 @@ void nano::bootstrap_service::run_timeouts ()
 	nano::unique_lock<nano::mutex> lock{ mutex };
 	while (!stopped)
 	{
-		stats.inc (nano::stat::type::bootstrap_ascending, nano::stat::detail::loop_cleanup);
+		stats.inc (nano::stat::type::bootstrap, nano::stat::detail::loop_cleanup);
 		cleanup_and_sync ();
 		condition.wait_for (lock, 5s, [this] () { return stopped; });
 	}
@@ -702,11 +702,11 @@ void nano::bootstrap_service::process (nano::asc_pull_ack const & message, std::
 	auto it = tags.get<tag_id> ().find (message.id);
 	if (it == tags.get<tag_id> ().end ())
 	{
-		stats.inc (nano::stat::type::bootstrap_ascending, nano::stat::detail::missing_tag);
+		stats.inc (nano::stat::type::bootstrap, nano::stat::detail::missing_tag);
 		return;
 	}
 
-	stats.inc (nano::stat::type::bootstrap_ascending, nano::stat::detail::reply);
+	stats.inc (nano::stat::type::bootstrap, nano::stat::detail::reply);
 
 	auto tag = *it;
 	tags.get<tag_id> ().erase (it); // Iterator is invalid after this point
@@ -737,12 +737,12 @@ void nano::bootstrap_service::process (nano::asc_pull_ack const & message, std::
 	bool valid = std::visit (payload_verifier{ tag.type }, message.payload);
 	if (!valid)
 	{
-		stats.inc (nano::stat::type::bootstrap_ascending, nano::stat::detail::invalid_response_type);
+		stats.inc (nano::stat::type::bootstrap, nano::stat::detail::invalid_response_type);
 		return;
 	}
 
 	// Track bootstrap request response time
-	stats.inc (nano::stat::type::bootstrap_ascending_reply, to_stat_detail (tag.type));
+	stats.inc (nano::stat::type::bootstrap_reply, to_stat_detail (tag.type));
 	stats.sample (nano::stat::sample::bootstrap_tag_duration, nano::log::milliseconds_delta (tag.timestamp), { 0, config.request_timeout.count () });
 
 	scoring.received_message (channel);
@@ -759,15 +759,15 @@ void nano::bootstrap_service::process (const nano::asc_pull_ack::blocks_payload 
 {
 	debug_assert (tag.type == query_type::blocks_by_hash || tag.type == query_type::blocks_by_account);
 
-	stats.inc (nano::stat::type::bootstrap_ascending_process, nano::stat::detail::blocks);
+	stats.inc (nano::stat::type::bootstrap_process, nano::stat::detail::blocks);
 
 	auto result = verify (response, tag);
 	switch (result)
 	{
 		case verify_result::ok:
 		{
-			stats.inc (nano::stat::type::bootstrap_ascending_verify_blocks, nano::stat::detail::ok);
-			stats.add (nano::stat::type::bootstrap_ascending, nano::stat::detail::blocks, nano::stat::dir::in, response.blocks.size ());
+			stats.inc (nano::stat::type::bootstrap_verify_blocks, nano::stat::detail::ok);
+			stats.add (nano::stat::type::bootstrap, nano::stat::detail::blocks, nano::stat::dir::in, response.blocks.size ());
 
 			auto blocks = response.blocks;
 
@@ -784,7 +784,7 @@ void nano::bootstrap_service::process (const nano::asc_pull_ack::blocks_payload 
 				{
 					// It's the last block submitted for this account chain, reset timestamp to allow more requests
 					block_processor.add (block, nano::block_source::bootstrap, nullptr, [this, account = tag.account] (auto result) {
-						stats.inc (nano::stat::type::bootstrap_ascending, nano::stat::detail::timestamp_reset);
+						stats.inc (nano::stat::type::bootstrap, nano::stat::detail::timestamp_reset);
 						{
 							nano::lock_guard<nano::mutex> guard{ mutex };
 							accounts.timestamp_reset (account);
@@ -807,7 +807,7 @@ void nano::bootstrap_service::process (const nano::asc_pull_ack::blocks_payload 
 		break;
 		case verify_result::nothing_new:
 		{
-			stats.inc (nano::stat::type::bootstrap_ascending_verify_blocks, nano::stat::detail::nothing_new);
+			stats.inc (nano::stat::type::bootstrap_verify_blocks, nano::stat::detail::nothing_new);
 
 			nano::lock_guard<nano::mutex> lock{ mutex };
 			accounts.priority_down (tag.account);
@@ -819,7 +819,7 @@ void nano::bootstrap_service::process (const nano::asc_pull_ack::blocks_payload 
 		break;
 		case verify_result::invalid:
 		{
-			stats.inc (nano::stat::type::bootstrap_ascending_verify_blocks, nano::stat::detail::invalid);
+			stats.inc (nano::stat::type::bootstrap_verify_blocks, nano::stat::detail::invalid);
 		}
 		break;
 	}
@@ -832,11 +832,11 @@ void nano::bootstrap_service::process (const nano::asc_pull_ack::account_info_pa
 
 	if (response.account.is_zero ())
 	{
-		stats.inc (nano::stat::type::bootstrap_ascending_process, nano::stat::detail::account_info_empty);
+		stats.inc (nano::stat::type::bootstrap_process, nano::stat::detail::account_info_empty);
 		return;
 	}
 
-	stats.inc (nano::stat::type::bootstrap_ascending_process, nano::stat::detail::account_info);
+	stats.inc (nano::stat::type::bootstrap_process, nano::stat::detail::account_info);
 
 	// Prioritize account containing the dependency
 	{
@@ -853,19 +853,19 @@ void nano::bootstrap_service::process (const nano::asc_pull_ack::frontiers_paylo
 
 	if (response.frontiers.empty ())
 	{
-		stats.inc (nano::stat::type::bootstrap_ascending_process, nano::stat::detail::frontiers_empty);
+		stats.inc (nano::stat::type::bootstrap_process, nano::stat::detail::frontiers_empty);
 		return;
 	}
 
-	stats.inc (nano::stat::type::bootstrap_ascending_process, nano::stat::detail::frontiers);
+	stats.inc (nano::stat::type::bootstrap_process, nano::stat::detail::frontiers);
 
 	auto result = verify (response, tag);
 	switch (result)
 	{
 		case verify_result::ok:
 		{
-			stats.inc (nano::stat::type::bootstrap_ascending_verify_frontiers, nano::stat::detail::ok);
-			stats.add (nano::stat::type::bootstrap_ascending, nano::stat::detail::frontiers, nano::stat::dir::in, response.frontiers.size ());
+			stats.inc (nano::stat::type::bootstrap_verify_frontiers, nano::stat::detail::ok);
+			stats.add (nano::stat::type::bootstrap, nano::stat::detail::frontiers, nano::stat::dir::in, response.frontiers.size ());
 
 			{
 				nano::lock_guard<nano::mutex> lock{ mutex };
@@ -881,18 +881,18 @@ void nano::bootstrap_service::process (const nano::asc_pull_ack::frontiers_paylo
 			}
 			else
 			{
-				stats.inc (nano::stat::type::bootstrap_ascending, nano::stat::detail::dropped_frontiers);
+				stats.add (nano::stat::type::bootstrap, nano::stat::detail::frontiers_dropped, response.frontiers.size ());
 			}
 		}
 		break;
 		case verify_result::nothing_new:
 		{
-			stats.inc (nano::stat::type::bootstrap_ascending_verify_frontiers, nano::stat::detail::nothing_new);
+			stats.inc (nano::stat::type::bootstrap_verify_frontiers, nano::stat::detail::nothing_new);
 		}
 		break;
 		case verify_result::invalid:
 		{
-			stats.inc (nano::stat::type::bootstrap_ascending_verify_frontiers, nano::stat::detail::invalid);
+			stats.inc (nano::stat::type::bootstrap_verify_frontiers, nano::stat::detail::invalid);
 		}
 		break;
 	}
@@ -900,7 +900,7 @@ void nano::bootstrap_service::process (const nano::asc_pull_ack::frontiers_paylo
 
 void nano::bootstrap_service::process (const nano::empty_payload & response, const async_tag & tag)
 {
-	stats.inc (nano::stat::type::bootstrap_ascending_process, nano::stat::detail::empty);
+	stats.inc (nano::stat::type::bootstrap_process, nano::stat::detail::empty);
 	debug_assert (false, "empty payload"); // Should not happen
 }
 
@@ -914,7 +914,7 @@ void nano::bootstrap_service::process_frontiers (std::deque<std::pair<nano::acco
 	})
 	== frontiers.end ());
 
-	stats.inc (nano::stat::type::bootstrap_ascending, nano::stat::detail::process_frontiers);
+	stats.inc (nano::stat::type::bootstrap, nano::stat::detail::processing_frontiers);
 
 	size_t outdated = 0;
 	size_t pending = 0;
@@ -971,10 +971,10 @@ void nano::bootstrap_service::process_frontiers (std::deque<std::pair<nano::acco
 		}
 	}
 
-	stats.add (nano::stat::type::bootstrap_ascending_frontiers, nano::stat::detail::processed, frontiers.size ());
-	stats.add (nano::stat::type::bootstrap_ascending_frontiers, nano::stat::detail::prioritized, result.size ());
-	stats.add (nano::stat::type::bootstrap_ascending_frontiers, nano::stat::detail::outdated, outdated);
-	stats.add (nano::stat::type::bootstrap_ascending_frontiers, nano::stat::detail::pending, pending);
+	stats.add (nano::stat::type::bootstrap_frontiers, nano::stat::detail::processed, frontiers.size ());
+	stats.add (nano::stat::type::bootstrap_frontiers, nano::stat::detail::prioritized, result.size ());
+	stats.add (nano::stat::type::bootstrap_frontiers, nano::stat::detail::outdated, outdated);
+	stats.add (nano::stat::type::bootstrap_frontiers, nano::stat::detail::pending, pending);
 
 	nano::lock_guard<nano::mutex> guard{ mutex };
 
