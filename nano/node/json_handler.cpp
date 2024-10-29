@@ -5160,7 +5160,7 @@ void nano::json_handler::debug_bootstrap_priority_info ()
 {
 	if (!ec)
 	{
-		auto [blocking, priorities] = node.ascendboot.info ();
+		auto [blocking, priorities] = node.bootstrap.info ();
 
 		// priorities
 		{

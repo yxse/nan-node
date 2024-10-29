@@ -115,8 +115,8 @@ TEST (bootstrap_ascending, profile)
 	rate.observe ("count", [&] () { return client->ledger.block_count (); });
 	rate.observe ("unchecked", [&] () { return client->unchecked.count (); });
 	rate.observe ("block_processor", [&] () { return client->block_processor.size (); });
-	rate.observe ("priority", [&] () { return client->ascendboot.priority_size (); });
-	rate.observe ("blocking", [&] () { return client->ascendboot.blocked_size (); });
+	rate.observe ("priority", [&] () { return client->bootstrap.priority_size (); });
+	rate.observe ("blocking", [&] () { return client->bootstrap.blocked_size (); });
 	rate.observe (*client, nano::stat::type::bootstrap_ascending, nano::stat::detail::request, nano::stat::dir::out);
 	rate.observe (*client, nano::stat::type::bootstrap_ascending, nano::stat::detail::reply, nano::stat::dir::in);
 	rate.observe (*client, nano::stat::type::bootstrap_ascending, nano::stat::detail::blocks, nano::stat::dir::in);

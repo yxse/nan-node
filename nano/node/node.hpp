@@ -210,8 +210,8 @@ public:
 	nano::backlog_population & backlog;
 	std::unique_ptr<nano::bootstrap_server> bootstrap_server_impl;
 	nano::bootstrap_server & bootstrap_server;
-	std::unique_ptr<nano::bootstrap_service> ascendboot_impl;
-	nano::bootstrap_service & ascendboot;
+	std::unique_ptr<nano::bootstrap_service> bootstrap_impl;
+	nano::bootstrap_service & bootstrap;
 	nano::websocket_server websocket;
 	nano::epoch_upgrader epoch_upgrader;
 	std::unique_ptr<nano::local_block_broadcaster> local_block_broadcaster_impl;

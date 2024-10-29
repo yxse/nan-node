@@ -361,7 +361,7 @@ TEST (bootstrap, frontier_scan)
 
 	// Frontier scan should detect all the accounts with missing blocks
 	ASSERT_TIMELY (10s, std::all_of (updates.begin (), updates.end (), [&node1] (auto const & block) {
-		return node1.ascendboot.prioritized (block->account ());
+		return node1.bootstrap.prioritized (block->account ());
 	}));
 }
 
@@ -443,7 +443,7 @@ TEST (bootstrap, frontier_scan_pending)
 
 	// Frontier scan should detect all the accounts with missing blocks
 	ASSERT_TIMELY (10s, std::all_of (opens.begin (), opens.end (), [&node1] (auto const & block) {
-		return node1.ascendboot.prioritized (block->account ());
+		return node1.bootstrap.prioritized (block->account ());
 	}));
 }
 
@@ -553,6 +553,6 @@ TEST (bootstrap, frontier_scan_cannot_prioritize)
 
 	// Frontier scan should not detect the accounts
 	ASSERT_ALWAYS (1s, std::none_of (opens2.begin (), opens2.end (), [&node1] (auto const & block) {
-		return node1.ascendboot.prioritized (block->account ());
+		return node1.bootstrap.prioritized (block->account ());
 	}));
 }

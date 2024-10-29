@@ -153,8 +153,8 @@ nano::node::node (std::shared_ptr<boost::asio::io_context> io_ctx_a, std::filesy
 	backlog{ *backlog_impl },
 	bootstrap_server_impl{ std::make_unique<nano::bootstrap_server> (config.bootstrap_server, store, ledger, network_params.network, stats) },
 	bootstrap_server{ *bootstrap_server_impl },
-	ascendboot_impl{ std::make_unique<nano::bootstrap_service> (config, block_processor, ledger, network, stats, logger) },
-	ascendboot{ *ascendboot_impl },
+	bootstrap_impl{ std::make_unique<nano::bootstrap_service> (config, block_processor, ledger, network, stats, logger) },
+	bootstrap{ *bootstrap_impl },
 	websocket{ config.websocket_config, observers, wallets, ledger, io_ctx, logger },
 	epoch_upgrader{ *this, ledger, store, network_params, logger },
 	local_block_broadcaster_impl{ std::make_unique<nano::local_block_broadcaster> (config.local_block_broadcaster, *this, block_processor, network, confirming_set, stats, logger, !flags.disable_block_processor_republishing) },
@@ -626,7 +626,7 @@ void nano::node::start ()
 	bootstrap_server.start ();
 	if (!flags.disable_ascending_bootstrap)
 	{
-		ascendboot.start ();
+		bootstrap.start ();
 	}
 	websocket.start ();
 	telemetry.start ();
@@ -657,7 +657,7 @@ void nano::node::stop ()
 	// No tasks may wait for work generation in I/O threads, or termination signal capturing will be unable to call node::stop()
 	distributed_work.stop ();
 	backlog.stop ();
-	ascendboot.stop ();
+	bootstrap.stop ();
 	rep_crawler.stop ();
 	unchecked.stop ();
 	block_processor.stop ();
@@ -1212,7 +1212,7 @@ nano::container_info nano::node::container_info () const
 	info.add ("vote_router", vote_router.container_info ());
 	info.add ("generator", generator.container_info ());
 	info.add ("final_generator", final_generator.container_info ());
-	info.add ("bootstrap_ascending", ascendboot.container_info ());
+	info.add ("bootstrap", bootstrap.container_info ());
 	info.add ("unchecked", unchecked.container_info ());
 	info.add ("local_block_broadcaster", local_block_broadcaster.container_info ());
 	info.add ("rep_tiers", rep_tiers.container_info ());
