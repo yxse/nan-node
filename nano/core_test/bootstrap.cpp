@@ -190,7 +190,7 @@ TEST (bootstrap, account_base)
 }
 
 /**
- * Tests that bootstrap_ascending will return multiple new blocks in-order
+ * Tests that bootstrap will return multiple new blocks in-order
  */
 TEST (bootstrap, account_inductive)
 {
@@ -226,7 +226,7 @@ TEST (bootstrap, account_inductive)
 }
 
 /**
- * Tests that bootstrap_ascending will return multiple new blocks in-order
+ * Tests that bootstrap will return multiple new blocks in-order
  */
 TEST (bootstrap, trace_base)
 {

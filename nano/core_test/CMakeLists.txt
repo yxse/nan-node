@@ -9,7 +9,7 @@ add_executable(
   block.cpp
   block_store.cpp
   blockprocessor.cpp
-  bootstrap_ascending.cpp
+  bootstrap.cpp
   bootstrap_server.cpp
   cli.cpp
   confirmation_solicitor.cpp

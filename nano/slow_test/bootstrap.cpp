@@ -60,7 +60,7 @@ std::unique_ptr<rpc_wrapper> start_rpc (nano::test::system & system, nano::node 
 }
 }
 
-TEST (bootstrap_ascending, profile)
+TEST (bootstrap, profile)
 {
 	nano::test::system system;
 	nano::thread_runner runner{ system.io_ctx, system.logger, 2 };
