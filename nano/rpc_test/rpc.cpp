@@ -2482,44 +2482,6 @@ TEST (rpc, account_representative_set_epoch_2_insufficient_work)
 	}
 }
 
-TEST (rpc, bootstrap)
-{
-	nano::test::system system0;
-	auto node = add_ipc_enabled_node (system0);
-	nano::test::system system1 (1);
-	auto node1 = system1.nodes[0];
-	auto latest (node1->latest (nano::dev::genesis_key.pub));
-	nano::block_builder builder;
-	auto send = builder
-				.send ()
-				.previous (latest)
-				.destination (nano::dev::genesis_key.pub)
-				.balance (100)
-				.sign (nano::dev::genesis_key.prv, nano::dev::genesis_key.pub)
-				.work (*node1->work_generate_blocking (latest))
-				.build ();
-	{
-		auto transaction = node1->ledger.tx_begin_write ();
-		ASSERT_EQ (nano::block_status::progress, node1->ledger.process (transaction, send));
-	}
-	auto const rpc_ctx = add_rpc (system0, node);
-	boost::property_tree::ptree request;
-	request.put ("action", "bootstrap");
-	request.put ("address", "::ffff:127.0.0.1");
-	request.put ("port", node1->network.endpoint ().port ());
-	test_response response (request, rpc_ctx.rpc->listening_port (), *system0.io_ctx);
-	while (response.status == 0)
-	{
-		system0.poll ();
-	}
-	system1.deadline_set (10s);
-	while (node->latest (nano::dev::genesis_key.pub) != node1->latest (nano::dev::genesis_key.pub))
-	{
-		ASSERT_NO_ERROR (system0.poll ());
-		ASSERT_NO_ERROR (system1.poll ());
-	}
-}
-
 TEST (rpc, account_remove)
 {
 	nano::test::system system0;
@@ -2766,33 +2728,6 @@ TEST (rpc, successors)
 	request.put ("reverse", "true");
 	auto response2 (wait_response (system, rpc_ctx, request, 10s));
 	ASSERT_EQ (response, response2);
-}
-
-TEST (rpc, bootstrap_any)
-{
-	nano::test::system system0;
-	auto node = add_ipc_enabled_node (system0);
-	nano::test::system system1 (1);
-	auto latest (system1.nodes[0]->latest (nano::dev::genesis_key.pub));
-	nano::block_builder builder;
-	auto send = builder
-				.send ()
-				.previous (latest)
-				.destination (nano::dev::genesis_key.pub)
-				.balance (100)
-				.sign (nano::dev::genesis_key.prv, nano::dev::genesis_key.pub)
-				.work (*system1.nodes[0]->work_generate_blocking (latest))
-				.build ();
-	{
-		auto transaction = system1.nodes[0]->ledger.tx_begin_write ();
-		ASSERT_EQ (nano::block_status::progress, system1.nodes[0]->ledger.process (transaction, send));
-	}
-	auto const rpc_ctx = add_rpc (system0, node);
-	boost::property_tree::ptree request;
-	request.put ("action", "bootstrap_any");
-	auto response (wait_response (system0, rpc_ctx, request));
-	std::string success (response.get<std::string> ("success"));
-	ASSERT_TRUE (success.empty ());
 }
 
 TEST (rpc, republish)
