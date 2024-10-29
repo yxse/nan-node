@@ -30,6 +30,8 @@ add_library(
   bootstrap/bootstrap_config.cpp
   bootstrap/bootstrap_server.hpp
   bootstrap/bootstrap_server.cpp
+  bootstrap/bootstrap_service.hpp
+  bootstrap/bootstrap_service.cpp
   bootstrap/common.hpp
   bootstrap/throttle.hpp
   bootstrap/throttle.cpp
@@ -39,8 +41,6 @@ add_library(
   bootstrap/frontier_scan.cpp
   bootstrap/peer_scoring.hpp
   bootstrap/peer_scoring.cpp
-  bootstrap/service.hpp
-  bootstrap/service.cpp
   cli.hpp
   cli.cpp
   common.hpp

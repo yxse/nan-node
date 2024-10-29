@@ -8,7 +8,7 @@
 #include <nano/node/backlog_population.hpp>
 #include <nano/node/bandwidth_limiter.hpp>
 #include <nano/node/bootstrap/bootstrap_server.hpp>
-#include <nano/node/bootstrap/service.hpp>
+#include <nano/node/bootstrap/bootstrap_service.hpp>
 #include <nano/node/bootstrap_weights_beta.hpp>
 #include <nano/node/bootstrap_weights_live.hpp>
 #include <nano/node/common.hpp>

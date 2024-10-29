@@ -2,8 +2,8 @@
 #include <nano/lib/logging.hpp>
 #include <nano/lib/stats.hpp>
 #include <nano/lib/tomlconfig.hpp>
+#include <nano/node/bootstrap/bootstrap_service.hpp>
 #include <nano/node/bootstrap/database_scan.hpp>
-#include <nano/node/bootstrap/service.hpp>
 #include <nano/node/make_store.hpp>
 #include <nano/secure/ledger.hpp>
 #include <nano/secure/ledger_set_any.hpp>

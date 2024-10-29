@@ -4,7 +4,7 @@
 #include <nano/lib/stats_sinks.hpp>
 #include <nano/lib/timer.hpp>
 #include <nano/node/active_elections.hpp>
-#include <nano/node/bootstrap/service.hpp>
+#include <nano/node/bootstrap/bootstrap_service.hpp>
 #include <nano/node/common.hpp>
 #include <nano/node/confirming_set.hpp>
 #include <nano/node/election.hpp>
