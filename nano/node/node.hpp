@@ -6,7 +6,6 @@
 #include <nano/lib/stats.hpp>
 #include <nano/lib/work.hpp>
 #include <nano/node/blockprocessor.hpp>
-#include <nano/node/bootstrap/bootstrap_server.hpp>
 #include <nano/node/distributed_work_factory.hpp>
 #include <nano/node/epoch_upgrader.hpp>
 #include <nano/node/fwd.hpp>
@@ -172,7 +171,6 @@ public:
 	nano::network network;
 	std::unique_ptr<nano::telemetry> telemetry_impl;
 	nano::telemetry & telemetry;
-	nano::bootstrap_server bootstrap_server;
 	std::unique_ptr<nano::transport::tcp_listener> tcp_listener_impl;
 	nano::transport::tcp_listener & tcp_listener;
 	std::filesystem::path application_path;
@@ -210,6 +208,8 @@ public:
 	nano::wallets wallets;
 	std::unique_ptr<nano::backlog_population> backlog_impl;
 	nano::backlog_population & backlog;
+	std::unique_ptr<nano::bootstrap_server> bootstrap_server_impl;
+	nano::bootstrap_server & bootstrap_server;
 	std::unique_ptr<nano::bootstrap_service> ascendboot_impl;
 	nano::bootstrap_service & ascendboot;
 	nano::websocket_server websocket;
