@@ -1,5 +1,7 @@
 #pragma once
 
+#include <nano/node/fwd.hpp>
+
 #include <boost/multi_index/hashed_index.hpp>
 #include <boost/multi_index/member.hpp>
 #include <boost/multi_index/ordered_index.hpp>
@@ -13,12 +15,8 @@ namespace mi = boost::multi_index;
 namespace nano
 {
 class bootstrap_ascending_config;
-class network_constants;
-namespace transport
-{
-	class channel;
-}
-namespace bootstrap_ascending
+
+namespace bootstrap
 {
 	// Container for tracking and scoring peers with respect to bootstrapping
 	class peer_scoring

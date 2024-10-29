@@ -12,14 +12,14 @@
  * database_scan
  */
 
-nano::bootstrap_ascending::database_scan::database_scan (nano::ledger & ledger_a) :
+nano::bootstrap::database_scan::database_scan (nano::ledger & ledger_a) :
 	ledger{ ledger_a },
 	account_scanner{ ledger },
 	pending_scanner{ ledger }
 {
 }
 
-nano::account nano::bootstrap_ascending::database_scan::next (std::function<bool (nano::account const &)> const & filter)
+nano::account nano::bootstrap::database_scan::next (std::function<bool (nano::account const &)> const & filter)
 {
 	if (queue.empty ())
 	{
@@ -40,7 +40,7 @@ nano::account nano::bootstrap_ascending::database_scan::next (std::function<bool
 	return { 0 };
 }
 
-void nano::bootstrap_ascending::database_scan::fill ()
+void nano::bootstrap::database_scan::fill ()
 {
 	auto transaction = ledger.store.tx_begin_read ();
 
@@ -51,12 +51,12 @@ void nano::bootstrap_ascending::database_scan::fill ()
 	queue.insert (queue.end (), set2.begin (), set2.end ());
 }
 
-bool nano::bootstrap_ascending::database_scan::warmed_up () const
+bool nano::bootstrap::database_scan::warmed_up () const
 {
 	return account_scanner.completed > 0 && pending_scanner.completed > 0;
 }
 
-nano::container_info nano::bootstrap_ascending::database_scan::container_info () const
+nano::container_info nano::bootstrap::database_scan::container_info () const
 {
 	nano::container_info info;
 	info.put ("accounts_iterator", account_scanner.completed);
@@ -68,11 +68,11 @@ nano::container_info nano::bootstrap_ascending::database_scan::container_info ()
  * account_database_scanner
  */
 
-std::deque<nano::account> nano::bootstrap_ascending::account_database_scanner::next_batch (nano::store::transaction & transaction, size_t batch_size)
+std::deque<nano::account> nano::bootstrap::account_database_scanner::next_batch (nano::store::transaction & transaction, size_t batch_size)
 {
 	std::deque<nano::account> result;
 
-	account_database_crawler crawler{ ledger.store, transaction, next };
+	nano::bootstrap::account_database_crawler crawler{ ledger.store, transaction, next };
 
 	for (size_t count = 0; crawler.current && count < batch_size; crawler.advance (), ++count)
 	{
@@ -96,11 +96,11 @@ std::deque<nano::account> nano::bootstrap_ascending::account_database_scanner::n
  * pending_database_scanner
  */
 
-std::deque<nano::account> nano::bootstrap_ascending::pending_database_scanner::next_batch (nano::store::transaction & transaction, size_t batch_size)
+std::deque<nano::account> nano::bootstrap::pending_database_scanner::next_batch (nano::store::transaction & transaction, size_t batch_size)
 {
 	std::deque<nano::account> result;
 
-	pending_database_crawler crawler{ ledger.store, transaction, next };
+	nano::bootstrap::pending_database_crawler crawler{ ledger.store, transaction, next };
 
 	for (size_t count = 0; crawler.current && count < batch_size; crawler.advance (), ++count)
 	{

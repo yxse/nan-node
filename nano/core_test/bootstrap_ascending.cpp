@@ -33,7 +33,7 @@ TEST (account_sets, construction)
 	auto store = nano::make_store (system.logger, nano::unique_path (), nano::dev::constants);
 	ASSERT_FALSE (store->init_error ());
 	nano::account_sets_config config;
-	nano::bootstrap_ascending::account_sets sets{ config, system.stats };
+	nano::bootstrap::account_sets sets{ config, system.stats };
 }
 
 TEST (account_sets, empty_blocked)
@@ -44,7 +44,7 @@ TEST (account_sets, empty_blocked)
 	auto store = nano::make_store (system.logger, nano::unique_path (), nano::dev::constants);
 	ASSERT_FALSE (store->init_error ());
 	nano::account_sets_config config;
-	nano::bootstrap_ascending::account_sets sets{ config, system.stats };
+	nano::bootstrap::account_sets sets{ config, system.stats };
 	ASSERT_FALSE (sets.blocked (account));
 }
 
@@ -56,7 +56,7 @@ TEST (account_sets, block)
 	auto store = nano::make_store (system.logger, nano::unique_path (), nano::dev::constants);
 	ASSERT_FALSE (store->init_error ());
 	nano::account_sets_config config;
-	nano::bootstrap_ascending::account_sets sets{ config, system.stats };
+	nano::bootstrap::account_sets sets{ config, system.stats };
 	sets.block (account, random_hash ());
 	ASSERT_TRUE (sets.blocked (account));
 }
@@ -69,7 +69,7 @@ TEST (account_sets, unblock)
 	auto store = nano::make_store (system.logger, nano::unique_path (), nano::dev::constants);
 	ASSERT_FALSE (store->init_error ());
 	nano::account_sets_config config;
-	nano::bootstrap_ascending::account_sets sets{ config, system.stats };
+	nano::bootstrap::account_sets sets{ config, system.stats };
 	auto hash = random_hash ();
 	sets.block (account, hash);
 	sets.unblock (account, hash);
@@ -84,7 +84,7 @@ TEST (account_sets, priority_base)
 	auto store = nano::make_store (system.logger, nano::unique_path (), nano::dev::constants);
 	ASSERT_FALSE (store->init_error ());
 	nano::account_sets_config config;
-	nano::bootstrap_ascending::account_sets sets{ config, system.stats };
+	nano::bootstrap::account_sets sets{ config, system.stats };
 	ASSERT_EQ (0.0, sets.priority (account));
 }
 
@@ -96,7 +96,7 @@ TEST (account_sets, priority_blocked)
 	auto store = nano::make_store (system.logger, nano::unique_path (), nano::dev::constants);
 	ASSERT_FALSE (store->init_error ());
 	nano::account_sets_config config;
-	nano::bootstrap_ascending::account_sets sets{ config, system.stats };
+	nano::bootstrap::account_sets sets{ config, system.stats };
 	sets.block (account, random_hash ());
 	ASSERT_EQ (0.0, sets.priority (account));
 }
@@ -110,15 +110,15 @@ TEST (account_sets, priority_unblock_keep)
 	auto store = nano::make_store (system.logger, nano::unique_path (), nano::dev::constants);
 	ASSERT_FALSE (store->init_error ());
 	nano::account_sets_config config;
-	nano::bootstrap_ascending::account_sets sets{ config, system.stats };
+	nano::bootstrap::account_sets sets{ config, system.stats };
 	sets.priority_up (account);
 	sets.priority_up (account);
-	ASSERT_EQ (sets.priority (account), nano::bootstrap_ascending::account_sets::priority_initial + nano::bootstrap_ascending::account_sets::priority_increase);
+	ASSERT_EQ (sets.priority (account), nano::bootstrap::account_sets::priority_initial + nano::bootstrap::account_sets::priority_increase);
 	auto hash = random_hash ();
 	sets.block (account, hash);
 	ASSERT_EQ (0.0, sets.priority (account));
 	sets.unblock (account, hash);
-	ASSERT_EQ (sets.priority (account), nano::bootstrap_ascending::account_sets::priority_initial + nano::bootstrap_ascending::account_sets::priority_increase);
+	ASSERT_EQ (sets.priority (account), nano::bootstrap::account_sets::priority_initial + nano::bootstrap::account_sets::priority_increase);
 }
 
 TEST (account_sets, priority_up_down)
@@ -129,11 +129,11 @@ TEST (account_sets, priority_up_down)
 	auto store = nano::make_store (system.logger, nano::unique_path (), nano::dev::constants);
 	ASSERT_FALSE (store->init_error ());
 	nano::account_sets_config config;
-	nano::bootstrap_ascending::account_sets sets{ config, system.stats };
+	nano::bootstrap::account_sets sets{ config, system.stats };
 	sets.priority_up (account);
-	ASSERT_EQ (sets.priority (account), nano::bootstrap_ascending::account_sets::priority_initial);
+	ASSERT_EQ (sets.priority (account), nano::bootstrap::account_sets::priority_initial);
 	sets.priority_down (account);
-	ASSERT_EQ (sets.priority (account), nano::bootstrap_ascending::account_sets::priority_initial / nano::bootstrap_ascending::account_sets::priority_divide);
+	ASSERT_EQ (sets.priority (account), nano::bootstrap::account_sets::priority_initial / nano::bootstrap::account_sets::priority_divide);
 }
 
 TEST (account_sets, priority_down_sat)
@@ -144,7 +144,7 @@ TEST (account_sets, priority_down_sat)
 	auto store = nano::make_store (system.logger, nano::unique_path (), nano::dev::constants);
 	ASSERT_FALSE (store->init_error ());
 	nano::account_sets_config config;
-	nano::bootstrap_ascending::account_sets sets{ config, system.stats };
+	nano::bootstrap::account_sets sets{ config, system.stats };
 	sets.priority_down (account);
 	ASSERT_EQ (0.0, sets.priority (account));
 }
@@ -158,18 +158,18 @@ TEST (account_sets, saturate_priority)
 	auto store = nano::make_store (system.logger, nano::unique_path (), nano::dev::constants);
 	ASSERT_FALSE (store->init_error ());
 	nano::account_sets_config config;
-	nano::bootstrap_ascending::account_sets sets{ config, system.stats };
+	nano::bootstrap::account_sets sets{ config, system.stats };
 	for (int n = 0; n < 1000; ++n)
 	{
 		sets.priority_up (account);
 	}
-	ASSERT_EQ (sets.priority (account), nano::bootstrap_ascending::account_sets::priority_max);
+	ASSERT_EQ (sets.priority (account), nano::bootstrap::account_sets::priority_max);
 }
 
 /**
  * Tests the base case for returning
  */
-TEST (bootstrap_ascending, account_base)
+TEST (bootstrap, account_base)
 {
 	nano::node_flags flags;
 	nano::test::system system{ 1, nano::transport::transport_type::tcp, flags };
@@ -192,7 +192,7 @@ TEST (bootstrap_ascending, account_base)
 /**
  * Tests that bootstrap_ascending will return multiple new blocks in-order
  */
-TEST (bootstrap_ascending, account_inductive)
+TEST (bootstrap, account_inductive)
 {
 	nano::node_flags flags;
 	nano::test::system system{ 1, nano::transport::transport_type::tcp, flags };
@@ -228,7 +228,7 @@ TEST (bootstrap_ascending, account_inductive)
 /**
  * Tests that bootstrap_ascending will return multiple new blocks in-order
  */
-TEST (bootstrap_ascending, trace_base)
+TEST (bootstrap, trace_base)
 {
 	nano::node_flags flags;
 	flags.disable_legacy_bootstrap = true;
@@ -272,7 +272,7 @@ TEST (bootstrap_ascending, trace_base)
 /*
  * Tests that bootstrap will prioritize existing accounts with outdated frontiers
  */
-TEST (bootstrap_ascending, frontier_scan)
+TEST (bootstrap, frontier_scan)
 {
 	nano::test::system system;
 
@@ -368,7 +368,7 @@ TEST (bootstrap_ascending, frontier_scan)
 /*
  * Tests that bootstrap will prioritize not yet existing accounts with pending blocks
  */
-TEST (bootstrap_ascending, frontier_scan_pending)
+TEST (bootstrap, frontier_scan_pending)
 {
 	nano::test::system system;
 
@@ -450,7 +450,7 @@ TEST (bootstrap_ascending, frontier_scan_pending)
 /*
  * Bootstrap should not attempt to prioritize accounts that can't be immediately connected to the ledger (no pending blocks, no existing frontier)
  */
-TEST (bootstrap_ascending, frontier_scan_cannot_prioritize)
+TEST (bootstrap, frontier_scan_cannot_prioritize)
 {
 	nano::test::system system;
 

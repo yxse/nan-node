@@ -58,10 +58,6 @@ namespace transport
 {
 	class tcp_listener;
 }
-namespace bootstrap_ascending
-{
-	class service;
-}
 namespace rocksdb
 {
 } // Declare a namespace rocksdb inside nano so all references to the rocksdb library need to be globally scoped e.g. ::rocksdb::Slice
@@ -214,8 +210,8 @@ public:
 	nano::wallets wallets;
 	std::unique_ptr<nano::backlog_population> backlog_impl;
 	nano::backlog_population & backlog;
-	std::unique_ptr<nano::bootstrap_ascending::service> ascendboot_impl;
-	nano::bootstrap_ascending::service & ascendboot;
+	std::unique_ptr<nano::bootstrap_service> ascendboot_impl;
+	nano::bootstrap_service & ascendboot;
 	nano::websocket_server websocket;
 	nano::epoch_upgrader epoch_upgrader;
 	std::unique_ptr<nano::local_block_broadcaster> local_block_broadcaster_impl;

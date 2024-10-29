@@ -16,6 +16,8 @@ namespace nano
 {
 class active_elections;
 class block_processor;
+class bootstrap_server;
+class bootstrap_service;
 class confirming_set;
 class election;
 class ledger;

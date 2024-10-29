@@ -3,7 +3,7 @@
 #include <boost/multiprecision/cpp_dec_float.hpp>
 #include <boost/multiprecision/cpp_int.hpp>
 
-nano::bootstrap_ascending::frontier_scan::frontier_scan (frontier_scan_config const & config_a, nano::stats & stats_a) :
+nano::bootstrap::frontier_scan::frontier_scan (frontier_scan_config const & config_a, nano::stats & stats_a) :
 	config{ config_a },
 	stats{ stats_a }
 {
@@ -23,7 +23,7 @@ nano::bootstrap_ascending::frontier_scan::frontier_scan (frontier_scan_config co
 	release_assert (!heads.empty ());
 }
 
-nano::account nano::bootstrap_ascending::frontier_scan::next ()
+nano::account nano::bootstrap::frontier_scan::next ()
 {
 	auto const cutoff = std::chrono::steady_clock::now () - config.cooldown;
 
@@ -54,7 +54,7 @@ nano::account nano::bootstrap_ascending::frontier_scan::next ()
 	return { 0 };
 }
 
-bool nano::bootstrap_ascending::frontier_scan::process (nano::account start, std::deque<std::pair<nano::account, nano::block_hash>> const & response)
+bool nano::bootstrap::frontier_scan::process (nano::account start, std::deque<std::pair<nano::account, nano::block_hash>> const & response)
 {
 	debug_assert (std::all_of (response.begin (), response.end (), [&] (auto const & pair) { return pair.first.number () >= start.number (); }));
 
@@ -124,7 +124,7 @@ bool nano::bootstrap_ascending::frontier_scan::process (nano::account start, std
 	return done;
 }
 
-nano::container_info nano::bootstrap_ascending::frontier_scan::container_info () const
+nano::container_info nano::bootstrap::frontier_scan::container_info () const
 {
 	auto collect_progress = [&] () {
 		nano::container_info info;

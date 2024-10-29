@@ -17,7 +17,7 @@
 
 namespace mi = boost::multi_index;
 
-namespace nano::bootstrap_ascending
+namespace nano::bootstrap
 {
 /*
  * Frontier scan divides the account space into ranges and scans each range for outdated frontiers in parallel.

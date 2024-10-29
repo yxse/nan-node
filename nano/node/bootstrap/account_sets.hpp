@@ -21,7 +21,7 @@ namespace nano
 {
 class stats;
 
-namespace bootstrap_ascending
+namespace bootstrap
 {
 	/** This class tracks accounts various account sets which are shared among the multiple bootstrap threads */
 	class account_sets

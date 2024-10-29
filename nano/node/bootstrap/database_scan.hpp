@@ -7,7 +7,7 @@
 
 #include <deque>
 
-namespace nano::bootstrap_ascending
+namespace nano::bootstrap
 {
 struct account_database_scanner
 {
