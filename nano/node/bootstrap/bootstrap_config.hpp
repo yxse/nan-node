@@ -8,7 +8,6 @@ namespace nano
 {
 class tomlconfig;
 
-// TODO: This should be moved next to `account_sets` class
 class account_sets_config final
 {
 public:
@@ -22,7 +21,6 @@ public:
 	std::chrono::milliseconds cooldown{ 1000 * 3 };
 };
 
-// TODO: This should be moved next to `frontier_scan` class
 class frontier_scan_config final
 {
 public:
@@ -35,8 +33,7 @@ public:
 	std::size_t max_pending{ 16 };
 };
 
-// TODO: This should be moved next to `bootstrap_ascending` class
-class bootstrap_ascending_config final
+class bootstrap_config final
 {
 public:
 	nano::error deserialize (nano::tomlconfig & toml);

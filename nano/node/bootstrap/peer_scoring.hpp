@@ -14,15 +14,13 @@ namespace mi = boost::multi_index;
 
 namespace nano
 {
-class bootstrap_ascending_config;
-
 namespace bootstrap
 {
 	// Container for tracking and scoring peers with respect to bootstrapping
 	class peer_scoring
 	{
 	public:
-		peer_scoring (bootstrap_ascending_config const &, nano::network_constants const &);
+		peer_scoring (bootstrap_config const &, nano::network_constants const &);
 
 		// Returns true if channel limit has been exceeded
 		bool try_send_message (std::shared_ptr<nano::transport::channel> channel);
@@ -35,7 +33,7 @@ namespace bootstrap
 		void sync (std::deque<std::shared_ptr<nano::transport::channel>> const & list);
 
 	private:
-		bootstrap_ascending_config const & config;
+		bootstrap_config const & config;
 		nano::network_constants const & network_constants;
 
 	private:

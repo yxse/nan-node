@@ -280,8 +280,8 @@ TEST (bootstrap, frontier_scan)
 	flags.disable_legacy_bootstrap = true;
 	nano::node_config config;
 	// Disable other bootstrap strategies
-	config.bootstrap_ascending.enable_scan = false;
-	config.bootstrap_ascending.enable_dependency_walker = false;
+	config.bootstrap.enable_scan = false;
+	config.bootstrap.enable_dependency_walker = false;
 	// Disable election activation
 	config.backlog_population.enable = false;
 	config.priority_scheduler.enable = false;
@@ -376,8 +376,8 @@ TEST (bootstrap, frontier_scan_pending)
 	flags.disable_legacy_bootstrap = true;
 	nano::node_config config;
 	// Disable other bootstrap strategies
-	config.bootstrap_ascending.enable_scan = false;
-	config.bootstrap_ascending.enable_dependency_walker = false;
+	config.bootstrap.enable_scan = false;
+	config.bootstrap.enable_dependency_walker = false;
 	// Disable election activation
 	config.backlog_population.enable = false;
 	config.priority_scheduler.enable = false;
@@ -458,8 +458,8 @@ TEST (bootstrap, frontier_scan_cannot_prioritize)
 	flags.disable_legacy_bootstrap = true;
 	nano::node_config config;
 	// Disable other bootstrap strategies
-	config.bootstrap_ascending.enable_scan = false;
-	config.bootstrap_ascending.enable_dependency_walker = false;
+	config.bootstrap.enable_scan = false;
+	config.bootstrap.enable_dependency_walker = false;
 	// Disable election activation
 	config.backlog_population.enable = false;
 	config.priority_scheduler.enable = false;

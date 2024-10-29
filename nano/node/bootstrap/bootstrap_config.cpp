@@ -26,10 +26,10 @@ nano::error nano::account_sets_config::serialize (nano::tomlconfig & toml) const
 }
 
 /*
- * bootstrap_ascending_config
+ * bootstrap_config
  */
 
-nano::error nano::bootstrap_ascending_config::deserialize (nano::tomlconfig & toml)
+nano::error nano::bootstrap_config::deserialize (nano::tomlconfig & toml)
 {
 	toml.get ("enable", enable);
 	toml.get ("enable_database_scan", enable_database_scan);
@@ -56,7 +56,7 @@ nano::error nano::bootstrap_ascending_config::deserialize (nano::tomlconfig & to
 	return toml.get_error ();
 }
 
-nano::error nano::bootstrap_ascending_config::serialize (nano::tomlconfig & toml) const
+nano::error nano::bootstrap_config::serialize (nano::tomlconfig & toml) const
 {
 	toml.put ("enable", enable, "Enable or disable the ascending bootstrap. Disabling it is not recommended and will prevent the node from syncing.\ntype:bool");
 	toml.put ("enable_database_scan", enable_database_scan, "Enable or disable the 'database scan` strategy for the ascending bootstrap.\ntype:bool");

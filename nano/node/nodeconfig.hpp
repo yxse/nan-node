@@ -120,7 +120,7 @@ public:
 	std::size_t bootstrap_bandwidth_limit{ 5 * 1024 * 1024 };
 	/** Bootstrap traffic does not need bursts */
 	double bootstrap_bandwidth_burst_ratio{ 1. };
-	nano::bootstrap_ascending_config bootstrap_ascending;
+	nano::bootstrap_config bootstrap;
 	nano::bootstrap_server_config bootstrap_server;
 	std::chrono::milliseconds confirming_set_batch_time{ 250 };
 	bool backup_before_upgrade{ false };

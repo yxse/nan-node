@@ -53,7 +53,7 @@ public:
 	nano::bootstrap::account_sets::info_t info () const;
 
 private: // Dependencies
-	bootstrap_ascending_config const & config;
+	bootstrap_config const & config;
 	nano::network_constants const & network_constants;
 	nano::block_processor & block_processor;
 	nano::ledger & ledger;
