@@ -1,18 +1,12 @@
 #pragma once
 
 #include <nano/lib/epoch.hpp>
+#include <nano/lib/fwd.hpp>
 #include <nano/lib/numbers.hpp>
-#include <nano/lib/stream_fwd.hpp>
 #include <nano/lib/timer.hpp>
 
 #include <cstdint>
 #include <memory>
-
-namespace nano
-{
-enum class block_type : uint8_t;
-class object_stream;
-}
 
 namespace nano
 {

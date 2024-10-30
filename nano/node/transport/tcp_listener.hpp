@@ -1,6 +1,7 @@
 #pragma once
 
 #include <nano/lib/async.hpp>
+#include <nano/lib/fwd.hpp>
 #include <nano/node/endpoint.hpp>
 #include <nano/node/fwd.hpp>
 #include <nano/node/transport/common.hpp>
@@ -19,11 +20,6 @@
 
 namespace mi = boost::multi_index;
 namespace asio = boost::asio;
-
-namespace nano::stat
-{
-enum class dir;
-}
 
 namespace nano::transport
 {

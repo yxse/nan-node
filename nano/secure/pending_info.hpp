@@ -1,19 +1,10 @@
 #pragma once
 
 #include <nano/lib/epoch.hpp>
+#include <nano/lib/fwd.hpp>
 #include <nano/lib/numbers.hpp>
 #include <nano/lib/numbers_templ.hpp>
-#include <nano/lib/stream_fwd.hpp>
-
-namespace nano
-{
-class ledger;
-}
-
-namespace nano::secure
-{
-class transaction;
-}
+#include <nano/secure/fwd.hpp>
 
 namespace nano
 {

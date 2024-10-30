@@ -2,7 +2,9 @@
 
 #include <nano/lib/locks.hpp>
 #include <nano/lib/timer.hpp>
+#include <nano/node/transport/fwd.hpp>
 #include <nano/secure/account_info.hpp>
+#include <nano/store/fwd.hpp>
 
 #include <gtest/gtest.h>
 
@@ -113,15 +115,6 @@
 	{                                 \
 		ASSERT_FALSE (condition);     \
 	}
-
-namespace nano::store
-{
-class component;
-}
-namespace nano::transport::fake
-{
-class channel;
-}
 
 namespace nano::test
 {

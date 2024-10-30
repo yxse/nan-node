@@ -6,6 +6,7 @@
 #include <nano/lib/thread_pool.hpp>
 #include <nano/node/fwd.hpp>
 #include <nano/secure/common.hpp>
+#include <nano/secure/fwd.hpp>
 
 #include <boost/multi_index/hashed_index.hpp>
 #include <boost/multi_index/member.hpp>
@@ -20,14 +21,6 @@
 #include <unordered_set>
 
 namespace mi = boost::multi_index;
-
-namespace nano
-{
-class election;
-class ledger;
-class logger;
-class stats;
-}
 
 namespace nano
 {

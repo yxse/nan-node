@@ -4,15 +4,16 @@
 #include <nano/lib/asio.hpp>
 #include <nano/lib/config.hpp>
 #include <nano/lib/errors.hpp>
+#include <nano/lib/fwd.hpp>
 #include <nano/lib/logging.hpp>
 #include <nano/lib/memory.hpp>
 #include <nano/lib/network_filter.hpp>
 #include <nano/lib/numbers.hpp>
 #include <nano/lib/object_stream.hpp>
 #include <nano/lib/stats_enums.hpp>
-#include <nano/lib/stream_fwd.hpp>
 #include <nano/node/endpoint.hpp>
 #include <nano/secure/common.hpp>
+#include <nano/secure/fwd.hpp>
 
 #include <bitset>
 #include <cstdint>
@@ -23,12 +24,6 @@
 
 namespace nano
 {
-class block;
-class jsonconfig;
-template <typename Key, typename Value>
-class uniquer;
-class vote;
-
 using block_uniquer = uniquer<nano::uint256_union, nano::block>;
 using vote_uniquer = uniquer<nano::block_hash, nano::vote>;
 }

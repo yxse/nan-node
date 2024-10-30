@@ -49,6 +49,7 @@ add_library(
   epochs.hpp
   errors.hpp
   errors.cpp
+  fwd.hpp
   id_dispenser.hpp
   interval.hpp
   ipc.hpp
@@ -97,7 +98,6 @@ add_library(
   stats_enums.cpp
   stats_sinks.hpp
   stream.hpp
-  stream_fwd.hpp
   thread_pool.hpp
   thread_roles.hpp
   thread_roles.cpp

@@ -3,9 +3,9 @@
 #include <nano/lib/block_sideband.hpp>
 #include <nano/lib/epoch.hpp>
 #include <nano/lib/errors.hpp>
+#include <nano/lib/fwd.hpp>
 #include <nano/lib/numbers.hpp>
 #include <nano/lib/optional_ptr.hpp>
-#include <nano/lib/stream_fwd.hpp>
 
 #include <boost/property_tree/ptree_fwd.hpp>
 
@@ -15,14 +15,6 @@ typedef struct blake2b_state__ blake2b_state;
 
 namespace nano
 {
-class block;
-class block_visitor;
-class mutable_block_visitor;
-class object_stream;
-template <typename Key, typename Value>
-class uniquer;
-enum class work_version;
-
 using block_uniquer = uniquer<nano::uint256_union, nano::block>;
 }
 

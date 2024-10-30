@@ -5,19 +5,14 @@
 #include <nano/lib/common.hpp>
 #include <nano/lib/config.hpp>
 #include <nano/lib/epochs.hpp>
+#include <nano/lib/fwd.hpp>
 #include <nano/lib/numbers.hpp>
 #include <nano/lib/object_stream.hpp>
-#include <nano/lib/stream_fwd.hpp>
 #include <nano/lib/timer.hpp>
 #include <nano/lib/utility.hpp>
 
 #include <array>
 #include <unordered_map>
-
-namespace nano::stat
-{
-enum class detail;
-}
 
 namespace nano
 {

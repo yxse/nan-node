@@ -1,23 +1,15 @@
 #pragma once
 
+#include <nano/lib/fwd.hpp>
 #include <nano/lib/locks.hpp>
 #include <nano/lib/logging.hpp>
 #include <nano/lib/numbers.hpp>
+#include <nano/node/fwd.hpp>
+#include <nano/secure/fwd.hpp>
+#include <nano/store/fwd.hpp>
 
 #include <cstdint>
 #include <future>
-
-namespace nano
-{
-enum class epoch : uint8_t;
-class network_params;
-class node;
-class ledger;
-}
-namespace nano::store
-{
-class component;
-}
 
 namespace nano
 {

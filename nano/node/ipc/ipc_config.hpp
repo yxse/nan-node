@@ -2,14 +2,9 @@
 
 #include <nano/lib/config.hpp>
 #include <nano/lib/errors.hpp>
+#include <nano/lib/fwd.hpp>
 
 #include <string>
-
-namespace nano
-{
-class network_constants;
-class tomlconfig;
-}
 
 namespace nano
 {

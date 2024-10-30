@@ -3,6 +3,8 @@
 #include <nano/crypto_lib/random_pool.hpp>
 #include <nano/lib/memory.hpp>
 #include <nano/secure/common.hpp>
+#include <nano/secure/fwd.hpp>
+#include <nano/store/fwd.hpp>
 #include <nano/store/tables.hpp>
 #include <nano/store/transaction.hpp>
 #include <nano/store/versioning.hpp>
@@ -16,26 +18,6 @@
 
 namespace nano
 {
-namespace store
-{
-	class account;
-	class block;
-	class confirmation_height;
-	class final_vote;
-	class online_weight;
-	class peer;
-	class pending;
-	class pruned;
-	class read_transaction;
-	class rep_weight;
-	class transaction;
-	class version;
-	class write_transaction;
-}
-class ledger_cache;
-class ledger_constants;
-enum class tables;
-
 namespace store
 {
 	/**
