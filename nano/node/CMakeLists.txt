@@ -80,6 +80,7 @@ add_library(
   epoch_upgrader.hpp
   epoch_upgrader.cpp
   fair_queue.hpp
+  fwd.hpp
   ipc/action_handler.hpp
   ipc/action_handler.cpp
   ipc/flatbuffers_handler.hpp
@@ -166,6 +167,7 @@ add_library(
   transport/tcp_channel.cpp
   transport/fake.hpp
   transport/fake.cpp
+  transport/fwd.hpp
   transport/inproc.hpp
   transport/inproc.cpp
   transport/message_deserializer.hpp
