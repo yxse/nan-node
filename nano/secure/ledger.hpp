@@ -43,6 +43,7 @@ public:
 	/** Start read-only transaction */
 	secure::read_transaction tx_begin_read () const;
 
+	bool unconfirmed_exists (secure::transaction const &, nano::block_hash const &);
 	nano::uint128_t account_receivable (secure::transaction const &, nano::account const &, bool = false);
 	/**
 	 * Returns the cached vote weight for the given representative.
@@ -83,6 +84,7 @@ public:
 	uint64_t block_count () const;
 	uint64_t account_count () const;
 	uint64_t pruned_count () const;
+	uint64_t backlog_count () const;
 
 	// Returned priority balance is maximum of block balance and previous block balance to handle full account balance send cases
 	// Returned timestamp is the previous block timestamp or the current timestamp if there's no previous block
