@@ -1,5 +1,7 @@
 #pragma once
 
+#include <nano/lib/locks.hpp>
+
 #include <algorithm>
 #include <chrono>
 #include <mutex>

@@ -2,6 +2,7 @@
 
 #include <nano/lib/id_dispenser.hpp>
 #include <nano/lib/logging.hpp>
+#include <nano/lib/numbers_templ.hpp>
 #include <nano/lib/stats_enums.hpp>
 #include <nano/node/election_status.hpp>
 #include <nano/node/vote_with_weight_info.hpp>

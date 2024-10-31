@@ -2,6 +2,7 @@
 #include <nano/lib/blocks.hpp>
 #include <nano/lib/threading.hpp>
 #include <nano/lib/utility.hpp>
+#include <nano/lib/work_version.hpp>
 #include <nano/node/confirming_set.hpp>
 #include <nano/node/election.hpp>
 #include <nano/node/node.hpp>

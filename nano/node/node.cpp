@@ -1,9 +1,11 @@
+#include <nano/lib/block_type.hpp>
 #include <nano/lib/blocks.hpp>
 #include <nano/lib/stream.hpp>
 #include <nano/lib/thread_pool.hpp>
 #include <nano/lib/thread_runner.hpp>
 #include <nano/lib/tomlconfig.hpp>
 #include <nano/lib/utility.hpp>
+#include <nano/lib/work_version.hpp>
 #include <nano/node/active_elections.hpp>
 #include <nano/node/backlog_population.hpp>
 #include <nano/node/bandwidth_limiter.hpp>
@@ -11,10 +13,10 @@
 #include <nano/node/bootstrap/bootstrap_service.hpp>
 #include <nano/node/bootstrap_weights_beta.hpp>
 #include <nano/node/bootstrap_weights_live.hpp>
-#include <nano/node/common.hpp>
 #include <nano/node/confirming_set.hpp>
 #include <nano/node/daemonconfig.hpp>
 #include <nano/node/election_status.hpp>
+#include <nano/node/endpoint.hpp>
 #include <nano/node/local_block_broadcaster.hpp>
 #include <nano/node/local_vote_history.hpp>
 #include <nano/node/make_store.hpp>
@@ -38,6 +40,7 @@
 #include <nano/secure/ledger.hpp>
 #include <nano/secure/ledger_set_any.hpp>
 #include <nano/secure/ledger_set_confirmed.hpp>
+#include <nano/secure/vote.hpp>
 #include <nano/store/component.hpp>
 #include <nano/store/rocksdb/rocksdb.hpp>
 
