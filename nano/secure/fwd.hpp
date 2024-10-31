@@ -3,6 +3,7 @@
 namespace nano
 {
 class account_info;
+class keypair;
 class ledger;
 class ledger_cache;
 class ledger_constants;
