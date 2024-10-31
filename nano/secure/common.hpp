@@ -4,19 +4,12 @@
 #include <nano/lib/blockbuilders.hpp>
 #include <nano/lib/common.hpp>
 #include <nano/lib/config.hpp>
-#include <nano/lib/epoch.hpp>
+#include <nano/lib/epochs.hpp>
+#include <nano/lib/fwd.hpp>
 #include <nano/lib/numbers.hpp>
 #include <nano/lib/object_stream.hpp>
-#include <nano/lib/stats.hpp>
 #include <nano/lib/timer.hpp>
 #include <nano/lib/utility.hpp>
-#include <nano/secure/rep_weights.hpp>
-#include <nano/secure/vote.hpp>
-
-#include <boost/iterator/transform_iterator.hpp>
-#include <boost/optional/optional.hpp>
-#include <boost/property_tree/ptree_fwd.hpp>
-#include <boost/variant/variant.hpp>
 
 #include <array>
 #include <unordered_map>

@@ -1,4 +1,5 @@
 #include <nano/lib/logging.hpp>
+#include <nano/lib/stats.hpp>
 #include <nano/lib/thread_roles.hpp>
 #include <nano/node/confirming_set.hpp>
 #include <nano/secure/ledger.hpp>

@@ -1,4 +1,5 @@
 #include <nano/lib/numbers.hpp>
+#include <nano/lib/numbers_templ.hpp>
 #include <nano/secure/common.hpp>
 
 #include <gtest/gtest.h>

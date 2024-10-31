@@ -3,6 +3,8 @@
 #include <nano/node/bootstrap/bootstrap_config.hpp>
 #include <nano/node/bootstrap_ascending/account_sets.hpp>
 
+#include <boost/range/iterator_range.hpp>
+
 #include <algorithm>
 #include <memory>
 #include <vector>

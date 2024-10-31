@@ -1,9 +1,10 @@
 #include <nano/lib/blocks.hpp>
-#include <nano/node/common.hpp>
+#include <nano/node/endpoint.hpp>
 #include <nano/node/local_vote_history.hpp>
 #include <nano/node/vote_generator.hpp>
 #include <nano/node/vote_spacing.hpp>
 #include <nano/secure/ledger.hpp>
+#include <nano/secure/vote.hpp>
 #include <nano/test_common/system.hpp>
 #include <nano/test_common/testutil.hpp>
 

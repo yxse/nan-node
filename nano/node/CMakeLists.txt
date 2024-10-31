@@ -59,8 +59,6 @@ add_library(
   bootstrap_ascending/service.cpp
   cli.hpp
   cli.cpp
-  common.hpp
-  common.cpp
   confirming_set.hpp
   confirming_set.cpp
   confirmation_solicitor.hpp
@@ -76,9 +74,13 @@ add_library(
   election_behavior.hpp
   election_insertion_result.hpp
   election_status.hpp
+  endpoint.cpp
+  endpoint.hpp
+  endpoint_templ.hpp
   epoch_upgrader.hpp
   epoch_upgrader.cpp
   fair_queue.hpp
+  fwd.hpp
   ipc/action_handler.hpp
   ipc/action_handler.cpp
   ipc/flatbuffers_handler.hpp
@@ -165,6 +167,7 @@ add_library(
   transport/tcp_channel.cpp
   transport/fake.hpp
   transport/fake.cpp
+  transport/fwd.hpp
   transport/inproc.hpp
   transport/inproc.cpp
   transport/message_deserializer.hpp

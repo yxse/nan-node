@@ -3,6 +3,7 @@
 #include <nano/lib/numbers.hpp>
 #include <nano/node/bootstrap/bootstrap_config.hpp>
 #include <nano/node/bootstrap_ascending/common.hpp>
+#include <nano/node/fwd.hpp>
 
 #include <boost/multi_index/hashed_index.hpp>
 #include <boost/multi_index/mem_fun.hpp>
@@ -18,8 +19,6 @@ namespace mi = boost::multi_index;
 
 namespace nano
 {
-class stats;
-
 namespace bootstrap_ascending
 {
 	/** This class tracks accounts various account sets which are shared among the multiple bootstrap threads */

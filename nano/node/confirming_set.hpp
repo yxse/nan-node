@@ -1,10 +1,12 @@
 #pragma once
 
 #include <nano/lib/numbers.hpp>
+#include <nano/lib/numbers_templ.hpp>
 #include <nano/lib/observer_set.hpp>
 #include <nano/lib/thread_pool.hpp>
 #include <nano/node/fwd.hpp>
 #include <nano/secure/common.hpp>
+#include <nano/secure/fwd.hpp>
 
 #include <boost/multi_index/hashed_index.hpp>
 #include <boost/multi_index/member.hpp>

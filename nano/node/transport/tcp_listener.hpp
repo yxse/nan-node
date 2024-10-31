@@ -1,7 +1,8 @@
 #pragma once
 
 #include <nano/lib/async.hpp>
-#include <nano/node/common.hpp>
+#include <nano/lib/fwd.hpp>
+#include <nano/node/endpoint.hpp>
 #include <nano/node/fwd.hpp>
 #include <nano/node/transport/common.hpp>
 

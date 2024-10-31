@@ -35,6 +35,8 @@ endif()
 
 if(MSVC)
   add_definitions(/MP)
+  add_definitions(
+    -D_SILENCE_STDEXT_ARR_ITERS_DEPRECATION_WARNING) # Suppress iterator warning
 endif()
 
 set(CPACK_PACKAGE_VENDOR "Nano Currency")

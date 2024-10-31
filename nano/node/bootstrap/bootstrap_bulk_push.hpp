@@ -1,6 +1,6 @@
 #pragma once
 
-#include <nano/node/common.hpp>
+#include <nano/node/endpoint.hpp>
 
 #include <future>
 
