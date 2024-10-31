@@ -1,9 +1,9 @@
-#include <nano/node/bootstrap_ascending/frontier_scan.hpp>
+#include <nano/node/bootstrap/frontier_scan.hpp>
 
 #include <boost/multiprecision/cpp_dec_float.hpp>
 #include <boost/multiprecision/cpp_int.hpp>
 
-nano::bootstrap_ascending::frontier_scan::frontier_scan (frontier_scan_config const & config_a, nano::stats & stats_a) :
+nano::bootstrap::frontier_scan::frontier_scan (frontier_scan_config const & config_a, nano::stats & stats_a) :
 	config{ config_a },
 	stats{ stats_a }
 {
@@ -23,7 +23,7 @@ nano::bootstrap_ascending::frontier_scan::frontier_scan (frontier_scan_config co
 	release_assert (!heads.empty ());
 }
 
-nano::account nano::bootstrap_ascending::frontier_scan::next ()
+nano::account nano::bootstrap::frontier_scan::next ()
 {
 	auto const cutoff = std::chrono::steady_clock::now () - config.cooldown;
 
@@ -34,7 +34,7 @@ nano::account nano::bootstrap_ascending::frontier_scan::next ()
 
 		if (head.requests < config.consideration_count || head.timestamp < cutoff)
 		{
-			stats.inc (nano::stat::type::bootstrap_ascending_frontiers, (head.requests < config.consideration_count) ? nano::stat::detail::next_by_requests : nano::stat::detail::next_by_timestamp);
+			stats.inc (nano::stat::type::bootstrap_frontier_scan, (head.requests < config.consideration_count) ? nano::stat::detail::next_by_requests : nano::stat::detail::next_by_timestamp);
 
 			debug_assert (head.next.number () >= head.start.number ());
 			debug_assert (head.next.number () < head.end.number ());
@@ -50,15 +50,15 @@ nano::account nano::bootstrap_ascending::frontier_scan::next ()
 		}
 	}
 
-	stats.inc (nano::stat::type::bootstrap_ascending_frontiers, nano::stat::detail::next_none);
+	stats.inc (nano::stat::type::bootstrap_frontier_scan, nano::stat::detail::next_none);
 	return { 0 };
 }
 
-bool nano::bootstrap_ascending::frontier_scan::process (nano::account start, std::deque<std::pair<nano::account, nano::block_hash>> const & response)
+bool nano::bootstrap::frontier_scan::process (nano::account start, std::deque<std::pair<nano::account, nano::block_hash>> const & response)
 {
 	debug_assert (std::all_of (response.begin (), response.end (), [&] (auto const & pair) { return pair.first.number () >= start.number (); }));
 
-	stats.inc (nano::stat::type::bootstrap_ascending_frontiers, nano::stat::detail::process);
+	stats.inc (nano::stat::type::bootstrap_frontier_scan, nano::stat::detail::process);
 
 	// Find the first head with head.start <= start
 	auto & heads_by_start = heads.get<tag_start> ();
@@ -89,14 +89,14 @@ bool nano::bootstrap_ascending::frontier_scan::process (nano::account start, std
 		// Special case for the last frontier head that won't receive larger than max frontier
 		if (entry.completed >= config.consideration_count * 2 && entry.candidates.empty ())
 		{
-			stats.inc (nano::stat::type::bootstrap_ascending_frontiers, nano::stat::detail::done_empty);
+			stats.inc (nano::stat::type::bootstrap_frontier_scan, nano::stat::detail::done_empty);
 			entry.candidates.insert (entry.end);
 		}
 
 		// Check if done
 		if (entry.completed >= config.consideration_count && !entry.candidates.empty ())
 		{
-			stats.inc (nano::stat::type::bootstrap_ascending_frontiers, nano::stat::detail::done);
+			stats.inc (nano::stat::type::bootstrap_frontier_scan, nano::stat::detail::done);
 
 			// Take the last candidate as the next frontier
 			release_assert (!entry.candidates.empty ());
@@ -113,7 +113,7 @@ bool nano::bootstrap_ascending::frontier_scan::process (nano::account start, std
 			// Bound the search range
 			if (entry.next.number () >= entry.end.number ())
 			{
-				stats.inc (nano::stat::type::bootstrap_ascending_frontiers, nano::stat::detail::done_range);
+				stats.inc (nano::stat::type::bootstrap_frontier_scan, nano::stat::detail::done_range);
 				entry.next = entry.start;
 			}
 
@@ -124,7 +124,7 @@ bool nano::bootstrap_ascending::frontier_scan::process (nano::account start, std
 	return done;
 }
 
-nano::container_info nano::bootstrap_ascending::frontier_scan::container_info () const
+nano::container_info nano::bootstrap::frontier_scan::container_info () const
 {
 	auto collect_progress = [&] () {
 		nano::container_info info;

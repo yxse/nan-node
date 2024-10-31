@@ -8,7 +8,6 @@ namespace nano
 {
 class tomlconfig;
 
-// TODO: This should be moved next to `account_sets` class
 class account_sets_config final
 {
 public:
@@ -22,7 +21,6 @@ public:
 	std::chrono::milliseconds cooldown{ 1000 * 3 };
 };
 
-// TODO: This should be moved next to `frontier_scan` class
 class frontier_scan_config final
 {
 public:
@@ -35,8 +33,7 @@ public:
 	std::size_t max_pending{ 16 };
 };
 
-// TODO: This should be moved next to `bootstrap_ascending` class
-class bootstrap_ascending_config final
+class bootstrap_config final
 {
 public:
 	nano::error deserialize (nano::tomlconfig & toml);
@@ -51,7 +48,8 @@ public:
 
 	// Maximum number of un-responded requests per channel, should be lower or equal to bootstrap server max queue size
 	std::size_t channel_limit{ 16 };
-	std::size_t database_rate_limit{ 256 };
+	std::size_t rate_limit{ 500 };
+	std::size_t database_rate_limit{ 250 };
 	std::size_t frontier_rate_limit{ 8 };
 	std::size_t database_warmup_ratio{ 10 };
 	std::size_t max_pull_count{ nano::bootstrap_server::max_blocks };
@@ -60,6 +58,7 @@ public:
 	std::chrono::milliseconds throttle_wait{ 100 };
 	std::size_t block_processor_threshold{ 1000 };
 	std::size_t max_requests{ 1024 };
+	unsigned optimistic_request_percentage{ 75 };
 
 	account_sets_config account_sets;
 	frontier_scan_config frontier_scan;

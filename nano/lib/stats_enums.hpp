@@ -19,7 +19,6 @@ enum class type
 	block,
 	ledger,
 	rollback,
-	bootstrap,
 	network,
 	tcp_server,
 	vote,
@@ -58,15 +57,18 @@ enum class type
 	blockprocessor_source,
 	blockprocessor_result,
 	blockprocessor_overfill,
-	bootstrap_ascending,
-	bootstrap_ascending_accounts,
-	bootstrap_ascending_verify_blocks,
-	bootstrap_ascending_verify_frontiers,
-	bootstrap_ascending_process,
-	bootstrap_ascending_request,
-	bootstrap_ascending_reply,
-	bootstrap_ascending_next,
-	bootstrap_ascending_frontiers,
+	bootstrap,
+	bootstrap_verify,
+	bootstrap_verify_blocks,
+	bootstrap_verify_frontiers,
+	bootstrap_process,
+	bootstrap_request,
+	bootstrap_request_blocks,
+	bootstrap_reply,
+	bootstrap_next,
+	bootstrap_frontiers,
+	bootstrap_account_sets,
+	bootstrap_frontier_scan,
 	bootstrap_server,
 	bootstrap_server_request,
 	bootstrap_server_overfill,
@@ -435,7 +437,7 @@ enum class detail
 	missing_cookie,
 	invalid_genesis,
 
-	// bootstrap_ascending
+	// bootstrap
 	missing_tag,
 	reply,
 	throttled,
@@ -451,10 +453,9 @@ enum class detail
 	duplicate_request,
 	invalid_response_type,
 	timestamp_reset,
-	process_frontiers,
-	dropped_frontiers,
+	processing_frontiers,
+	frontiers_dropped,
 
-	// bootstrap_ascending_accounts
 	prioritize,
 	prioritize_failed,
 	block,
@@ -463,7 +464,6 @@ enum class detail
 	dependency_update,
 	dependency_update_failed,
 
-	// bootstrap_ascending_frontiers
 	done_range,
 	done_empty,
 	next_by_requests,
@@ -490,6 +490,9 @@ enum class detail
 
 	request_blocks,
 	request_account_info,
+
+	safe,
+	base,
 
 	// active
 	started_hinted,

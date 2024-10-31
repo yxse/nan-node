@@ -10,6 +10,9 @@ namespace nano
 class account_sets_config;
 class active_elections;
 class block_processor;
+class bootstrap_config;
+class bootstrap_server;
+class bootstrap_service;
 class confirming_set;
 class election;
 class local_block_broadcaster;

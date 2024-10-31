@@ -1,7 +1,7 @@
 #pragma once
 
 #include <nano/node/bootstrap/bootstrap_config.hpp>
-#include <nano/node/bootstrap_ascending/common.hpp>
+#include <nano/node/bootstrap/common.hpp>
 
 #include <boost/multi_index/hashed_index.hpp>
 #include <boost/multi_index/mem_fun.hpp>
@@ -17,7 +17,7 @@
 
 namespace mi = boost::multi_index;
 
-namespace nano::bootstrap_ascending
+namespace nano::bootstrap
 {
 /*
  * Frontier scan divides the account space into ranges and scans each range for outdated frontiers in parallel.

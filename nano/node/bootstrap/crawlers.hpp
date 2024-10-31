@@ -8,7 +8,7 @@
 
 #include <optional>
 
-namespace nano::bootstrap_ascending
+namespace nano::bootstrap
 {
 struct account_database_crawler
 {
