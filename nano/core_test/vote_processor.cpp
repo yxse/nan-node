@@ -2,10 +2,12 @@
 #include <nano/lib/jsonconfig.hpp>
 #include <nano/node/active_elections.hpp>
 #include <nano/node/election.hpp>
+#include <nano/node/transport/fake.hpp>
 #include <nano/node/transport/inproc.hpp>
 #include <nano/node/vote_processor.hpp>
 #include <nano/node/vote_router.hpp>
 #include <nano/secure/ledger.hpp>
+#include <nano/secure/vote.hpp>
 #include <nano/test_common/chains.hpp>
 #include <nano/test_common/system.hpp>
 #include <nano/test_common/testutil.hpp>
@@ -20,8 +22,8 @@ TEST (vote_processor, codes)
 	auto node_config = system.default_config ();
 	// Disable all election schedulers
 	node_config.backlog_population.enable = false;
-	node_config.hinted_scheduler.enabled = false;
-	node_config.optimistic_scheduler.enabled = false;
+	node_config.hinted_scheduler.enable = false;
+	node_config.optimistic_scheduler.enable = false;
 	auto & node = *system.add_node (node_config);
 
 	auto blocks = nano::test::setup_chain (system, node, 1, nano::dev::genesis_key, false);

@@ -1,24 +1,25 @@
 #pragma once
 
 #include <nano/lib/block_sideband.hpp>
-#include <nano/lib/block_uniquer.hpp>
-#include <nano/lib/config.hpp>
 #include <nano/lib/epoch.hpp>
 #include <nano/lib/errors.hpp>
+#include <nano/lib/fwd.hpp>
 #include <nano/lib/numbers.hpp>
 #include <nano/lib/optional_ptr.hpp>
-#include <nano/lib/stream.hpp>
 
 #include <boost/property_tree/ptree_fwd.hpp>
+
+#include <optional>
 
 typedef struct blake2b_state__ blake2b_state;
 
 namespace nano
 {
-class block_visitor;
-class mutable_block_visitor;
-class object_stream;
+using block_uniquer = uniquer<nano::uint256_union, nano::block>;
+}
 
+namespace nano
+{
 class block
 {
 public:

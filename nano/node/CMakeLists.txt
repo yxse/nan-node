@@ -22,43 +22,27 @@ add_library(
   bandwidth_limiter.cpp
   blockprocessor.hpp
   blockprocessor.cpp
-  bootstrap/block_deserializer.hpp
-  bootstrap/block_deserializer.cpp
-  bootstrap/bootstrap_attempt.hpp
-  bootstrap/bootstrap_attempt.cpp
-  bootstrap/bootstrap_bulk_pull.hpp
-  bootstrap/bootstrap_bulk_pull.cpp
-  bootstrap/bootstrap_bulk_push.hpp
-  bootstrap/bootstrap_bulk_push.cpp
+  bootstrap_weights_beta.hpp
+  bootstrap_weights_live.hpp
+  bootstrap/account_sets.hpp
+  bootstrap/account_sets.cpp
   bootstrap/bootstrap_config.hpp
   bootstrap/bootstrap_config.cpp
-  bootstrap/bootstrap_connections.hpp
-  bootstrap/bootstrap_connections.cpp
-  bootstrap/bootstrap_frontier.hpp
-  bootstrap/bootstrap_frontier.cpp
-  bootstrap/bootstrap_lazy.hpp
-  bootstrap/bootstrap_lazy.cpp
-  bootstrap/bootstrap_legacy.hpp
-  bootstrap/bootstrap_legacy.cpp
-  bootstrap/bootstrap.hpp
-  bootstrap/bootstrap.cpp
   bootstrap/bootstrap_server.hpp
   bootstrap/bootstrap_server.cpp
-  bootstrap_ascending/common.hpp
-  bootstrap_ascending/throttle.hpp
-  bootstrap_ascending/throttle.cpp
-  bootstrap_ascending/account_sets.hpp
-  bootstrap_ascending/account_sets.cpp
-  bootstrap_ascending/database_scan.hpp
-  bootstrap_ascending/database_scan.cpp
-  bootstrap_ascending/peer_scoring.hpp
-  bootstrap_ascending/peer_scoring.cpp
-  bootstrap_ascending/service.hpp
-  bootstrap_ascending/service.cpp
+  bootstrap/bootstrap_service.hpp
+  bootstrap/bootstrap_service.cpp
+  bootstrap/common.hpp
+  bootstrap/throttle.hpp
+  bootstrap/throttle.cpp
+  bootstrap/database_scan.hpp
+  bootstrap/database_scan.cpp
+  bootstrap/frontier_scan.hpp
+  bootstrap/frontier_scan.cpp
+  bootstrap/peer_scoring.hpp
+  bootstrap/peer_scoring.cpp
   cli.hpp
   cli.cpp
-  common.hpp
-  common.cpp
   confirming_set.hpp
   confirming_set.cpp
   confirmation_solicitor.hpp
@@ -74,9 +58,13 @@ add_library(
   election_behavior.hpp
   election_insertion_result.hpp
   election_status.hpp
+  endpoint.cpp
+  endpoint.hpp
+  endpoint_templ.hpp
   epoch_upgrader.hpp
   epoch_upgrader.cpp
   fair_queue.hpp
+  fwd.hpp
   ipc/action_handler.hpp
   ipc/action_handler.cpp
   ipc/flatbuffers_handler.hpp
@@ -157,12 +145,15 @@ add_library(
   scheduler/priority.cpp
   telemetry.hpp
   telemetry.cpp
+  transport/block_deserializer.hpp
+  transport/block_deserializer.cpp
   transport/channel.hpp
   transport/channel.cpp
   transport/tcp_channel.hpp
   transport/tcp_channel.cpp
   transport/fake.hpp
   transport/fake.cpp
+  transport/fwd.hpp
   transport/inproc.hpp
   transport/inproc.cpp
   transport/message_deserializer.hpp

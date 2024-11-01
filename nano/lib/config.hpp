@@ -105,15 +105,11 @@ enum class networks : uint16_t
 
 std::string_view to_string (nano::networks);
 
-enum class work_version
-{
-	unspecified,
-	work_1
-};
 enum class block_type : uint8_t;
 class root;
 class block;
 class block_details;
+enum class work_version;
 
 class work_thresholds
 {

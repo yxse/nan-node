@@ -5,6 +5,7 @@
 #include <nano/lib/thread_roles.hpp>
 #include <nano/lib/threading.hpp>
 #include <nano/lib/work.hpp>
+#include <nano/lib/work_version.hpp>
 #include <nano/node/xorshift.hpp>
 
 #include <future>
@@ -41,7 +42,7 @@ nano::work_pool::work_pool (nano::network_constants & network_constants, unsigne
 	}
 	for (auto i (0u); i < count; ++i)
 	{
-		threads.emplace_back (nano::thread_attributes::get_default (), [this, i] () {
+		threads.emplace_back ([this, i] () {
 			nano::thread_role::set (nano::thread_role::name::work);
 			nano::work_thread_reprioritize ();
 			loop (i);

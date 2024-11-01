@@ -7,7 +7,7 @@ from binascii import hexlify, unhexlify
 
 parser = argparse.ArgumentParser(
     description='Generate bootstrap representative weight file.')
-parser.add_argument("output", type=str, help="output weight file")
+parser.add_argument("network", type=str, help="Network name. Eg Live or Beta")
 parser.add_argument("--rpc", help="node rpc host:port",
                     default="http://[::1]:7076")
 parser.add_argument(
@@ -43,9 +43,12 @@ for rep in reps:
 supplymax /= int('1000000000000000000000000000000')
 supplymax = int(supplymax * args.limit)
 supplymax *= int('1000000000000000000000000000000')
+outputfile = 'bootstrap_weights_' + args.network + '.hpp'
 
-with open(args.output, 'wb') as of:
-    of.write(unhexlify("%032X" % block_height))
+with open(outputfile, 'w') as of:
+    of.write(f"#pragma once\n\n#include <string>\n#include <vector>\n\nnamespace nano::weights\n{{\n")
+    of.write(f"// Bootstrap weights for {args.network} network\n")
+    of.write(f"std::vector<std::pair<std::string, std::string>> preconfigured_weights_{args.network} = {{\n")
 
     total = int(0)
     count = 0
@@ -54,17 +57,20 @@ with open(args.output, 'wb') as of:
             break
         acc_val = int(hexlify(b32decode(rep["account"].encode(
             'utf-8').replace(b"nano_", b"").translate(tbl) + b"====")), 16)
-        acc_bytes = unhexlify("%064X" % (((acc_val >> 36) & ((1 << 256) - 1))))
-        weight_bytes = unhexlify("%032X" % rep["weight"])
-        of.write(acc_bytes)
-        of.write(weight_bytes)
+        
+        of.write(f'\t{{ "{rep["account"]}", "{rep["weight"]}" }},\n')
+                
         total += rep["weight"]
         count += 1
-        print(rep["account"] + ": " + str(rep["weight"]))
+        print(f'{rep["account"]} {rep["weight"]}')
         if total >= supplymax:
             break
-
-    print("wrote %d rep weights" % count)
-    print("max supply %d" % supplymax)
+    of.write(f'}};\n')
+    of.write(f'uint64_t max_blocks_{args.network} = {block_height};\n')
+    of.write(f"}}\n")
+    
+    print(f"wrote {count} rep weights")
+    print(f"max supply {supplymax}")
+    print(f"Weight file generated: {outputfile}")
 
     of.close()

@@ -1,24 +1,20 @@
 #pragma once
 
+#include <nano/lib/fwd.hpp>
 #include <nano/node/transport/fwd.hpp>
 #include <nano/secure/fwd.hpp>
 #include <nano/store/fwd.hpp>
 
-// TODO: Move to lib/fwd.hpp
 namespace nano
 {
-class block;
-class container_info;
-class thread_pool;
-}
-
-namespace nano
-{
+class account_sets_config;
 class active_elections;
 class block_processor;
+class bootstrap_config;
+class bootstrap_server;
+class bootstrap_service;
 class confirming_set;
 class election;
-class ledger;
 class local_block_broadcaster;
 class local_vote_history;
 class logger;
@@ -37,6 +33,8 @@ class telemetry;
 class unchecked_map;
 class stats;
 class vote_cache;
+enum class vote_code;
+enum class vote_source;
 class vote_generator;
 class vote_processor;
 class vote_router;

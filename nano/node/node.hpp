@@ -5,9 +5,6 @@
 #include <nano/lib/logging.hpp>
 #include <nano/lib/stats.hpp>
 #include <nano/lib/work.hpp>
-#include <nano/node/bootstrap/bootstrap.hpp>
-#include <nano/node/bootstrap/bootstrap_attempt.hpp>
-#include <nano/node/bootstrap/bootstrap_server.hpp>
 #include <nano/node/distributed_work_factory.hpp>
 #include <nano/node/epoch_upgrader.hpp>
 #include <nano/node/fwd.hpp>
@@ -59,10 +56,6 @@ namespace transport
 {
 	class tcp_listener;
 }
-namespace bootstrap_ascending
-{
-	class service;
-}
 namespace rocksdb
 {
 } // Declare a namespace rocksdb inside nano so all references to the rocksdb library need to be globally scoped e.g. ::rocksdb::Slice
@@ -102,10 +95,8 @@ public:
 	std::pair<nano::uint128_t, nano::uint128_t> balance_pending (nano::account const &, bool only_confirmed);
 	nano::uint128_t weight (nano::account const &);
 	nano::uint128_t minimum_principal_weight ();
-	void ongoing_bootstrap ();
 	void backup_wallet ();
 	void search_receivable_all ();
-	void bootstrap_wallet ();
 	bool collect_ledger_pruning_targets (std::deque<nano::block_hash> &, nano::account &, uint64_t const, uint64_t const, uint64_t const);
 	void ledger_pruning (uint64_t const, bool);
 	void ongoing_ledger_pruning ();
@@ -178,8 +169,6 @@ public:
 	nano::network network;
 	std::unique_ptr<nano::telemetry> telemetry_impl;
 	nano::telemetry & telemetry;
-	nano::bootstrap_initiator bootstrap_initiator;
-	nano::bootstrap_server bootstrap_server;
 	std::unique_ptr<nano::transport::tcp_listener> tcp_listener_impl;
 	nano::transport::tcp_listener & tcp_listener;
 	std::filesystem::path application_path;
@@ -218,8 +207,10 @@ public:
 	nano::wallets wallets;
 	std::unique_ptr<nano::backlog_population> backlog_impl;
 	nano::backlog_population & backlog;
-	std::unique_ptr<nano::bootstrap_ascending::service> ascendboot_impl;
-	nano::bootstrap_ascending::service & ascendboot;
+	std::unique_ptr<nano::bootstrap_server> bootstrap_server_impl;
+	nano::bootstrap_server & bootstrap_server;
+	std::unique_ptr<nano::bootstrap_service> bootstrap_impl;
+	nano::bootstrap_service & bootstrap;
 	nano::websocket_server websocket;
 	nano::epoch_upgrader epoch_upgrader;
 	std::unique_ptr<nano::local_block_broadcaster> local_block_broadcaster_impl;

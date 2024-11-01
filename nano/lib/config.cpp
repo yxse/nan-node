@@ -1,8 +1,10 @@
 #include <nano/crypto/blake2/blake2.h>
+#include <nano/lib/block_type.hpp>
 #include <nano/lib/blocks.hpp>
 #include <nano/lib/config.hpp>
 #include <nano/lib/env.hpp>
 #include <nano/lib/logging.hpp>
+#include <nano/lib/work_version.hpp>
 
 #include <boost/format.hpp>
 #include <boost/lexical_cast.hpp>

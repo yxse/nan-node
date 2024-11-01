@@ -8,6 +8,8 @@
 #include <nano/node/node.hpp>
 #include <nano/secure/ledger.hpp>
 
+#include <boost/range/iterator_range.hpp>
+
 nano::local_block_broadcaster::local_block_broadcaster (local_block_broadcaster_config const & config_a, nano::node & node_a, nano::block_processor & block_processor_a, nano::network & network_a, nano::confirming_set & confirming_set_a, nano::stats & stats_a, nano::logger & logger_a, bool enabled_a) :
 	config{ config_a },
 	node{ node_a },

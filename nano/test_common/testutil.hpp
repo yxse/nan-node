@@ -2,9 +2,9 @@
 
 #include <nano/lib/locks.hpp>
 #include <nano/lib/timer.hpp>
-#include <nano/node/transport/channel.hpp>
-#include <nano/node/transport/fake.hpp>
+#include <nano/node/transport/fwd.hpp>
 #include <nano/secure/account_info.hpp>
+#include <nano/store/fwd.hpp>
 
 #include <gtest/gtest.h>
 

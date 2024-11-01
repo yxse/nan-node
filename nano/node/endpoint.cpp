@@ -2,10 +2,11 @@
 #include <nano/lib/memory.hpp>
 #include <nano/lib/stream.hpp>
 #include <nano/node/active_elections.hpp>
-#include <nano/node/common.hpp>
 #include <nano/node/election.hpp>
+#include <nano/node/endpoint.hpp>
 #include <nano/node/network.hpp>
 #include <nano/node/wallet.hpp>
+#include <nano/secure/vote.hpp>
 
 #include <boost/format.hpp>
 
@@ -24,6 +25,12 @@ uint64_t nano::ip_address_hash_raw (boost::asio::ip::address const & ip_a, uint1
 	}
 	blake2b_update (&state, address.bytes.data (), address.bytes.size ());
 	blake2b_final (&state, &result, sizeof (result));
+	return result;
+}
+
+uint64_t nano::endpoint_hash_raw (nano::endpoint const & endpoint_a)
+{
+	uint64_t result (nano::ip_address_hash_raw (endpoint_a.address (), endpoint_a.port ()));
 	return result;
 }
 
