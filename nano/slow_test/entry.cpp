@@ -1,3 +1,4 @@
+#include <nano/lib/files.hpp>
 #include <nano/lib/logging.hpp>
 #include <nano/lib/memory.hpp>
 

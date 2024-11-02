@@ -51,6 +51,8 @@ add_library(
   epochs.hpp
   errors.hpp
   errors.cpp
+  files.hpp
+  files.cpp
   fwd.hpp
   id_dispenser.hpp
   interval.hpp

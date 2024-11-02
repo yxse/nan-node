@@ -1,5 +1,6 @@
 #include <nano/lib/cli.hpp>
 #include <nano/lib/errors.hpp>
+#include <nano/lib/files.hpp>
 #include <nano/lib/logging.hpp>
 #include <nano/lib/signal_manager.hpp>
 #include <nano/lib/thread_runner.hpp>

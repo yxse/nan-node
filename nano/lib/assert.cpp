@@ -1,6 +1,10 @@
 #include <nano/lib/assert.hpp>
+#include <nano/lib/files.hpp>
 #include <nano/lib/stacktrace.hpp>
 
+#include <boost/dll/runtime_symbol_info.hpp>
+
+#include <fstream>
 #include <iostream>
 
 /*
