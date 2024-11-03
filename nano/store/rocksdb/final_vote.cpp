@@ -35,6 +35,18 @@ std::vector<nano::block_hash> nano::store::rocksdb::final_vote::get (store::tran
 	return result;
 }
 
+std::optional<nano::block_hash> nano::store::rocksdb::final_vote::get (store::transaction const & transaction, nano::qualified_root const & qualified_root_a)
+{
+	nano::store::rocksdb::db_val result;
+	auto status = store.get (transaction, tables::final_votes, qualified_root_a, result);
+	std::optional<nano::block_hash> final_vote_hash;
+	if (store.success (status))
+	{
+		final_vote_hash = static_cast<nano::block_hash> (result);
+	}
+	return final_vote_hash;
+}
+
 void nano::store::rocksdb::final_vote::del (store::write_transaction const & transaction, nano::root const & root)
 {
 	std::vector<nano::qualified_root> final_vote_qualified_roots;
