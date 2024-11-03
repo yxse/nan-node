@@ -2157,6 +2157,13 @@ TEST (node, epoch_conflict_confirm)
 	nano::keypair key;
 	nano::keypair epoch_signer (nano::dev::genesis_key);
 	nano::state_block_builder builder;
+
+	// Node 1 is the voting node
+	// Send sends to an account we control: send -> open -> change
+	// Send2 sends to an account with public key of the open block
+	// Epoch open qualified root: (open, 0) on account with the same public key as the hash of the open block
+	// Epoch open and change have the same root!
+
 	auto send = builder.make_block ()
 				.account (nano::dev::genesis_key.pub)
 				.previous (nano::dev::genesis->hash ())
@@ -2203,34 +2210,30 @@ TEST (node, epoch_conflict_confirm)
 					  .work (*system.work.generate (open->hash ()))
 					  .build ();
 
-	// Process initial blocks on node1
+	// Process initial blocks
+	ASSERT_TRUE (nano::test::process (node0, { send, send2, open }));
 	ASSERT_TRUE (nano::test::process (node1, { send, send2, open }));
 
-	// Confirm open block in node1 to allow generating votes
-	nano::test::confirm (node1.ledger, open);
-
-	// Process initial blocks on node0
-	ASSERT_TRUE (nano::test::process (node0, { send, send2, open }));
-
-	// Process conflicting blocks on node 0 as blocks coming from live network
+	// Process conflicting blocks on nodes as blocks coming from live network
 	ASSERT_TRUE (nano::test::process_live (node0, { change, epoch_open }));
+	ASSERT_TRUE (nano::test::process_live (node1, { change, epoch_open }));
 
 	// Ensure blocks were propagated to both nodes
 	ASSERT_TIMELY (5s, nano::test::exists (node0, { change, epoch_open }));
 	ASSERT_TIMELY (5s, nano::test::exists (node1, { change, epoch_open }));
 
 	// Confirm initial blocks in node1 to allow generating votes later
-	ASSERT_TRUE (nano::test::start_elections (system, node1, { change, epoch_open, send2 }, true));
+	nano::test::confirm (node1, { change, epoch_open, send2 });
 	ASSERT_TIMELY (5s, nano::test::confirmed (node1, { change, epoch_open, send2 }));
 
-	// Start elections for node0 for conflicting change and epoch_open blocks (those two blocks have the same root)
+	// Start elections on node0 for conflicting change and epoch_open blocks (these two blocks have the same root)
 	ASSERT_TRUE (nano::test::activate (node0, { change, epoch_open }));
 	ASSERT_TIMELY (5s, nano::test::active (node0, { change, epoch_open }));
 
-	// Make node1 a representative
+	// Make node1 a representative so it can vote for both blocks
 	system.wallet (1)->insert_adhoc (nano::dev::genesis_key.prv);
 
-	// Ensure the elections for conflicting blocks have completed
+	// Ensure the elections for conflicting blocks have started
 	ASSERT_TIMELY (5s, nano::test::active (node0, { change, epoch_open }));
 
 	// Ensure both conflicting blocks were successfully processed and confirmed

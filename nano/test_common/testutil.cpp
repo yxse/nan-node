@@ -124,6 +124,11 @@ bool nano::test::exists (nano::node & node, std::vector<std::shared_ptr<nano::bl
 	return exists (node, blocks_to_hashes (blocks));
 }
 
+void nano::test::confirm (nano::node & node, std::vector<std::shared_ptr<nano::block>> const blocks)
+{
+	confirm (node.ledger, blocks);
+}
+
 void nano::test::confirm (nano::ledger & ledger, std::vector<std::shared_ptr<nano::block>> const blocks)
 {
 	for (auto const block : blocks)
