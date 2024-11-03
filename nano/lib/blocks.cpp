@@ -210,7 +210,7 @@ nano::block_hash nano::block::full_hash () const
 
 nano::block_sideband const & nano::block::sideband () const
 {
-	debug_assert (sideband_m.is_initialized ());
+	release_assert (sideband_m.is_initialized ());
 	return *sideband_m;
 }
 
@@ -569,6 +569,11 @@ nano::send_block::send_block (bool & error_a, boost::property_tree::ptree const 
 	}
 }
 
+std::shared_ptr<nano::block> nano::send_block::clone () const
+{
+	return std::make_shared<nano::send_block> (*this);
+}
+
 bool nano::send_block::operator== (nano::block const & other_a) const
 {
 	return blocks_equal (*this, other_a);
@@ -756,6 +761,11 @@ nano::open_block::open_block (bool & error_a, boost::property_tree::ptree const 
 			error_a = true;
 		}
 	}
+}
+
+std::shared_ptr<nano::block> nano::open_block::clone () const
+{
+	return std::make_shared<nano::open_block> (*this);
 }
 
 void nano::open_block::generate_hash (blake2b_state & hash_a) const
@@ -1027,6 +1037,11 @@ nano::change_block::change_block (bool & error_a, boost::property_tree::ptree co
 			error_a = true;
 		}
 	}
+}
+
+std::shared_ptr<nano::block> nano::change_block::clone () const
+{
+	return std::make_shared<nano::change_block> (*this);
 }
 
 void nano::change_block::generate_hash (blake2b_state & hash_a) const
@@ -1324,6 +1339,11 @@ nano::state_block::state_block (bool & error_a, boost::property_tree::ptree cons
 			error_a = true;
 		}
 	}
+}
+
+std::shared_ptr<nano::block> nano::state_block::clone () const
+{
+	return std::make_shared<nano::state_block> (*this);
 }
 
 void nano::state_block::generate_hash (blake2b_state & hash_a) const
@@ -1790,6 +1810,11 @@ nano::receive_block::receive_block (bool & error_a, boost::property_tree::ptree 
 			error_a = true;
 		}
 	}
+}
+
+std::shared_ptr<nano::block> nano::receive_block::clone () const
+{
+	return std::make_shared<nano::receive_block> (*this);
 }
 
 void nano::receive_block::generate_hash (blake2b_state & hash_a) const
