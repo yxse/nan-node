@@ -22,7 +22,6 @@ public:
 
 public:
 	virtual bool put (store::write_transaction const & transaction_a, nano::qualified_root const & root_a, nano::block_hash const & hash_a) = 0;
-	virtual std::vector<nano::block_hash> get (store::transaction const & transaction_a, nano::root const & root_a) = 0;
 	virtual std::optional<nano::block_hash> get (store::transaction const & transaction_a, nano::qualified_root const & qualified_root_a) = 0;
 	virtual void del (store::write_transaction const & transaction_a, nano::root const & root_a) = 0;
 	virtual size_t count (store::transaction const & transaction_a) const = 0;

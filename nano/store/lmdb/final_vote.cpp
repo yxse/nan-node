@@ -23,17 +23,6 @@ bool nano::store::lmdb::final_vote::put (store::write_transaction const & transa
 	return result;
 }
 
-std::vector<nano::block_hash> nano::store::lmdb::final_vote::get (store::transaction const & transaction, nano::root const & root_a)
-{
-	std::vector<nano::block_hash> result;
-	nano::qualified_root key_start{ root_a.raw, 0 };
-	for (auto i = begin (transaction, key_start), n = end (transaction); i != n && nano::qualified_root{ i->first }.root () == root_a; ++i)
-	{
-		result.push_back (i->second);
-	}
-	return result;
-}
-
 std::optional<nano::block_hash> nano::store::lmdb::final_vote::get (store::transaction const & transaction, nano::qualified_root const & qualified_root_a)
 {
 	nano::store::lmdb::db_val result;
