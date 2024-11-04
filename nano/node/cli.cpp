@@ -646,10 +646,10 @@ std::error_code nano::handle_node_options (boost::program_options::variables_map
 			{
 				auto root_str = root_it->second.as<std::string> ();
 				auto transaction (node.node->store.tx_begin_write ());
-				nano::root root;
+				nano::qualified_root root;
 				if (!root.decode_hex (root_str))
 				{
-					node.node->store.final_vote.clear (transaction, root);
+					node.node->store.final_vote.del (transaction, root);
 					std::cout << "Successfully cleared final votes" << std::endl;
 				}
 				else
