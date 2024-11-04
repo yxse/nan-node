@@ -35,29 +35,15 @@ std::optional<nano::block_hash> nano::store::lmdb::final_vote::get (store::trans
 	return final_vote_hash;
 }
 
-void nano::store::lmdb::final_vote::del (store::write_transaction const & transaction, nano::root const & root)
+void nano::store::lmdb::final_vote::del (store::write_transaction const & transaction, nano::qualified_root const & root)
 {
-	std::vector<nano::qualified_root> final_vote_qualified_roots;
-	for (auto i = begin (transaction, nano::qualified_root{ root.raw, 0 }), n = end (transaction); i != n && nano::qualified_root{ i->first }.root () == root; ++i)
-	{
-		final_vote_qualified_roots.push_back (i->first);
-	}
-
-	for (auto & final_vote_qualified_root : final_vote_qualified_roots)
-	{
-		auto status = store.del (transaction, tables::final_votes, final_vote_qualified_root);
-		store.release_assert_success (status);
-	}
+	auto status = store.del (transaction, tables::final_votes, root);
+	store.release_assert_success (status);
 }
 
 size_t nano::store::lmdb::final_vote::count (store::transaction const & transaction_a) const
 {
 	return store.count (transaction_a, tables::final_votes);
-}
-
-void nano::store::lmdb::final_vote::clear (store::write_transaction const & transaction_a, nano::root const & root_a)
-{
-	del (transaction_a, root_a);
 }
 
 void nano::store::lmdb::final_vote::clear (store::write_transaction const & transaction_a)
