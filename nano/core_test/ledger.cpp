@@ -5861,3 +5861,38 @@ TEST (ledger_transaction, write_wait_order)
 	// Signal to continue and drop the third transaction
 	latch3.count_down ();
 }
+
+TEST (ledger_transaction, multithreaded_interleaving)
+{
+	nano::test::system system;
+
+	auto ctx = nano::test::ledger_empty ();
+
+	int constexpr num_threads = 2;
+	int constexpr num_iterations = 10;
+	int constexpr num_blocks = 10;
+
+	std::deque<std::thread> threads;
+	for (int i = 0; i < num_threads; ++i)
+	{
+		threads.emplace_back ([&] {
+			for (int n = 0; n < num_iterations; ++n)
+			{
+				auto tx = ctx.ledger ().tx_begin_write (nano::store::writer::testing);
+				for (unsigned k = 0; k < num_blocks; ++k)
+				{
+					ctx.store ().account.put (tx, nano::account{ k }, nano::account_info{});
+				}
+				for (unsigned k = 0; k < num_blocks; ++k)
+				{
+					ctx.store ().account.del (tx, nano::account{ k });
+				}
+			}
+		});
+	}
+
+	for (auto & thread : threads)
+	{
+		thread.join ();
+	}
+}
