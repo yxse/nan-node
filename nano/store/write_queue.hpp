@@ -70,7 +70,9 @@ private:
 	void release (writer writer);
 
 private:
-	std::deque<writer> queue;
+	uint64_t next{ 0 };
+	using entry = std::pair<writer, uint64_t>; // uint64_t is a unique id for each write_guard
+	std::deque<entry> queue;
 	mutable nano::mutex mutex;
 	nano::condition_variable condition;
 
