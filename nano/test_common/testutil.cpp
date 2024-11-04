@@ -242,6 +242,13 @@ std::vector<nano::block_hash> nano::test::blocks_to_hashes (std::vector<std::sha
 	return hashes;
 }
 
+std::vector<std::shared_ptr<nano::block>> nano::test::clone (std::vector<std::shared_ptr<nano::block>> blocks)
+{
+	std::vector<std::shared_ptr<nano::block>> clones;
+	std::transform (blocks.begin (), blocks.end (), std::back_inserter (clones), [] (auto & block) { return block->clone (); });
+	return clones;
+}
+
 std::shared_ptr<nano::transport::fake::channel> nano::test::fake_channel (nano::node & node, nano::account node_id)
 {
 	auto channel = std::make_shared<nano::transport::fake::channel> (node);

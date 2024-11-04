@@ -391,6 +391,10 @@ namespace test
 	 */
 	std::vector<nano::block_hash> blocks_to_hashes (std::vector<std::shared_ptr<nano::block>> blocks);
 	/*
+	 * Clones list of blocks
+	 */
+	std::vector<std::shared_ptr<nano::block>> clone (std::vector<std::shared_ptr<nano::block>> blocks);
+	/*
 	 * Creates a new fake channel associated with `node`
 	 */
 	std::shared_ptr<nano::transport::fake::channel> fake_channel (nano::node & node, nano::account node_id = { 0 });

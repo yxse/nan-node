@@ -2211,12 +2211,12 @@ TEST (node, epoch_conflict_confirm)
 					  .build ();
 
 	// Process initial blocks
-	ASSERT_TRUE (nano::test::process (node0, { send, send2, open }));
-	ASSERT_TRUE (nano::test::process (node1, { send, send2, open }));
+	ASSERT_TRUE (nano::test::process (node0, nano::test::clone ({ send, send2, open })));
+	ASSERT_TRUE (nano::test::process (node1, nano::test::clone ({ send, send2, open })));
 
 	// Process conflicting blocks on nodes as blocks coming from live network
-	ASSERT_TRUE (nano::test::process_live (node0, { change, epoch_open }));
-	ASSERT_TRUE (nano::test::process_live (node1, { change, epoch_open }));
+	ASSERT_TRUE (nano::test::process_live (node0, nano::test::clone ({ change, epoch_open })));
+	ASSERT_TRUE (nano::test::process_live (node1, nano::test::clone ({ change, epoch_open })));
 
 	// Ensure blocks were propagated to both nodes
 	ASSERT_TIMELY (5s, nano::test::exists (node0, { change, epoch_open }));
