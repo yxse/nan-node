@@ -1108,6 +1108,14 @@ nano::container_info nano::bootstrap_service::container_info () const
 {
 	nano::lock_guard<nano::mutex> lock{ mutex };
 
+	auto collect_limiters = [this] () {
+		nano::container_info info;
+		info.put ("total", limiter.size ());
+		info.put ("database", database_limiter.size ());
+		info.put ("frontiers", frontiers_limiter.size ());
+		return info;
+	};
+
 	nano::container_info info;
 	info.put ("tags", tags);
 	info.put ("throttle", throttle.size ());
@@ -1117,6 +1125,7 @@ nano::container_info nano::bootstrap_service::container_info () const
 	info.add ("frontiers", frontiers.container_info ());
 	info.add ("workers", workers.container_info ());
 	info.add ("peers", scoring.container_info ());
+	info.add ("limiters", collect_limiters ());
 	return info;
 }
 
