@@ -1,5 +1,7 @@
 #pragma once
 
+#include <nano/lib/stats.hpp>
+
 namespace nano::transport
 {
 /**
@@ -10,4 +12,6 @@ enum class traffic_type
 	generic,
 	bootstrap, // Ascending bootstrap (asc_pull_ack, asc_pull_req) traffic
 };
+
+nano::stat::detail to_stat_detail (traffic_type);
 }

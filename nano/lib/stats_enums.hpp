@@ -13,14 +13,12 @@ enum class type
 	_invalid = 0, // Default value, should not be used
 
 	test,
-	traffic_tcp,
 	error,
 	message,
 	block,
 	ledger,
 	rollback,
 	network,
-	tcp_server,
 	vote,
 	vote_processor,
 	vote_processor_tier,
@@ -31,11 +29,14 @@ enum class type
 	http_callback,
 	ipc,
 	tcp,
+	tcp_server,
 	tcp_channels,
 	tcp_channels_rejected,
 	tcp_channels_purge,
 	tcp_listener,
 	tcp_listener_rejected,
+	traffic_tcp,
+	traffic_tcp_type,
 	channel,
 	socket,
 	confirmation_height,
@@ -293,6 +294,9 @@ enum class detail
 	merge_peer,
 	reachout_live,
 	reachout_cached,
+
+	// traffic
+	generic,
 
 	// tcp
 	tcp_write_drop,
