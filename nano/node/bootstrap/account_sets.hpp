@@ -30,7 +30,7 @@ namespace bootstrap
 		static double constexpr priority_divide = 2.0;
 		static double constexpr priority_max = 128.0;
 		static double constexpr priority_cutoff = 0.15;
-		static unsigned constexpr max_fails = 2;
+		static unsigned constexpr max_fails = 3;
 
 	public:
 		account_sets (account_sets_config const &, nano::stats &);
