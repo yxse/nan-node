@@ -186,17 +186,18 @@ void nano::transport::tcp_socket::write_queued_messages ()
 		return;
 	}
 
-	auto next = send_queue.pop ();
-	if (!next)
+	auto maybe_next = send_queue.pop ();
+	if (!maybe_next)
 	{
 		return;
 	}
+	auto const & [next, type] = *maybe_next;
 
 	set_default_timeout ();
 
 	write_in_progress = true;
-	nano::async_write (raw_socket, next->buffer,
-	boost::asio::bind_executor (strand, [this_l = shared_from_this (), next /* `next` object keeps buffer in scope */] (boost::system::error_code ec, std::size_t size) {
+	nano::async_write (raw_socket, next.buffer,
+	boost::asio::bind_executor (strand, [this_l = shared_from_this (), next /* `next` object keeps buffer in scope */, type] (boost::system::error_code ec, std::size_t size) {
 		debug_assert (this_l->strand.running_in_this_thread ());
 
 		auto node_l = this_l->node_w.lock ();
@@ -214,12 +215,13 @@ void nano::transport::tcp_socket::write_queued_messages ()
 		else
 		{
 			node_l->stats.add (nano::stat::type::traffic_tcp, nano::stat::detail::all, nano::stat::dir::out, size, /* aggregate all */ true);
+			node_l->stats.add (nano::stat::type::traffic_tcp_type, to_stat_detail (type), nano::stat::dir::out, size);
 			this_l->set_last_completion ();
 		}
 
-		if (next->callback)
+		if (next.callback)
 		{
-			next->callback (ec, size);
+			next.callback (ec, size);
 		}
 
 		if (!ec)
@@ -436,17 +438,17 @@ bool nano::transport::socket_queue::insert (const buffer_t & buffer, callback_t 
 	return false; // Not queued
 }
 
-std::optional<nano::transport::socket_queue::entry> nano::transport::socket_queue::pop ()
+auto nano::transport::socket_queue::pop () -> std::optional<result_t>
 {
 	nano::lock_guard<nano::mutex> guard{ mutex };
 
-	auto try_pop = [this] (nano::transport::traffic_type type) -> std::optional<entry> {
+	auto try_pop = [this] (nano::transport::traffic_type type) -> std::optional<result_t> {
 		auto & que = queues[type];
 		if (!que.empty ())
 		{
 			auto item = que.front ();
 			que.pop ();
-			return item;
+			return std::make_pair (item, type);
 		}
 		return std::nullopt;
 	};
