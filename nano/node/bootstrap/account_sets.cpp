@@ -105,18 +105,20 @@ void nano::bootstrap::account_sets::block (nano::account const & account, nano::
 {
 	debug_assert (!account.is_zero ());
 
-	stats.inc (nano::stat::type::bootstrap_account_sets, nano::stat::detail::block);
+	auto erased = priorities.get<tag_account> ().erase (account);
+	if (erased > 0)
+	{
+		stats.inc (nano::stat::type::bootstrap_account_sets, nano::stat::detail::erase_by_blocking);
+		stats.inc (nano::stat::type::bootstrap_account_sets, nano::stat::detail::block);
 
-	auto existing = priorities.get<tag_account> ().find (account);
-	auto entry = (existing == priorities.get<tag_account> ().end ()) ? priority_entry{ account, 0 } : *existing;
-
-	priorities.get<tag_account> ().erase (account);
-	stats.inc (nano::stat::type::bootstrap_account_sets, nano::stat::detail::erase_by_blocking);
-
-	blocking.get<tag_account> ().insert ({ entry, dependency });
-	stats.inc (nano::stat::type::bootstrap_account_sets, nano::stat::detail::blocking_insert);
-
-	trim_overflow ();
+		debug_assert (blocking.get<tag_account> ().count (account) == 0);
+		blocking.get<tag_account> ().insert ({ account, dependency });
+		trim_overflow ();
+	}
+	else
+	{
+		stats.inc (nano::stat::type::bootstrap_account_sets, nano::stat::detail::block_failed);
+	}
 }
 
 void nano::bootstrap::account_sets::unblock (nano::account const & account, std::optional<nano::block_hash> const & hash)
@@ -131,19 +133,11 @@ void nano::bootstrap::account_sets::unblock (nano::account const & account, std:
 	if (existing != blocking.get<tag_account> ().end () && (!hash || existing->dependency == *hash))
 	{
 		stats.inc (nano::stat::type::bootstrap_account_sets, nano::stat::detail::unblock);
+		stats.inc (nano::stat::type::bootstrap_account_sets, nano::stat::detail::priority_unblocked);
 
 		debug_assert (priorities.get<tag_account> ().count (account) == 0);
-		if (!existing->original_entry.account.is_zero ())
-		{
-			debug_assert (existing->original_entry.account == account);
-			priorities.get<tag_account> ().insert (existing->original_entry);
-		}
-		else
-		{
-			priorities.get<tag_account> ().insert ({ account, account_sets::priority_initial });
-		}
+		priorities.get<tag_account> ().insert ({ account, account_sets::priority_initial });
 		blocking.get<tag_account> ().erase (account);
-
 		trim_overflow ();
 	}
 	else

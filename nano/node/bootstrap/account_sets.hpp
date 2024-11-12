@@ -95,25 +95,16 @@ namespace bootstrap
 			nano::account account;
 			double priority;
 			unsigned fails{ 0 };
-			id_t id{ generate_id () }; // Uniformly distributed, used for random querying
 			std::chrono::steady_clock::time_point timestamp{};
+			id_t id{ generate_id () }; // Uniformly distributed, used for random querying
 		};
 
 		struct blocking_entry
 		{
-			priority_entry original_entry;
+			nano::account account;
 			nano::block_hash dependency;
 			nano::account dependency_account{ 0 };
 			id_t id{ generate_id () }; // Uniformly distributed, used for random querying
-
-			nano::account account () const
-			{
-				return original_entry.account;
-			}
-			double priority () const
-			{
-				return original_entry.priority;
-			}
 		};
 
 		// clang-format off
@@ -142,7 +133,7 @@ namespace bootstrap
 		mi::indexed_by<
 			mi::sequenced<mi::tag<tag_sequenced>>,
 			mi::ordered_unique<mi::tag<tag_account>,
-				mi::const_mem_fun<blocking_entry, nano::account, &blocking_entry::account>>,
+				mi::member<blocking_entry, nano::account, &blocking_entry::account>>,
 			mi::ordered_non_unique<mi::tag<tag_dependency>,
 				mi::member<blocking_entry, nano::block_hash, &blocking_entry::dependency>>,
 			mi::ordered_non_unique<mi::tag<tag_dependency_account>,
