@@ -21,6 +21,8 @@ add_library(
   ${platform_sources}
   asio.hpp
   asio.cpp
+  assert.hpp
+  assert.cpp
   block_sideband.hpp
   block_sideband.cpp
   block_type.hpp
@@ -49,6 +51,8 @@ add_library(
   epochs.hpp
   errors.hpp
   errors.cpp
+  files.hpp
+  files.cpp
   fwd.hpp
   id_dispenser.hpp
   interval.hpp

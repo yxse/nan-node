@@ -2,6 +2,7 @@
 #include <nano/lib/block_type.hpp>
 #include <nano/lib/blocks.hpp>
 #include <nano/lib/cli.hpp>
+#include <nano/lib/files.hpp>
 #include <nano/lib/thread_runner.hpp>
 #include <nano/lib/utility.hpp>
 #include <nano/lib/work_version.hpp>
