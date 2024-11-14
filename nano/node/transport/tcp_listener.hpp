@@ -133,6 +133,7 @@ private:
 private:
 	struct connection
 	{
+		connection_type type;
 		asio::ip::tcp::endpoint endpoint;
 		std::weak_ptr<nano::transport::tcp_socket> socket;
 		std::weak_ptr<nano::transport::tcp_server> server;
