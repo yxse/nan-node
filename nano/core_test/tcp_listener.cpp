@@ -275,7 +275,7 @@ TEST (tcp_listener, tcp_listener_timeout_node_id_handshake)
 	auto channel = std::make_shared<nano::transport::tcp_channel> (*node0, socket);
 	socket->async_connect (node0->tcp_listener.endpoint (), [&node_id_handshake, channel] (boost::system::error_code const & ec) {
 		ASSERT_FALSE (ec);
-		channel->send (node_id_handshake, [] (boost::system::error_code const & ec, size_t size_a) {
+		channel->send (node_id_handshake, nano::transport::traffic_type::test, [] (boost::system::error_code const & ec, size_t size_a) {
 			ASSERT_FALSE (ec);
 		});
 	});
