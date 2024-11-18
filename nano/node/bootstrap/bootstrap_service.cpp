@@ -372,30 +372,28 @@ size_t nano::bootstrap_service::count_tags (nano::block_hash const & hash, query
 	return std::count_if (begin, end, [source] (auto const & tag) { return tag.source == source; });
 }
 
-std::pair<nano::account, double> nano::bootstrap_service::next_priority ()
+nano::bootstrap::account_sets::priority_result nano::bootstrap_service::next_priority ()
 {
 	debug_assert (!mutex.try_lock ());
 
-	auto account = accounts.next_priority ([this] (nano::account const & account) {
+	auto next = accounts.next_priority ([this] (nano::account const & account) {
 		return count_tags (account, query_source::priority) < 4;
 	});
-	if (account.is_zero ())
+	if (next.account.is_zero ())
 	{
 		return {};
 	}
 	stats.inc (nano::stat::type::bootstrap_next, nano::stat::detail::next_priority);
-	accounts.timestamp_set (account);
-	// TODO: Priority could be returned by the accounts.next_priority() call
-	return { account, accounts.priority (account) };
+	return next;
 }
 
-std::pair<nano::account, double> nano::bootstrap_service::wait_priority ()
+nano::bootstrap::account_sets::priority_result nano::bootstrap_service::wait_priority ()
 {
-	std::pair<nano::account, double> result{ 0, 0 };
+	nano::bootstrap::account_sets::priority_result result{};
 	wait ([this, &result] () {
 		debug_assert (!mutex.try_lock ());
 		result = next_priority ();
-		if (!result.first.is_zero ())
+		if (!result.account.is_zero ())
 		{
 			return true;
 		}
@@ -565,14 +563,26 @@ void nano::bootstrap_service::run_one_priority ()
 	{
 		return;
 	}
-	auto [account, priority] = wait_priority ();
+	auto [account, priority, fails] = wait_priority ();
 	if (account.is_zero ())
 	{
 		return;
 	}
+
+	// Decide how many blocks to request
 	size_t const min_pull_count = 2;
-	auto count = std::clamp (static_cast<size_t> (priority), min_pull_count, nano::bootstrap_server::max_blocks);
-	request (account, count, channel, query_source::priority);
+	auto pull_count = std::clamp (static_cast<size_t> (priority), min_pull_count, nano::bootstrap_server::max_blocks);
+
+	bool sent = request (account, pull_count, channel, query_source::priority);
+
+	// Only cooldown accounts that are likely to have more blocks
+	// This is to avoid requesting blocks from the same frontier multiple times, before the block processor had a chance to process them
+	// Not throttling accounts that are probably up-to-date allows us to evict them from the priority set faster
+	if (sent && fails == 0)
+	{
+		nano::lock_guard<nano::mutex> lock{ mutex };
+		accounts.timestamp_set (account);
+	}
 }
 
 void nano::bootstrap_service::run_priorities ()
