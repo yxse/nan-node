@@ -4,6 +4,7 @@ add_executable(
   fakes/websocket_client.hpp
   fakes/work_peer.hpp
   active_elections.cpp
+  assert.cpp
   async.cpp
   backlog.cpp
   block.cpp
@@ -42,6 +43,7 @@ add_executable(
   processor_service.cpp
   random.cpp
   random_pool.cpp
+  rate_limiting.cpp
   rep_crawler.cpp
   receivable.cpp
   peer_history.cpp

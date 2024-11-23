@@ -329,6 +329,7 @@ namespace test
 	void confirm (nano::ledger & ledger, std::vector<std::shared_ptr<nano::block>> const blocks);
 	void confirm (nano::ledger & ledger, std::shared_ptr<nano::block> const block);
 	void confirm (nano::ledger & ledger, nano::block_hash const & hash);
+	void confirm (nano::node & node, std::vector<std::shared_ptr<nano::block>> const blocks);
 	/*
 	 * Convenience function to check whether *all* of the hashes exists in node ledger or in the pruned table.
 	 * @return true if all blocks are fully processed and inserted in the ledger, false otherwise
@@ -389,6 +390,10 @@ namespace test
 	 * Converts list of blocks to list of hashes
 	 */
 	std::vector<nano::block_hash> blocks_to_hashes (std::vector<std::shared_ptr<nano::block>> blocks);
+	/*
+	 * Clones list of blocks
+	 */
+	std::vector<std::shared_ptr<nano::block>> clone (std::vector<std::shared_ptr<nano::block>> blocks);
 	/*
 	 * Creates a new fake channel associated with `node`
 	 */

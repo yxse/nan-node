@@ -5482,8 +5482,12 @@ TEST (ledger, migrate_lmdb_to_rocksdb)
 	ASSERT_FALSE (rocksdb_store.confirmation_height.get (rocksdb_transaction, nano::dev::genesis_key.pub, confirmation_height_info));
 	ASSERT_EQ (confirmation_height_info.height, 2);
 	ASSERT_EQ (confirmation_height_info.frontier, send->hash ());
-	ASSERT_EQ (rocksdb_store.final_vote.get (rocksdb_transaction, nano::root (send->previous ())).size (), 1);
-	ASSERT_EQ (rocksdb_store.final_vote.get (rocksdb_transaction, nano::root (send->previous ()))[0], nano::block_hash (2));
+	ASSERT_TRUE (rocksdb_store.final_vote.get (rocksdb_transaction, send->qualified_root ()).has_value ());
+	ASSERT_EQ (rocksdb_store.final_vote.get (rocksdb_transaction, send->qualified_root ()).value (), nano::block_hash (2));
+
+	// Retry migration while rocksdb folder is still present
+	auto error_on_retry = ledger.migrate_lmdb_to_rocksdb (path);
+	ASSERT_EQ (error_on_retry, true);
 }
 
 TEST (ledger, is_send_genesis)
@@ -5856,4 +5860,39 @@ TEST (ledger_transaction, write_wait_order)
 
 	// Signal to continue and drop the third transaction
 	latch3.count_down ();
+}
+
+TEST (ledger_transaction, multithreaded_interleaving)
+{
+	nano::test::system system;
+
+	auto ctx = nano::test::ledger_empty ();
+
+	int constexpr num_threads = 2;
+	int constexpr num_iterations = 10;
+	int constexpr num_blocks = 10;
+
+	std::deque<std::thread> threads;
+	for (int i = 0; i < num_threads; ++i)
+	{
+		threads.emplace_back ([&] {
+			for (int n = 0; n < num_iterations; ++n)
+			{
+				auto tx = ctx.ledger ().tx_begin_write (nano::store::writer::testing);
+				for (unsigned k = 0; k < num_blocks; ++k)
+				{
+					ctx.store ().account.put (tx, nano::account{ k }, nano::account_info{});
+				}
+				for (unsigned k = 0; k < num_blocks; ++k)
+				{
+					ctx.store ().account.del (tx, nano::account{ k });
+				}
+			}
+		});
+	}
+
+	for (auto & thread : threads)
+	{
+		thread.join ();
+	}
 }

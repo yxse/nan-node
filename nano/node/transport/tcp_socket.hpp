@@ -42,10 +42,12 @@ public:
 	};
 
 public:
+	using result_t = std::pair<entry, nano::transport::traffic_type>;
+
 	explicit socket_queue (std::size_t max_size);
 
 	bool insert (buffer_t const &, callback_t, nano::transport::traffic_type);
-	std::optional<entry> pop ();
+	std::optional<result_t> pop ();
 	void clear ();
 	std::size_t size (nano::transport::traffic_type) const;
 	bool empty () const;

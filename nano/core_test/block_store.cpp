@@ -1,6 +1,7 @@
 #include <nano/crypto_lib/random_pool.hpp>
 #include <nano/lib/block_type.hpp>
 #include <nano/lib/blocks.hpp>
+#include <nano/lib/files.hpp>
 #include <nano/lib/lmdbconfig.hpp>
 #include <nano/lib/logging.hpp>
 #include <nano/lib/stats.hpp>
@@ -1630,11 +1631,8 @@ TEST (block_store, final_vote)
 		ASSERT_EQ (store->final_vote.count (transaction), 0);
 		store->final_vote.put (transaction, qualified_root, nano::block_hash (2));
 		ASSERT_EQ (store->final_vote.count (transaction), 1);
-		// Clearing with incorrect root shouldn't remove
-		store->final_vote.clear (transaction, qualified_root.previous ());
-		ASSERT_EQ (store->final_vote.count (transaction), 1);
 		// Clearing with correct root should remove
-		store->final_vote.clear (transaction, qualified_root.root ());
+		store->final_vote.del (transaction, qualified_root);
 		ASSERT_EQ (store->final_vote.count (transaction), 0);
 	}
 }

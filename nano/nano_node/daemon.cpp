@@ -1,4 +1,5 @@
 #include <nano/boost/process/child.hpp>
+#include <nano/lib/files.hpp>
 #include <nano/lib/signal_manager.hpp>
 #include <nano/lib/stacktrace.hpp>
 #include <nano/lib/thread_runner.hpp>
