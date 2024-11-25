@@ -4548,7 +4548,7 @@ void nano::json_handler::wallet_frontiers ()
 
 void nano::json_handler::wallet_history ()
 {
-	uint64_t modified_since (1);
+	uint64_t modified_since (0);
 	boost::optional<std::string> modified_since_text (request.get_optional<std::string> ("modified_since"));
 	if (modified_since_text.is_initialized ())
 	{
