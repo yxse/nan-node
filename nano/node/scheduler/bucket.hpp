@@ -83,12 +83,19 @@ private: // Blocks
 		uint64_t time;
 		std::shared_ptr<nano::block> block;
 
-		bool operator< (block_entry const & other) const;
-		bool operator== (block_entry const & other) const;
-
 		nano::block_hash hash () const
 		{
 			return block->hash ();
+		}
+
+		// Keep operators inlined
+		bool operator< (block_entry const & other) const
+		{
+			return time < other.time || (time == other.time && hash () < other.hash ());
+		}
+		bool operator== (block_entry const & other) const
+		{
+			return time == other.time && hash () == other.hash ();
 		}
 	};
 

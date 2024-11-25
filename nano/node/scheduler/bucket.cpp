@@ -190,20 +190,6 @@ void nano::scheduler::bucket::dump () const
 }
 
 /*
- * block_entry
- */
-
-bool nano::scheduler::bucket::block_entry::operator< (block_entry const & other_a) const
-{
-	return time < other_a.time || (time == other_a.time && block->hash () < other_a.block->hash ());
-}
-
-bool nano::scheduler::bucket::block_entry::operator== (block_entry const & other_a) const
-{
-	return time == other_a.time && block->hash () == other_a.block->hash ();
-}
-
-/*
  * priority_bucket_config
  */
 
