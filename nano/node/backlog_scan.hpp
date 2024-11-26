@@ -23,10 +23,10 @@ public:
 public:
 	/** Control if ongoing backlog population is enabled. If not, backlog population can still be triggered by RPC */
 	bool enable{ true };
+	/** Number of accounts to scan per second. */
+	size_t rate_limit{ 10000 };
 	/** Number of accounts per second to process. */
 	size_t batch_size{ 1000 };
-	/** Number of batches to run per second. */
-	size_t frequency{ 10 };
 };
 
 class backlog_scan final

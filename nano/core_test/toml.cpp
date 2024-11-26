@@ -199,7 +199,7 @@ TEST (toml, daemon_config_deserialize_defaults)
 	ASSERT_EQ (conf.node.max_unchecked_blocks, defaults.node.max_unchecked_blocks);
 	ASSERT_EQ (conf.node.backlog_scan.enable, defaults.node.backlog_scan.enable);
 	ASSERT_EQ (conf.node.backlog_scan.batch_size, defaults.node.backlog_scan.batch_size);
-	ASSERT_EQ (conf.node.backlog_scan.frequency, defaults.node.backlog_scan.frequency);
+	ASSERT_EQ (conf.node.backlog_scan.rate_limit, defaults.node.backlog_scan.rate_limit);
 	ASSERT_EQ (conf.node.enable_upnp, defaults.node.enable_upnp);
 
 	ASSERT_EQ (conf.node.websocket_config.enabled, defaults.node.websocket_config.enabled);
@@ -468,7 +468,7 @@ TEST (toml, daemon_config_deserialize_no_defaults)
 	[node.backlog_scan]
 	enable = false
 	batch_size = 999
-	frequency = 999
+	rate_limit = 999
 
 	[node.block_processor]
 	max_peer_queue = 999
@@ -706,7 +706,7 @@ TEST (toml, daemon_config_deserialize_no_defaults)
 	ASSERT_NE (conf.node.request_aggregator_threads, defaults.node.request_aggregator_threads);
 	ASSERT_NE (conf.node.backlog_scan.enable, defaults.node.backlog_scan.enable);
 	ASSERT_NE (conf.node.backlog_scan.batch_size, defaults.node.backlog_scan.batch_size);
-	ASSERT_NE (conf.node.backlog_scan.frequency, defaults.node.backlog_scan.frequency);
+	ASSERT_NE (conf.node.backlog_scan.rate_limit, defaults.node.backlog_scan.rate_limit);
 	ASSERT_NE (conf.node.enable_upnp, defaults.node.enable_upnp);
 
 	ASSERT_NE (conf.node.websocket_config.enabled, defaults.node.websocket_config.enabled);

@@ -12,7 +12,7 @@ nano::backlog_scan::backlog_scan (backlog_scan_config const & config_a, nano::le
 	config{ config_a },
 	ledger{ ledger_a },
 	stats{ stats_a },
-	limiter{ config.batch_size * config.frequency }
+	limiter{ config.rate_limit }
 {
 }
 
@@ -93,7 +93,8 @@ void nano::backlog_scan::populate_backlog (nano::unique_lock<nano::mutex> & lock
 		// Wait for the rate limiter
 		while (!limiter.should_pass (config.batch_size))
 		{
-			condition.wait_for (lock, std::chrono::milliseconds{ 1000 / config.frequency / 2 });
+			std::chrono::milliseconds const wait_time{ 1000 / std::max ((config.rate_limit / config.batch_size), size_t{ 1 }) / 2 };
+			condition.wait_for (lock, std::max (wait_time, 10ms));
 			if (stopped)
 			{
 				return;
@@ -158,8 +159,8 @@ nano::container_info nano::backlog_scan::container_info () const
 nano::error nano::backlog_scan_config::serialize (nano::tomlconfig & toml) const
 {
 	toml.put ("enable", enable, "Control if ongoing backlog population is enabled. If not, backlog population can still be triggered by RPC \ntype:bool");
-	toml.put ("batch_size", batch_size, "Number of accounts per second to process when doing backlog population scan. Increasing this value will help unconfirmed frontiers get into election prioritization queue faster, however it will also increase resource usage. \ntype:uint");
-	toml.put ("frequency", frequency, "Number of batches to process per second. Higher frequency and smaller batch size helps to utilize resources more uniformly, however it also introduces more overhead. Use 0 to process as fast as possible, but be aware that it may consume a lot of resources. \ntype:uint");
+	toml.put ("batch_size", batch_size, "Size of a single batch. Larger batches reduce overhead, but may put more pressure on other node components. \ntype:uint");
+	toml.put ("rate_limit", rate_limit, "Number of accounts per second to process when doing backlog population scan. Increasing this value will help unconfirmed frontiers get into election prioritization queue faster. Use 0 to process as fast as possible, but be aware that it may consume a lot of resources. \ntype:uint");
 
 	return toml.get_error ();
 }
@@ -168,7 +169,7 @@ nano::error nano::backlog_scan_config::deserialize (nano::tomlconfig & toml)
 {
 	toml.get ("enable", enable);
 	toml.get ("batch_size", batch_size);
-	toml.get ("frequency", frequency);
+	toml.get ("rate_limit", rate_limit);
 
 	return toml.get_error ();
 }
