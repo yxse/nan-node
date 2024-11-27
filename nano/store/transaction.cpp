@@ -9,6 +9,7 @@
 nano::store::transaction_impl::transaction_impl (nano::id_dispenser::id_t const store_id_a) :
 	store_id{ store_id_a }
 {
+	debug_assert (!nano::thread_role::is_network_io (), "database operations are not allowed to run on network IO threads");
 }
 
 /*

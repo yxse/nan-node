@@ -714,7 +714,7 @@ nano_qt::block_viewer::block_viewer (nano_qt::wallet & wallet_a) :
 			if (this->wallet.node.ledger.any.block_exists (transaction, block))
 			{
 				rebroadcast->setEnabled (false);
-				this->wallet.node.background ([this, block] () {
+				this->wallet.node.workers.post ([this, block] () {
 					rebroadcast_action (block);
 				});
 			}
@@ -1194,7 +1194,7 @@ void nano_qt::wallet::start ()
 						if (this_l->wallet_m->store.valid_password (transaction))
 						{
 							this_l->send_blocks_send->setEnabled (false);
-							this_l->node.background ([this_w, account_l, actual] () {
+							this_l->node.workers.post ([this_w, account_l, actual] () {
 								if (auto this_l = this_w.lock ())
 								{
 									this_l->wallet_m->send_async (this_l->account, account_l, actual, [this_w] (std::shared_ptr<nano::block> const & block_a) {

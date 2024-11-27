@@ -20,7 +20,7 @@ void nano::transport::fake::channel::send_buffer (nano::shared_const_buffer cons
 	auto size = buffer_a.size ();
 	if (callback_a)
 	{
-		node.background ([callback_a, size] () {
+		node.io_ctx.post ([callback_a, size] () {
 			callback_a (boost::system::errc::make_error_code (boost::system::errc::success), size);
 		});
 	}

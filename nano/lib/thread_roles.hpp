@@ -12,6 +12,7 @@ enum class name
 	unknown,
 	io,
 	io_daemon,
+	io_ipc,
 	work,
 	message_processing,
 	vote_processing,
@@ -87,4 +88,9 @@ std::string get_string ();
  * Internal only, should not be called directly
  */
 void set_os_name (std::string const &);
+
+/*
+ * Check if the current thread is a network IO thread
+ */
+bool is_network_io ();
 }

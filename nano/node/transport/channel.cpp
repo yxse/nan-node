@@ -36,7 +36,7 @@ void nano::transport::channel::send (nano::message & message_a, std::function<vo
 	{
 		if (callback_a)
 		{
-			node.background ([callback_a] () {
+			node.io_ctx.post ([callback_a] () {
 				callback_a (boost::system::errc::make_error_code (boost::system::errc::not_supported), 0);
 			});
 		}

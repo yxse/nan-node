@@ -14,12 +14,16 @@ nano::rep_crawler::rep_crawler (nano::rep_crawler_config const & config_a, nano:
 	network_constants{ node_a.network_params.network },
 	active{ node_a.active }
 {
-	if (!node.flags.disable_rep_crawler)
-	{
-		node.observers.endpoint.add ([this] (std::shared_ptr<nano::transport::channel> const & channel) {
-			query (channel);
-		});
-	}
+	node.observers.endpoint.add ([this] (std::shared_ptr<nano::transport::channel> const & channel) {
+		if (!node.flags.disable_rep_crawler)
+		{
+			{
+				nano::lock_guard<nano::mutex> lock{ mutex };
+				prioritized.push_back (channel);
+			}
+			condition.notify_all ();
+		}
+	});
 }
 
 nano::rep_crawler::~rep_crawler ()
@@ -161,7 +165,7 @@ void nano::rep_crawler::run ()
 		lock.lock ();
 
 		condition.wait_for (lock, query_interval (sufficient_weight), [this, sufficient_weight] {
-			return stopped || query_predicate (sufficient_weight) || !responses.empty ();
+			return stopped || query_predicate (sufficient_weight) || !responses.empty () || !prioritized.empty ();
 		});
 
 		if (stopped)
@@ -179,6 +183,16 @@ void nano::rep_crawler::run ()
 		}
 
 		cleanup ();
+
+		if (!prioritized.empty ())
+		{
+			decltype (prioritized) prioritized_l;
+			prioritized_l.swap (prioritized);
+
+			lock.unlock ();
+			query (prioritized_l);
+			lock.lock ();
+		}
 
 		if (query_predicate (sufficient_weight))
 		{
@@ -230,7 +244,7 @@ void nano::rep_crawler::cleanup ()
 	});
 }
 
-std::vector<std::shared_ptr<nano::transport::channel>> nano::rep_crawler::prepare_crawl_targets (bool sufficient_weight) const
+std::deque<std::shared_ptr<nano::transport::channel>> nano::rep_crawler::prepare_crawl_targets (bool sufficient_weight) const
 {
 	debug_assert (!mutex.try_lock ());
 
@@ -310,7 +324,7 @@ bool nano::rep_crawler::track_rep_request (hash_root_t hash_root, std::shared_pt
 	return true;
 }
 
-void nano::rep_crawler::query (std::vector<std::shared_ptr<nano::transport::channel>> const & target_channels)
+void nano::rep_crawler::query (std::deque<std::shared_ptr<nano::transport::channel>> const & target_channels)
 {
 	auto maybe_hash_root = prepare_query_target ();
 	if (!maybe_hash_root)
@@ -356,7 +370,7 @@ void nano::rep_crawler::query (std::vector<std::shared_ptr<nano::transport::chan
 
 void nano::rep_crawler::query (std::shared_ptr<nano::transport::channel> const & target_channel)
 {
-	query (std::vector{ target_channel });
+	query (std::deque{ target_channel });
 }
 
 bool nano::rep_crawler::is_pr (std::shared_ptr<nano::transport::channel> const & channel) const
@@ -432,6 +446,7 @@ std::vector<nano::representative> nano::rep_crawler::representatives (std::size_
 	}
 
 	std::vector<nano::representative> result;
+	result.reserve (ordered.size ());
 	for (auto i = ordered.begin (), n = ordered.end (); i != n && result.size () < count; ++i)
 	{
 		auto const & [weight, rep] = *i;
@@ -483,6 +498,7 @@ nano::container_info nano::rep_crawler::container_info () const
 	info.put ("reps", reps);
 	info.put ("queries", queries);
 	info.put ("responses", responses);
+	info.put ("prioritized", prioritized);
 	return info;
 }
 

@@ -76,12 +76,6 @@ public:
 
 	std::shared_ptr<nano::node> shared ();
 
-	template <typename T>
-	void background (T action_a)
-	{
-		io_ctx.post (action_a);
-	}
-
 	bool copy_with_compaction (std::filesystem::path const &);
 	void keepalive (std::string const &, uint16_t);
 	int store_version ();
