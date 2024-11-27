@@ -2,6 +2,7 @@
 
 #include <nano/lib/locks.hpp>
 #include <nano/lib/timer.hpp>
+#include <nano/node/fwd.hpp>
 #include <nano/node/transport/fwd.hpp>
 #include <nano/secure/account_info.hpp>
 #include <nano/store/fwd.hpp>
@@ -159,20 +160,6 @@ private:
 /* Convenience globals for gtest projects */
 namespace nano
 {
-class node;
-using uint128_t = boost::multiprecision::uint128_t;
-class keypair;
-class public_key;
-class block_hash;
-class telemetry_data;
-class network_params;
-class vote;
-class block;
-class election;
-class ledger;
-
-extern nano::uint128_t const & genesis_amount;
-
 namespace test
 {
 	class system;

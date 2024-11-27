@@ -256,8 +256,7 @@ TEST (election_scheduler_bucket, construction)
 	auto & node = *system.add_node ();
 
 	nano::scheduler::priority_bucket_config bucket_config;
-	nano::scheduler::bucket bucket{ nano::Knano_ratio, bucket_config, node.active, node.stats };
-	ASSERT_EQ (nano::Knano_ratio, bucket.minimum_balance);
+	nano::scheduler::bucket bucket{ 0, bucket_config, node.active, node.stats };
 	ASSERT_TRUE (bucket.empty ());
 	ASSERT_EQ (0, bucket.size ());
 }
@@ -269,7 +268,9 @@ TEST (election_scheduler_bucket, insert_one)
 
 	nano::scheduler::priority_bucket_config bucket_config;
 	nano::scheduler::bucket bucket{ 0, bucket_config, node.active, node.stats };
+	ASSERT_FALSE (bucket.contains (block0 ()->hash ()));
 	ASSERT_TRUE (bucket.push (1000, block0 ()));
+	ASSERT_TRUE (bucket.contains (block0 ()->hash ()));
 	ASSERT_FALSE (bucket.empty ());
 	ASSERT_EQ (1, bucket.size ());
 	auto blocks = bucket.blocks ();
@@ -320,10 +321,15 @@ TEST (election_scheduler_bucket, max_blocks)
 	};
 	nano::scheduler::bucket bucket{ 0, bucket_config, node.active, node.stats };
 	ASSERT_TRUE (bucket.push (2000, block0 ()));
+	ASSERT_TRUE (bucket.contains (block0 ()->hash ()));
 	ASSERT_TRUE (bucket.push (900, block1 ()));
+	ASSERT_TRUE (bucket.contains (block1 ()->hash ()));
 	ASSERT_FALSE (bucket.push (3000, block2 ()));
+	ASSERT_FALSE (bucket.contains (block2 ()->hash ()));
 	ASSERT_TRUE (bucket.push (1001, block3 ())); // Evicts 2000
+	ASSERT_FALSE (bucket.contains (block0 ()->hash ()));
 	ASSERT_TRUE (bucket.push (1000, block0 ())); // Evicts 1001
+	ASSERT_FALSE (bucket.contains (block3 ()->hash ()));
 	ASSERT_EQ (2, bucket.size ());
 	auto blocks = bucket.blocks ();
 	ASSERT_EQ (2, blocks.size ());

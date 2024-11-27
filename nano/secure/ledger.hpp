@@ -75,12 +75,19 @@ public:
 	nano::link const & epoch_link (nano::epoch) const;
 	bool migrate_lmdb_to_rocksdb (std::filesystem::path const &) const;
 	bool bootstrap_weight_reached () const;
+
 	static nano::epoch version (nano::block const & block);
 	nano::epoch version (secure::transaction const &, nano::block_hash const & hash) const;
+
 	uint64_t cemented_count () const;
 	uint64_t block_count () const;
 	uint64_t account_count () const;
 	uint64_t pruned_count () const;
+
+	// Returned priority balance is maximum of block balance and previous block balance to handle full account balance send cases
+	// Returned timestamp is the previous block timestamp or the current timestamp if there's no previous block
+	using block_priority_result = std::pair<nano::amount, nano::priority_timestamp>;
+	block_priority_result block_priority (secure::transaction const &, nano::block const &) const;
 
 	nano::container_info container_info () const;
 

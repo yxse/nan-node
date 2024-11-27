@@ -12,6 +12,7 @@ add_executable(
   blockprocessor.cpp
   bootstrap.cpp
   bootstrap_server.cpp
+  bucketing.cpp
   cli.cpp
   confirmation_solicitor.cpp
   confirming_set.cpp
@@ -26,6 +27,7 @@ add_executable(
   ipc.cpp
   ledger.cpp
   ledger_confirm.cpp
+  ledger_priority.cpp
   locks.cpp
   logging.cpp
   message.cpp
