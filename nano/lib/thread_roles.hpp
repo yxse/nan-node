@@ -12,6 +12,7 @@ enum class name
 	unknown,
 	io,
 	io_daemon,
+	io_ipc,
 	work,
 	message_processing,
 	vote_processing,
