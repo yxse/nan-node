@@ -149,7 +149,7 @@ void nano::transport::tcp_socket::async_write (nano::shared_const_buffer const &
 	{
 		if (callback_a)
 		{
-			node_l->background ([callback = std::move (callback_a)] () {
+			node_l->io_ctx.post ([callback = std::move (callback_a)] () {
 				callback (boost::system::errc::make_error_code (boost::system::errc::not_supported), 0);
 			});
 		}
@@ -161,7 +161,7 @@ void nano::transport::tcp_socket::async_write (nano::shared_const_buffer const &
 	{
 		if (callback_a)
 		{
-			node_l->background ([callback = std::move (callback_a)] () {
+			node_l->io_ctx.post ([callback = std::move (callback_a)] () {
 				callback (boost::system::errc::make_error_code (boost::system::errc::not_supported), 0);
 			});
 		}

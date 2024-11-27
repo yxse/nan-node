@@ -50,7 +50,7 @@ void nano::transport::inproc::channel::send_buffer (nano::shared_const_buffer co
 
 	if (callback_a)
 	{
-		node.background ([callback_l = std::move (callback_a), buffer_size = buffer_a.size ()] () {
+		node.io_ctx.post ([callback_l = std::move (callback_a), buffer_size = buffer_a.size ()] () {
 			callback_l (boost::system::errc::make_error_code (boost::system::errc::success), buffer_size);
 		});
 	}

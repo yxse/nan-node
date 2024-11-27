@@ -240,7 +240,7 @@ nano::node::node (std::shared_ptr<boost::asio::io_context> io_ctx_a, std::filesy
 				if ((status_a.type == nano::election_status_type::active_confirmed_quorum || status_a.type == nano::election_status_type::active_confirmation_height))
 				{
 					auto node_l (shared_from_this ());
-					background ([node_l, block_a, account_a, amount_a, is_state_send_a, is_state_epoch_a] () {
+					io_ctx.post ([node_l, block_a, account_a, amount_a, is_state_send_a, is_state_epoch_a] () {
 						boost::property_tree::ptree event;
 						event.add ("account", account_a.to_account ());
 						event.add ("hash", block_a->hash ().to_string ());
