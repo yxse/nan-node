@@ -78,7 +78,7 @@ std::deque<nano::account> nano::bootstrap::account_database_scanner::next_batch 
 	{
 		auto const & [account, info] = crawler.current.value ();
 		result.push_back (account);
-		next = account.number () + 1; // TODO: Handle account number overflow
+		next = inc_sat (account.number ());
 	}
 
 	// Empty current value indicates the end of the table
@@ -106,7 +106,7 @@ std::deque<nano::account> nano::bootstrap::pending_database_scanner::next_batch 
 	{
 		auto const & [key, info] = crawler.current.value ();
 		result.push_back (key.account);
-		next = key.account.number () + 1; // TODO: Handle account number overflow
+		next = inc_sat (key.account.number ());
 	}
 
 	// Empty current value indicates the end of the table

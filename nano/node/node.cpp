@@ -8,7 +8,7 @@
 #include <nano/lib/utility.hpp>
 #include <nano/lib/work_version.hpp>
 #include <nano/node/active_elections.hpp>
-#include <nano/node/backlog_population.hpp>
+#include <nano/node/backlog_scan.hpp>
 #include <nano/node/bandwidth_limiter.hpp>
 #include <nano/node/bootstrap/bootstrap_server.hpp>
 #include <nano/node/bootstrap/bootstrap_service.hpp>
@@ -154,8 +154,8 @@ nano::node::node (std::shared_ptr<boost::asio::io_context> io_ctx_a, std::filesy
 	aggregator_impl{ std::make_unique<nano::request_aggregator> (config.request_aggregator, *this, stats, generator, final_generator, history, ledger, wallets, vote_router) },
 	aggregator{ *aggregator_impl },
 	wallets (wallets_store.init_error (), *this),
-	backlog_impl{ std::make_unique<nano::backlog_population> (config.backlog_population, scheduler, ledger, stats) },
-	backlog{ *backlog_impl },
+	backlog_scan_impl{ std::make_unique<nano::backlog_scan> (config.backlog_scan, ledger, stats) },
+	backlog_scan{ *backlog_scan_impl },
 	bootstrap_server_impl{ std::make_unique<nano::bootstrap_server> (config.bootstrap_server, store, ledger, network_params.network, stats) },
 	bootstrap_server{ *bootstrap_server_impl },
 	bootstrap_impl{ std::make_unique<nano::bootstrap_service> (config, block_processor, ledger, network, stats, logger) },
@@ -179,6 +179,16 @@ nano::node::node (std::shared_ptr<boost::asio::io_context> io_ctx_a, std::filesy
 	vote_cache.rep_weight_query = [this] (nano::account const & rep) {
 		return ledger.weight (rep);
 	};
+
+	// TODO: Hook this direclty in the schedulers
+	backlog_scan.batch_activated.add ([this] (auto const & batch) {
+		auto transaction = ledger.tx_begin_read ();
+		for (auto const & info : batch)
+		{
+			scheduler.optimistic.activate (info.account, info.account_info, info.conf_info);
+			scheduler.priority.activate (transaction, info.account, info.account_info, info.conf_info);
+		}
+	});
 
 	// Republish vote if it is new and the node does not host a principal representative (or close to)
 	vote_router.vote_processed.add ([this] (std::shared_ptr<nano::vote> const & vote, nano::vote_source source, std::unordered_map<nano::block_hash, nano::vote_code> const & results) {
@@ -636,7 +646,7 @@ void nano::node::start ()
 	confirming_set.start ();
 	scheduler.start ();
 	aggregator.start ();
-	backlog.start ();
+	backlog_scan.start ();
 	bootstrap_server.start ();
 	bootstrap.start ();
 	websocket.start ();
@@ -667,7 +677,7 @@ void nano::node::stop ()
 	// Cancels ongoing work generation tasks, which may be blocking other threads
 	// No tasks may wait for work generation in I/O threads, or termination signal capturing will be unable to call node::stop()
 	distributed_work.stop ();
-	backlog.stop ();
+	backlog_scan.stop ();
 	bootstrap.stop ();
 	rep_crawler.stop ();
 	unchecked.stop ();
@@ -849,7 +859,7 @@ bool nano::node::collect_ledger_pruning_targets (std::deque<nano::block_hash> & 
 		read_operations += depth;
 		if (read_operations >= batch_read_size_a)
 		{
-			last_account_a = account.number () + 1;
+			last_account_a = inc_sat (account.number ());
 			finish_transaction = true;
 		}
 		else
@@ -1196,6 +1206,7 @@ nano::container_info nano::node::container_info () const
 	info.add ("rep_tiers", rep_tiers.container_info ());
 	info.add ("message_processor", message_processor.container_info ());
 	info.add ("bandwidth", outbound_limiter.container_info ());
+	info.add ("backlog_scan", backlog_scan.container_info ());
 	return info;
 }
 

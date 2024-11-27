@@ -134,7 +134,7 @@ struct pending_database_crawler
 		if (it != end)
 		{
 			// If that fails, perform a fresh lookup
-			seek (starting_account.number () + 1);
+			seek (inc_sat (starting_account.number ()));
 		}
 
 		update_current ();
