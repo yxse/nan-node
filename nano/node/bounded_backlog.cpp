@@ -132,20 +132,9 @@ size_t nano::bounded_backlog::index_size () const
 	return index.size ();
 }
 
-bool nano::bounded_backlog::erase (nano::secure::transaction const & transaction, nano::account const & account)
-{
-	nano::lock_guard<nano::mutex> guard{ mutex };
-	return index.erase (account);
-}
-
 void nano::bounded_backlog::activate (nano::secure::transaction & transaction, nano::account const & account, nano::account_info const & account_info, nano::confirmation_height_info const & conf_info)
 {
 	debug_assert (conf_info.frontier != account_info.head);
-
-	auto contains = [this] (nano::block_hash const & hash) {
-		nano::lock_guard<nano::mutex> guard{ mutex };
-		return index.contains (hash);
-	};
 
 	// Insert blocks into the index starting from the account head block
 	auto block = ledger.any.block_get (transaction, account_info.head);
@@ -418,6 +407,12 @@ void nano::bounded_backlog::run_scan ()
 			lock.lock ();
 		}
 	}
+}
+
+bool nano::bounded_backlog::contains (nano::block_hash const & hash) const
+{
+	nano::lock_guard<nano::mutex> guard{ mutex };
+	return index.contains (hash);
 }
 
 nano::container_info nano::bounded_backlog::container_info () const

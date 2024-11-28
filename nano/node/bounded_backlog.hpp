@@ -116,6 +116,7 @@ public:
 
 	size_t index_size () const;
 	size_t bucket_threshold () const;
+	bool contains (nano::block_hash const &) const;
 
 	nano::container_info container_info () const;
 
@@ -133,7 +134,6 @@ private: // Dependencies
 private:
 	void activate (nano::secure::transaction &, nano::account const &, nano::account_info const &, nano::confirmation_height_info const &);
 	void update (nano::secure::transaction const &, nano::block_hash const &);
-	bool erase (nano::secure::transaction const &, nano::account const &);
 	bool insert (nano::secure::transaction const &, nano::block const &);
 
 	bool predicate () const;
