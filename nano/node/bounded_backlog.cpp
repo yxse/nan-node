@@ -203,54 +203,54 @@ void nano::bounded_backlog::run ()
 	std::unique_lock<nano::mutex> lock{ mutex };
 	while (!stopped)
 	{
-		if (predicate ())
+		condition.wait_for (lock, 1s, [this] {
+			return stopped || predicate ();
+		});
+
+		if (stopped)
 		{
-			// Wait until all notification about the previous rollbacks are processed
-			while (workers.queued_tasks () >= config.max_queued_notifications)
+			return;
+		}
+
+		// Wait until all notification about the previous rollbacks are processed
+		while (workers.queued_tasks () >= config.max_queued_notifications)
+		{
+			stats.inc (nano::stat::type::bounded_backlog, nano::stat::detail::cooldown);
+			condition.wait_for (lock, 100ms, [this] { return stopped.load (); });
+			if (stopped)
 			{
-				stats.inc (nano::stat::type::bounded_backlog, nano::stat::detail::cooldown);
-				condition.wait_for (lock, 100ms, [this] { return stopped.load (); });
-				if (stopped)
-				{
-					return;
-				}
+				return;
 			}
+		}
 
-			stats.inc (nano::stat::type::bounded_backlog, nano::stat::detail::loop);
+		stats.inc (nano::stat::type::bounded_backlog, nano::stat::detail::loop);
 
-			// Calculate the number of targets to rollback
-			uint64_t const backlog = ledger.backlog_count ();
-			uint64_t const target_count = backlog > config.max_backlog ? backlog - config.max_backlog : 0;
+		// Calculate the number of targets to rollback
+		uint64_t const backlog = ledger.backlog_count ();
+		uint64_t const target_count = backlog > config.max_backlog ? backlog - config.max_backlog : 0;
 
-			auto targets = gather_targets (std::min (target_count, static_cast<uint64_t> (config.batch_size)));
-			if (!targets.empty ())
+		auto targets = gather_targets (std::min (target_count, static_cast<uint64_t> (config.batch_size)));
+		if (!targets.empty ())
+		{
+			lock.unlock ();
+
+			stats.add (nano::stat::type::bounded_backlog, nano::stat::detail::gathered_targets, targets.size ());
+			auto processed = perform_rollbacks (targets, target_count);
+
+			lock.lock ();
+
+			// Erase rolled back blocks from the index
+			for (auto const & hash : processed)
 			{
-				lock.unlock ();
-
-				stats.add (nano::stat::type::bounded_backlog, nano::stat::detail::gathered_targets, targets.size ());
-				auto processed = perform_rollbacks (targets, target_count);
-
-				lock.lock ();
-
-				// Erase rolled back blocks from the index
-				for (auto const & hash : processed)
-				{
-					index.erase (hash);
-				}
-			}
-			else
-			{
-				// Cooldown, this should not happen in normal operation
-				stats.inc (nano::stat::type::bounded_backlog, nano::stat::detail::no_targets);
-				condition.wait_for (lock, 100ms, [this] {
-					return stopped.load ();
-				});
+				index.erase (hash);
 			}
 		}
 		else
 		{
-			condition.wait_for (lock, 1s, [this] {
-				return stopped || predicate ();
+			// Cooldown, this should not happen in normal operation
+			stats.inc (nano::stat::type::bounded_backlog, nano::stat::detail::no_targets);
+			condition.wait_for (lock, 100ms, [this] {
+				return stopped.load ();
 			});
 		}
 	}
