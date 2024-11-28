@@ -3705,7 +3705,7 @@ TEST (node, bounded_backlog)
 	nano::test::system system;
 
 	nano::node_config node_config;
-	node_config.backlog.max_backlog = 10;
+	node_config.max_backlog = 10;
 	node_config.backlog_scan.enable = false;
 	auto & node = *system.add_node (node_config);
 

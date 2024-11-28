@@ -12,7 +12,7 @@
 #include <nano/secure/ledger_set_confirmed.hpp>
 #include <nano/secure/transaction.hpp>
 
-nano::bounded_backlog::bounded_backlog (nano::bounded_backlog_config const & config_a, nano::node & node_a, nano::ledger & ledger_a, nano::bucketing & bucketing_a, nano::backlog_scan & backlog_scan_a, nano::block_processor & block_processor_a, nano::confirming_set & confirming_set_a, nano::stats & stats_a, nano::logger & logger_a) :
+nano::bounded_backlog::bounded_backlog (nano::node_config const & config_a, nano::node & node_a, nano::ledger & ledger_a, nano::bucketing & bucketing_a, nano::backlog_scan & backlog_scan_a, nano::block_processor & block_processor_a, nano::confirming_set & confirming_set_a, nano::stats & stats_a, nano::logger & logger_a) :
 	config{ config_a },
 	node{ node_a },
 	ledger{ ledger_a },
@@ -22,7 +22,7 @@ nano::bounded_backlog::bounded_backlog (nano::bounded_backlog_config const & con
 	confirming_set{ confirming_set_a },
 	stats{ stats_a },
 	logger{ logger_a },
-	scan_limiter{ config.batch_size },
+	scan_limiter{ config.bounded_backlog.scan_rate },
 	workers{ 1, nano::thread_role::name::bounded_backlog_notifications }
 {
 	// Activate accounts with unconfirmed blocks
@@ -89,6 +89,11 @@ nano::bounded_backlog::~bounded_backlog ()
 void nano::bounded_backlog::start ()
 {
 	debug_assert (!thread.joinable ());
+
+	if (!config.bounded_backlog.enable)
+	{
+		return;
+	}
 
 	workers.start ();
 
@@ -213,7 +218,7 @@ void nano::bounded_backlog::run ()
 		}
 
 		// Wait until all notification about the previous rollbacks are processed
-		while (workers.queued_tasks () >= config.max_queued_notifications)
+		while (workers.queued_tasks () >= config.bounded_backlog.max_queued_notifications)
 		{
 			stats.inc (nano::stat::type::bounded_backlog, nano::stat::detail::cooldown);
 			condition.wait_for (lock, 100ms, [this] { return stopped.load (); });
@@ -229,7 +234,7 @@ void nano::bounded_backlog::run ()
 		uint64_t const backlog = ledger.backlog_count ();
 		uint64_t const target_count = backlog > config.max_backlog ? backlog - config.max_backlog : 0;
 
-		auto targets = gather_targets (std::min (target_count, static_cast<uint64_t> (config.batch_size)));
+		auto targets = gather_targets (std::min (target_count, static_cast<uint64_t> (config.bounded_backlog.batch_size)));
 		if (!targets.empty ())
 		{
 			lock.unlock ();
@@ -354,7 +359,7 @@ std::deque<nano::block_hash> nano::bounded_backlog::gather_targets (size_t max_c
 		// Only start rolling back if the bucket is over the threshold of unconfirmed blocks
 		if (index.size (bucket) > bucket_threshold ())
 		{
-			auto const count = std::min (max_count, config.batch_size);
+			auto const count = std::min (max_count, config.bounded_backlog.batch_size);
 
 			auto const top = index.top (bucket, count, [this] (auto const & hash) {
 				// Only rollback if the block is not being used by the node
@@ -390,11 +395,11 @@ void nano::bounded_backlog::run_scan ()
 		nano::block_hash last = 0;
 		while (!stopped)
 		{
-			wait (config.batch_size);
+			wait (config.bounded_backlog.batch_size);
 
 			stats.inc (nano::stat::type::bounded_backlog, nano::stat::detail::loop_scan);
 
-			auto batch = index.next (last, config.batch_size);
+			auto batch = index.next (last, config.bounded_backlog.batch_size);
 			if (batch.empty ()) // If batch is empty, we iterated over all accounts in the index
 			{
 				break;
@@ -537,4 +542,28 @@ nano::container_info nano::backlog_index::container_info () const
 	info.put ("blocks", blocks);
 	info.add ("sizes", collect_bucket_sizes ());
 	return info;
+}
+
+/*
+ * bounded_backlog_config
+ */
+
+nano::error nano::bounded_backlog_config::serialize (nano::tomlconfig & toml) const
+{
+	toml.put ("enable", enable, "Enable the bounded backlog. \ntype:bool");
+	toml.put ("batch_size", batch_size, "Maximum number of blocks to rollback per iteration. \ntype:uint64");
+	toml.put ("max_queued_notifications", max_queued_notifications, "Maximum number of queued background tasks before cooldown. \ntype:uint64");
+	toml.put ("scan_rate", scan_rate, "Rate limit for refreshing the backlog index. \ntype:uint64");
+
+	return toml.get_error ();
+}
+
+nano::error nano::bounded_backlog_config::deserialize (nano::tomlconfig & toml)
+{
+	toml.get ("enable", enable);
+	toml.get ("batch_size", batch_size);
+	toml.get ("max_queued_notifications", max_queued_notifications);
+	toml.get ("scan_rate", scan_rate);
+
+	return toml.get_error ();
 }

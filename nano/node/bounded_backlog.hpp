@@ -95,16 +95,20 @@ private:
 class bounded_backlog_config
 {
 public:
-	size_t max_backlog{ 100000 };
-	double overfill_factor{ 1.5 };
+	nano::error deserialize (nano::tomlconfig &);
+	nano::error serialize (nano::tomlconfig &) const;
+
+public:
+	bool enable{ true };
 	size_t batch_size{ 32 };
 	size_t max_queued_notifications{ 128 };
+	size_t scan_rate{ 64 };
 };
 
 class bounded_backlog
 {
 public:
-	bounded_backlog (bounded_backlog_config const &, nano::node &, nano::ledger &, nano::bucketing &, nano::backlog_scan &, nano::block_processor &, nano::confirming_set &, nano::stats &, nano::logger &);
+	bounded_backlog (nano::node_config const &, nano::node &, nano::ledger &, nano::bucketing &, nano::backlog_scan &, nano::block_processor &, nano::confirming_set &, nano::stats &, nano::logger &);
 	~bounded_backlog ();
 
 	void start ();
@@ -116,7 +120,7 @@ public:
 	nano::container_info container_info () const;
 
 private: // Dependencies
-	bounded_backlog_config const & config;
+	nano::node_config const & config;
 	nano::node & node;
 	nano::ledger & ledger;
 	nano::bucketing & bucketing;
