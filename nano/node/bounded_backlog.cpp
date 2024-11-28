@@ -337,6 +337,11 @@ std::deque<nano::block_hash> nano::bounded_backlog::perform_rollbacks (std::dequ
 	return processed;
 }
 
+size_t nano::bounded_backlog::bucket_threshold () const
+{
+	return config.max_backlog / bucketing.size ();
+}
+
 std::deque<nano::block_hash> nano::bounded_backlog::gather_targets (size_t max_count) const
 {
 	debug_assert (!mutex.try_lock ());
@@ -347,7 +352,7 @@ std::deque<nano::block_hash> nano::bounded_backlog::gather_targets (size_t max_c
 	for (auto bucket : bucketing.bucket_indices ())
 	{
 		// Only start rolling back if the bucket is over the threshold of unconfirmed blocks
-		if (index.size (bucket) > config.bucket_threshold)
+		if (index.size (bucket) > bucket_threshold ())
 		{
 			auto const count = std::min (max_count, config.batch_size);
 

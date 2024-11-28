@@ -96,7 +96,6 @@ class bounded_backlog_config
 {
 public:
 	size_t max_backlog{ 100000 };
-	size_t bucket_threshold{ 1000 };
 	double overfill_factor{ 1.5 };
 	size_t batch_size{ 32 };
 	size_t max_queued_notifications{ 128 };
@@ -112,6 +111,7 @@ public:
 	void stop ();
 
 	size_t index_size () const;
+	size_t bucket_threshold () const;
 
 	nano::container_info container_info () const;
 
