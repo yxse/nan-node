@@ -140,6 +140,7 @@ nano::error nano::node_config::serialize_toml (nano::tomlconfig & toml) const
 	toml.put ("max_queued_requests", max_queued_requests, "Limit for number of queued confirmation requests for one channel, after which new requests are dropped until the queue drops below this value.\ntype:uint32");
 	toml.put ("request_aggregator_threads", request_aggregator_threads, "Number of threads to dedicate to request aggregator. Defaults to using all cpu threads, up to a maximum of 4");
 	toml.put ("max_unchecked_blocks", max_unchecked_blocks, "Maximum number of unchecked blocks to store in memory. Defaults to 65536. \ntype:uint64,[0..]");
+	toml.put ("max_backlog", max_backlog, "Maximum number of unconfirmed blocks to keep in the ledger. If this limit is exceeded, the node will start dropping low-priority unconfirmed blocks.\ntype:uint64");
 	toml.put ("rep_crawler_weight_minimum", rep_crawler_weight_minimum.to_string_dec (), "Rep crawler minimum weight, if this is less than minimum principal weight then this is taken as the minimum weight a rep must have to be tracked. If you want to track all reps set this to 0. If you do not want this to influence anything then set it to max value. This is only useful for debugging or for people who really know what they are doing.\ntype:string,amount,raw");
 	toml.put ("enable_upnp", enable_upnp, "Enable or disable automatic UPnP port forwarding. This feature only works if the node is directly connected to a router (not inside a docker container, etc.).\ntype:bool");
 
@@ -261,6 +262,10 @@ nano::error nano::node_config::serialize_toml (nano::tomlconfig & toml) const
 	nano::tomlconfig backlog_scan_l;
 	backlog_scan.serialize (backlog_scan_l);
 	toml.put_child ("backlog_scan", backlog_scan_l);
+
+	nano::tomlconfig bounded_backlog_l;
+	bounded_backlog.serialize (bounded_backlog_l);
+	toml.put_child ("bounded_backlog", bounded_backlog_l);
 
 	return toml.get_error ();
 }
@@ -399,6 +404,12 @@ nano::error nano::node_config::deserialize_toml (nano::tomlconfig & toml)
 		{
 			auto config_l = toml.get_required_child ("backlog_scan");
 			backlog_scan.deserialize (config_l);
+		}
+
+		if (toml.has_key ("bounded_backlog"))
+		{
+			auto config_l = toml.get_required_child ("bounded_backlog");
+			bounded_backlog.deserialize (config_l);
 		}
 
 		/*
@@ -552,6 +563,7 @@ nano::error nano::node_config::deserialize_toml (nano::tomlconfig & toml)
 		toml.get<uint32_t> ("request_aggregator_threads", request_aggregator_threads);
 
 		toml.get<unsigned> ("max_unchecked_blocks", max_unchecked_blocks);
+		toml.get<std::size_t> ("max_backlog", max_backlog);
 
 		auto rep_crawler_weight_minimum_l (rep_crawler_weight_minimum.to_string_dec ());
 		if (toml.has_key ("rep_crawler_weight_minimum"))

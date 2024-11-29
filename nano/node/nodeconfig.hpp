@@ -13,6 +13,7 @@
 #include <nano/node/blockprocessor.hpp>
 #include <nano/node/bootstrap/bootstrap_config.hpp>
 #include <nano/node/bootstrap/bootstrap_server.hpp>
+#include <nano/node/bounded_backlog.hpp>
 #include <nano/node/confirming_set.hpp>
 #include <nano/node/ipc/ipc_config.hpp>
 #include <nano/node/local_block_broadcaster.hpp>
@@ -128,11 +129,14 @@ public:
 	uint32_t max_queued_requests{ 512 };
 	unsigned request_aggregator_threads{ std::min (nano::hardware_concurrency (), 4u) }; // Max 4 threads if available
 	unsigned max_unchecked_blocks{ 65536 };
+	std::size_t max_backlog{ 100000 };
 	std::chrono::seconds max_pruning_age{ !network_params.network.is_beta_network () ? std::chrono::seconds (24 * 60 * 60) : std::chrono::seconds (5 * 60) }; // 1 day; 5 minutes for beta network
 	uint64_t max_pruning_depth{ 0 };
 	nano::rocksdb_config rocksdb_config;
 	nano::lmdb_config lmdb_config;
 	bool enable_upnp{ true };
+
+public:
 	nano::vote_cache_config vote_cache;
 	nano::rep_crawler_config rep_crawler;
 	nano::block_processor_config block_processor;
@@ -147,6 +151,7 @@ public:
 	nano::confirming_set_config confirming_set;
 	nano::monitor_config monitor;
 	nano::backlog_scan_config backlog_scan;
+	nano::bounded_backlog_config bounded_backlog;
 
 public:
 	/** Entry is ignored if it cannot be parsed as a valid address:port */
