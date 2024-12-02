@@ -183,6 +183,25 @@ void nano::election::transition_active ()
 	state_change (nano::election_state::passive, nano::election_state::active);
 }
 
+bool nano::election::transition_priority ()
+{
+	nano::lock_guard<nano::mutex> guard{ mutex };
+
+	if (behavior_m == nano::election_behavior::priority || behavior_m == nano::election_behavior::manual)
+	{
+		return false;
+	}
+
+	behavior_m = nano::election_behavior::priority;
+	last_vote = std::chrono::steady_clock::time_point{}; // allow new outgoing votes immediately
+
+	node.logger.debug (nano::log::type::election, "Transitioned election behavior to priority from {} for root: {}",
+	to_string (behavior_m),
+	qualified_root.to_string ());
+
+	return true;
+}
+
 void nano::election::cancel ()
 {
 	nano::lock_guard<nano::mutex> guard{ mutex };

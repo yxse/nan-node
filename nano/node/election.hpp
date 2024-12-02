@@ -87,6 +87,7 @@ private: // State management
 public: // State transitions
 	bool transition_time (nano::confirmation_solicitor &);
 	void transition_active ();
+	bool transition_priority ();
 	void cancel ();
 
 public: // Status
