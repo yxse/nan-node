@@ -27,7 +27,7 @@ nano::election::election (nano::node & node_a, std::shared_ptr<nano::block> cons
 	live_vote_action (live_vote_action_a),
 	node (node_a),
 	behavior_m (election_behavior_a),
-	status ({ block_a, 0, 0, std::chrono::duration_cast<std::chrono::milliseconds> (std::chrono::system_clock::now ().time_since_epoch ()), std::chrono::duration_values<std::chrono::milliseconds>::zero (), 0, 1, 0, nano::election_status_type::ongoing }),
+	status ({ block_a, 0, 0, std::chrono::duration_cast<std::chrono::milliseconds> (std::chrono::system_clock::now ().time_since_epoch ()), std::chrono::duration_values<std::chrono::milliseconds>::zero (), 0, 0, 1, 0, nano::election_status_type::ongoing }),
 	height (block_a->sideband ().height),
 	root (block_a->root ()),
 	qualified_root (block_a->qualified_root ())
@@ -440,6 +440,7 @@ void nano::election::confirm_if_quorum (nano::unique_lock<nano::mutex> & lock_a)
 	{
 		if (!is_quorum.exchange (true) && node.config.enable_voting && node.wallets.reps ().voting > 0)
 		{
+			++vote_broadcast_count;
 			node.final_generator.add (root, status.winner->hash ());
 		}
 		if (final_weight >= node.online_reps.delta ())
@@ -596,6 +597,7 @@ nano::election_extended_status nano::election::current_status_locked () const
 
 	nano::election_status status_l = status;
 	status_l.confirmation_request_count = confirmation_request_count;
+	status_l.vote_broadcast_count = vote_broadcast_count;
 	status_l.block_count = nano::narrow_cast<decltype (status_l.block_count)> (last_blocks.size ());
 	status_l.voter_count = nano::narrow_cast<decltype (status_l.voter_count)> (last_votes.size ());
 	return nano::election_extended_status{ status_l, last_votes, last_blocks, tally_impl () };
@@ -625,6 +627,7 @@ void nano::election::broadcast_vote_locked (nano::unique_lock<nano::mutex> & loc
 	if (node.config.enable_voting && node.wallets.reps ().voting > 0)
 	{
 		node.stats.inc (nano::stat::type::election, nano::stat::detail::broadcast_vote);
+		++vote_broadcast_count;
 
 		if (confirmed_locked () || have_quorum (tally_impl ()))
 		{
@@ -822,6 +825,7 @@ void nano::election_extended_status::operator() (nano::object_stream & obs) cons
 	obs.write ("tally_amount", status.tally.to_string_dec ());
 	obs.write ("final_tally_amount", status.final_tally.to_string_dec ());
 	obs.write ("confirmation_request_count", status.confirmation_request_count);
+	obs.write ("vote_broadcast_count", status.vote_broadcast_count);
 	obs.write ("block_count", status.block_count);
 	obs.write ("voter_count", status.voter_count);
 	obs.write ("type", status.type);

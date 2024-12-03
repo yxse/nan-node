@@ -35,6 +35,7 @@ public:
 	std::chrono::milliseconds election_end{ std::chrono::duration_cast<std::chrono::milliseconds> (std::chrono::system_clock::now ().time_since_epoch ()) };
 	std::chrono::milliseconds election_duration{ std::chrono::duration_values<std::chrono::milliseconds>::zero () };
 	unsigned confirmation_request_count{ 0 };
+	unsigned vote_broadcast_count{ 0 };
 	unsigned block_count{ 0 };
 	unsigned voter_count{ 0 };
 	election_status_type type{ nano::election_status_type::inactive_confirmation_height };

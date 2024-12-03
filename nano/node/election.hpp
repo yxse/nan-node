@@ -97,6 +97,7 @@ public: // Status
 	std::shared_ptr<nano::block> winner () const;
 	std::chrono::milliseconds duration () const;
 	std::atomic<unsigned> confirmation_request_count{ 0 };
+	std::atomic<unsigned> vote_broadcast_count{ 0 };
 
 	nano::tally_t tally () const;
 	bool have_quorum (nano::tally_t const &) const;
