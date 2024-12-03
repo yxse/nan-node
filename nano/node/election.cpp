@@ -27,7 +27,7 @@ nano::election::election (nano::node & node_a, std::shared_ptr<nano::block> cons
 	live_vote_action (live_vote_action_a),
 	node (node_a),
 	behavior_m (election_behavior_a),
-	status ({ block_a, 0, 0, std::chrono::duration_cast<std::chrono::milliseconds> (std::chrono::system_clock::now ().time_since_epoch ()), std::chrono::duration_values<std::chrono::milliseconds>::zero (), 0, 0, 1, 0, nano::election_status_type::ongoing }),
+	status (block_a),
 	height (block_a->sideband ().height),
 	root (block_a->root ()),
 	qualified_root (block_a->qualified_root ())

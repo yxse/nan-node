@@ -39,5 +39,14 @@ public:
 	unsigned block_count{ 0 };
 	unsigned voter_count{ 0 };
 	election_status_type type{ nano::election_status_type::inactive_confirmation_height };
+
+	election_status () = default;
+
+	election_status (std::shared_ptr<nano::block> block_a, election_status_type type_a = nano::election_status_type::ongoing) :
+		winner (block_a),
+		type (type_a)
+	{
+		block_count = 1;
+	}
 };
 }
