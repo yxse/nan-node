@@ -87,6 +87,7 @@ private: // State management
 public: // State transitions
 	bool transition_time (nano::confirmation_solicitor &);
 	void transition_active ();
+	bool transition_priority ();
 	void cancel ();
 
 public: // Status
@@ -96,6 +97,7 @@ public: // Status
 	std::shared_ptr<nano::block> winner () const;
 	std::chrono::milliseconds duration () const;
 	std::atomic<unsigned> confirmation_request_count{ 0 };
+	std::atomic<unsigned> vote_broadcast_count{ 0 };
 
 	nano::tally_t tally () const;
 	bool have_quorum (nano::tally_t const &) const;
@@ -180,7 +182,7 @@ private:
 	mutable nano::uint128_t final_weight{ 0 };
 	mutable std::unordered_map<nano::block_hash, nano::uint128_t> last_tally;
 
-	nano::election_behavior const behavior_m;
+	nano::election_behavior behavior_m;
 	std::chrono::steady_clock::time_point const election_start{ std::chrono::steady_clock::now () };
 
 	mutable nano::mutex mutex;

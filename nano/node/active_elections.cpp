@@ -435,6 +435,23 @@ nano::election_insertion_result nano::active_elections::insert (std::shared_ptr<
 	else
 	{
 		result.election = existing->election;
+
+		// Upgrade to priority election to enable immediate vote broadcasting.
+		auto previous_behavior = result.election->behavior ();
+		if (election_behavior_a == nano::election_behavior::priority && previous_behavior != nano::election_behavior::priority)
+		{
+			bool transitioned = result.election->transition_priority ();
+			if (transitioned)
+			{
+				count_by_behavior[previous_behavior]--;
+				count_by_behavior[election_behavior_a]++;
+				node.stats.inc (nano::stat::type::active_elections, nano::stat::detail::transition_priority);
+			}
+			else
+			{
+				node.stats.inc (nano::stat::type::active_elections, nano::stat::detail::transition_priority_failed);
+			}
+		}
 	}
 
 	lock.unlock ();
