@@ -522,13 +522,13 @@ TEST (node, fork_publish)
 				 .build ();
 	node1.work_generate_blocking (*send2);
 	node1.process_active (send1);
+	node1.process_active (send2);
 	ASSERT_TIMELY_EQ (5s, 1, node1.active.size ());
+	ASSERT_TIMELY (5s, node1.active.active (*send2));
 	auto election (node1.active.election (send1->qualified_root ()));
 	ASSERT_NE (nullptr, election);
 	// Wait until the genesis rep activated & makes vote
 	ASSERT_TIMELY_EQ (1s, election->votes ().size (), 2);
-	node1.process_active (send2);
-	ASSERT_TIMELY (5s, node1.active.active (*send2));
 	auto votes1 (election->votes ());
 	auto existing1 (votes1.find (nano::dev::genesis_key.pub));
 	ASSERT_NE (votes1.end (), existing1);
