@@ -61,15 +61,18 @@ void nano::bootstrap::account_sets::priority_down (nano::account const & account
 	{
 		stats.inc (nano::stat::type::bootstrap_account_sets, nano::stat::detail::deprioritize);
 
-		if (it->fails >= account_sets::max_fails || it->fails >= it->priority)
+		auto priority = it->priority / account_sets::priority_divide;
+
+		if (it->fails >= account_sets::max_fails || it->fails >= it->priority || priority <= account_sets::priority_cutoff)
 		{
 			stats.inc (nano::stat::type::bootstrap_account_sets, nano::stat::detail::erase_by_threshold);
 			priorities.get<tag_account> ().erase (it);
 		}
 		else
 		{
-			priorities.get<tag_account> ().modify (it, [] (auto & val) {
+			priorities.get<tag_account> ().modify (it, [priority] (auto & val) {
 				val.fails += 1;
+				val.priority = priority;
 			});
 		}
 	}
@@ -217,7 +220,7 @@ void nano::bootstrap::account_sets::trim_overflow ()
 	}
 }
 
-nano::account nano::bootstrap::account_sets::next_priority (std::function<bool (nano::account const &)> const & filter)
+auto nano::bootstrap::account_sets::next_priority (std::function<bool (nano::account const &)> const & filter) -> priority_result
 {
 	if (priorities.empty ())
 	{
@@ -236,10 +239,14 @@ nano::account nano::bootstrap::account_sets::next_priority (std::function<bool (
 		{
 			continue;
 		}
-		return entry.account;
+		return {
+			.account = entry.account,
+			.priority = entry.priority,
+			.fails = entry.fails
+		};
 	}
 
-	return { 0 };
+	return {};
 }
 
 nano::block_hash nano::bootstrap::account_sets::next_blocking (std::function<bool (nano::block_hash const &)> const & filter)
