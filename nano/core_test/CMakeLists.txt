@@ -57,6 +57,7 @@ add_executable(
   signal_manager.cpp
   socket.cpp
   system.cpp
+  tcp_listener.cpp
   telemetry.cpp
   thread_pool.cpp
   throttle.cpp
