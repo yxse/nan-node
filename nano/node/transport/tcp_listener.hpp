@@ -86,7 +86,7 @@ public:
 	nano::container_info container_info () const;
 
 public: // Events
-	using connection_accepted_event_t = nano::observer_set<std::shared_ptr<nano::transport::tcp_socket> const &, std::shared_ptr<nano::transport::tcp_server>>;
+	using connection_accepted_event_t = nano::observer_set<std::shared_ptr<nano::transport::tcp_socket>, std::shared_ptr<nano::transport::tcp_server>>;
 	connection_accepted_event_t connection_accepted;
 
 private: // Dependencies
