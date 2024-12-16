@@ -159,6 +159,7 @@ void nano::bootstrap_server::respond (nano::asc_pull_ack & response, std::shared
 		}
 		void operator() (nano::asc_pull_ack::account_info_payload const & pld)
 		{
+			stats.inc (nano::stat::type::bootstrap_server, nano::stat::detail::account_info, nano::stat::dir::out);
 		}
 		void operator() (nano::asc_pull_ack::frontiers_payload const & pld)
 		{
