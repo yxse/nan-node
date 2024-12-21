@@ -335,10 +335,12 @@ nano::node::node (std::shared_ptr<boost::asio::io_context> io_ctx_a, std::filesy
 		logger.info (nano::log::type::node, "Work peers: {}", config.work_peers.size ());
 		logger.info (nano::log::type::node, "Node ID: {}", node_id.pub.to_node_id ());
 		logger.info (nano::log::type::node, "Number of buckets: {}", bucketing.size ());
+		logger.info (nano::log::type::node, "Genesis block: {}", config.network_params.ledger.genesis->hash ().to_string ());
+		logger.info (nano::log::type::node, "Genesis account: {}", config.network_params.ledger.genesis->account ().to_account ());
 
 		if (!work_generation_enabled ())
 		{
-			logger.info (nano::log::type::node, "Work generation is disabled");
+			logger.warn (nano::log::type::node, "Work generation is disabled");
 		}
 
 		logger.info (nano::log::type::node, "Outbound bandwidth limit: {} bytes/s, burst ratio: {}",
