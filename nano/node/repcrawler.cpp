@@ -83,7 +83,8 @@ void nano::rep_crawler::validate_and_process (nano::unique_lock<nano::mutex> & l
 		if (channel->get_type () == nano::transport::transport_type::loopback)
 		{
 			logger.debug (nano::log::type::rep_crawler, "Ignoring vote from loopback channel: {}", channel->to_string ());
-			continue;
+
+			continue; // Skip this vote
 		}
 
 		nano::uint128_t const rep_weight = node.ledger.weight (vote->account);
@@ -91,8 +92,9 @@ void nano::rep_crawler::validate_and_process (nano::unique_lock<nano::mutex> & l
 		{
 			logger.debug (nano::log::type::rep_crawler, "Ignoring vote from account: {} with too little voting weight: {}",
 			vote->account.to_account (),
-			nano::util::to_str (rep_weight));
-			continue;
+			fmt::streamed (rep_weight));
+
+			continue; // Skip this vote
 		}
 
 		// temporary data used for logging after dropping the lock

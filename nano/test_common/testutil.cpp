@@ -387,3 +387,8 @@ std::vector<std::shared_ptr<nano::block>> nano::test::all_blocks (nano::node & n
 	}
 	return result;
 }
+
+nano::uint128_t nano::test::minimum_principal_weight ()
+{
+	return nano::dev::genesis->balance ().number () / nano::dev::network_params.network.principal_weight_factor;
+}
