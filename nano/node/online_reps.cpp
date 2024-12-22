@@ -141,19 +141,26 @@ void nano::online_reps::trim_trended (nano::store::write_transaction const & tra
 	auto const now = std::chrono::system_clock::now ();
 	auto const cutoff = now - config.network_params.node.weight_cutoff;
 
+	std::deque<nano::store::online_weight::iterator::value_type> to_remove;
+
 	for (auto it = ledger.store.online_weight.begin (transaction); it != ledger.store.online_weight.end (transaction); ++it)
 	{
 		auto tstamp = nano::from_seconds_since_epoch (it->first);
 		if (tstamp < cutoff)
 		{
 			stats.inc (nano::stat::type::online_reps, nano::stat::detail::trim_trend);
-			ledger.store.online_weight.del (transaction, it->first);
+			to_remove.push_back (*it);
 		}
 		else
 		{
-			// Entries are ordered by timestamp, so break early
-			break;
+			break; // Entries are ordered by timestamp, so break early
 		}
+	}
+
+	// Remove entries after iterating to avoid iterator invalidation
+	for (auto const & entry : to_remove)
+	{
+		ledger.store.online_weight.del (transaction, entry.first);
 	}
 
 	// Ensure that all remaining entries are within the expected range
@@ -166,6 +173,7 @@ void nano::online_reps::sanitize_trended (nano::store::write_transaction const &
 	auto const cutoff = now - config.network_params.node.weight_cutoff;
 
 	size_t removed_old = 0, removed_future = 0;
+	std::deque<nano::store::online_weight::iterator::value_type> to_remove;
 
 	for (auto it = ledger.store.online_weight.begin (transaction); it != ledger.store.online_weight.end (transaction); ++it)
 	{
@@ -173,17 +181,21 @@ void nano::online_reps::sanitize_trended (nano::store::write_transaction const &
 		if (tstamp < cutoff)
 		{
 			stats.inc (nano::stat::type::online_reps, nano::stat::detail::sanitize_old);
-			// TODO: Ensure it's OK to delete entry with the same key as the current iterator
-			ledger.store.online_weight.del (transaction, it->first);
+			to_remove.push_back (*it);
 			++removed_old;
 		}
 		else if (tstamp > now)
 		{
 			stats.inc (nano::stat::type::online_reps, nano::stat::detail::sanitize_future);
-			// TODO: Ensure it's OK to delete entry with the same key as the current iterator
-			ledger.store.online_weight.del (transaction, it->first);
+			to_remove.push_back (*it);
 			++removed_future;
 		}
+	}
+
+	// Remove entries after iterating to avoid iterator invalidation
+	for (auto const & entry : to_remove)
+	{
+		ledger.store.online_weight.del (transaction, entry.first);
 	}
 
 	logger.debug (nano::log::type::online_reps, "Sanitized online weight trend, remaining entries: {}, removed: {} (old: {}, future: {})",
