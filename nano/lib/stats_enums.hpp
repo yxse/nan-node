@@ -30,6 +30,12 @@ enum class type
 	ipc,
 	tcp,
 	tcp_server,
+	tcp_channel,
+	tcp_channel_queued,
+	tcp_channel_send,
+	tcp_channel_drop,
+	tcp_channel_ec,
+	tcp_channel_wait,
 	tcp_channels,
 	tcp_channels_rejected,
 	tcp_channels_purge,
@@ -42,7 +48,7 @@ enum class type
 	confirmation_height,
 	confirmation_observer,
 	confirming_set,
-	drop,
+	drop, // TODO: Rename to message_drop
 	aggregator,
 	requests,
 	request_aggregator,
@@ -64,6 +70,7 @@ enum class type
 	bootstrap_verify_frontiers,
 	bootstrap_process,
 	bootstrap_request,
+	bootstrap_request_ec,
 	bootstrap_request_blocks,
 	bootstrap_reply,
 	bootstrap_next,
@@ -75,6 +82,8 @@ enum class type
 	bootstrap_server_request,
 	bootstrap_server_overfill,
 	bootstrap_server_response,
+	bootstrap_server_send,
+	bootstrap_server_ec,
 	active,
 	active_elections,
 	active_elections_started,
@@ -93,6 +102,7 @@ enum class type
 	optimistic_scheduler,
 	handshake,
 	rep_crawler,
+	rep_crawler_ec,
 	local_block_broadcaster,
 	rep_tiers,
 	syn_cookies,
@@ -152,6 +162,9 @@ enum class detail
 	sync,
 	requeued,
 	evicted,
+	other,
+	drop,
+	queued,
 
 	// processing queue
 	queue,
@@ -300,15 +313,25 @@ enum class detail
 	loop_reachout,
 	loop_reachout_cached,
 	merge_peer,
+	merge_peer_failed,
 	reachout_live,
 	reachout_cached,
+	connected,
 
-	// traffic
+	// traffic type
 	generic,
+	bootstrap_server,
+	bootstrap_requests,
+	block_broadcast,
+	block_broadcast_initial,
+	block_broadcast_rpc,
+	confirmation_requests,
+	vote_rebroadcast,
+	vote_reply,
+	rep_crawler,
+	telemetry,
 
 	// tcp
-	tcp_write_drop,
-	tcp_write_no_socket_drop,
 	tcp_silent_connection_drop,
 	tcp_io_timeout_drop,
 	tcp_connect_error,
@@ -334,6 +357,10 @@ enum class detail
 	connect_success,
 	attempt_timeout,
 	not_a_peer,
+
+	// tcp_channel
+	wait_socket,
+	wait_bandwidth,
 
 	// tcp_channels
 	channel_accepted,
@@ -581,6 +608,12 @@ enum class detail
 	rollback_missing_block,
 	rollback_skipped,
 	loop_scan,
+
+	// error codes
+	no_buffer_space,
+	timed_out,
+	host_unreachable,
+	not_supported,
 
 	_last // Must be the last enum
 };

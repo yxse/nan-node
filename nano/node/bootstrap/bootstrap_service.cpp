@@ -201,14 +201,12 @@ bool nano::bootstrap_service::send (std::shared_ptr<nano::transport::channel> co
 
 	request.update_header ();
 
-	stats.inc (nano::stat::type::bootstrap, nano::stat::detail::request, nano::stat::dir::out);
-	stats.inc (nano::stat::type::bootstrap_request, to_stat_detail (tag.type));
-
-	channel->send (
-	request, [this, id = tag.id] (auto const & ec, auto size) {
+	bool sent = channel->send (
+	request, nano::transport::traffic_type::bootstrap_requests, [this, id = tag.id] (auto const & ec, auto size) {
 		nano::lock_guard<nano::mutex> lock{ mutex };
 		if (auto it = tags.get<tag_id> ().find (id); it != tags.get<tag_id> ().end ())
 		{
+			stats.inc (nano::stat::type::bootstrap_request_ec, to_stat_detail (ec), nano::stat::dir::out);
 			if (!ec)
 			{
 				stats.inc (nano::stat::type::bootstrap, nano::stat::detail::request_success, nano::stat::dir::out);
@@ -222,9 +220,19 @@ bool nano::bootstrap_service::send (std::shared_ptr<nano::transport::channel> co
 				stats.inc (nano::stat::type::bootstrap, nano::stat::detail::request_failed, nano::stat::dir::out);
 				tags.get<tag_id> ().erase (it);
 			}
-		} }, nano::transport::buffer_drop_policy::limiter, nano::transport::traffic_type::bootstrap);
+		} });
 
-	return true; // TODO: Return channel send result
+	if (sent)
+	{
+		stats.inc (nano::stat::type::bootstrap, nano::stat::detail::request);
+		stats.inc (nano::stat::type::bootstrap_request, to_stat_detail (tag.type));
+	}
+	else
+	{
+		stats.inc (nano::stat::type::bootstrap, nano::stat::detail::request_failed);
+	}
+
+	return sent;
 }
 
 std::size_t nano::bootstrap_service::priority_size () const

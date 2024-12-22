@@ -67,10 +67,10 @@ class tcp_socket final : public std::enable_shared_from_this<tcp_socket>
 	friend class tcp_listener;
 
 public:
-	static std::size_t constexpr default_max_queue_size = 128;
+	static size_t constexpr default_queue_size = 16;
 
 public:
-	explicit tcp_socket (nano::node &, nano::transport::socket_endpoint = socket_endpoint::client, std::size_t max_queue_size = default_max_queue_size);
+	explicit tcp_socket (nano::node &, nano::transport::socket_endpoint = socket_endpoint::client, size_t queue_size = default_queue_size);
 
 	// TODO: Accepting remote/local endpoints as a parameter is unnecessary, but is needed for now to keep compatibility with the legacy code
 	tcp_socket (
@@ -79,7 +79,7 @@ public:
 	boost::asio::ip::tcp::endpoint remote_endpoint,
 	boost::asio::ip::tcp::endpoint local_endpoint,
 	nano::transport::socket_endpoint = socket_endpoint::server,
-	std::size_t max_queue_size = default_max_queue_size);
+	size_t queue_size = default_queue_size);
 
 	~tcp_socket ();
 
@@ -97,8 +97,7 @@ public:
 
 	void async_write (
 	nano::shared_const_buffer const &,
-	std::function<void (boost::system::error_code const &, std::size_t)> callback = {},
-	traffic_type = traffic_type::generic);
+	std::function<void (boost::system::error_code const &, std::size_t)> callback = nullptr);
 
 	boost::asio::ip::tcp::endpoint remote_endpoint () const;
 	boost::asio::ip::tcp::endpoint local_endpoint () const;
@@ -110,8 +109,8 @@ public:
 	std::chrono::seconds get_default_timeout_value () const;
 	void set_timeout (std::chrono::seconds);
 
-	bool max (nano::transport::traffic_type = traffic_type::generic) const;
-	bool full (nano::transport::traffic_type = traffic_type::generic) const;
+	bool max () const;
+	bool full () const;
 
 	nano::transport::socket_type type () const
 	{
@@ -143,6 +142,7 @@ public:
 	}
 
 private:
+	size_t const queue_size;
 	socket_queue send_queue;
 
 protected:
@@ -200,20 +200,7 @@ private:
 	socket_endpoint const endpoint_type_m;
 	std::atomic<socket_type> type_m{ socket_type::undefined };
 
-public:
-	std::size_t const max_queue_size;
-
 public: // Logging
 	virtual void operator() (nano::object_stream &) const;
 };
-
-using address_socket_mmap = std::multimap<boost::asio::ip::address, std::weak_ptr<tcp_socket>>;
-
-namespace socket_functions
-{
-	boost::asio::ip::network_v6 get_ipv6_subnet_address (boost::asio::ip::address_v6 const &, std::size_t);
-	boost::asio::ip::address first_ipv6_subnet_address (boost::asio::ip::address_v6 const &, std::size_t);
-	boost::asio::ip::address last_ipv6_subnet_address (boost::asio::ip::address_v6 const &, std::size_t);
-	std::size_t count_subnetwork_connections (nano::transport::address_socket_mmap const &, boost::asio::ip::address_v6 const &, std::size_t);
-}
 }

@@ -473,7 +473,7 @@ TEST (node, confirm_locked)
 				 .sign (nano::keypair ().prv, 0)
 				 .work (0)
 				 .build ();
-	system.nodes[0]->network.flood_block (block);
+	system.nodes[0]->network.flood_block (block, nano::transport::traffic_type::test);
 }
 
 TEST (node_config, random_rep)
@@ -1005,14 +1005,9 @@ TEST (node, fork_no_vote_quorum)
 	ASSERT_FALSE (system.wallet (1)->store.fetch (transaction, key1, key3));
 	auto vote = std::make_shared<nano::vote> (key1, key3, 0, 0, std::vector<nano::block_hash>{ send2->hash () });
 	nano::confirm_ack confirm{ nano::dev::network_params.network, vote };
-	std::vector<uint8_t> buffer;
-	{
-		nano::vectorstream stream (buffer);
-		confirm.serialize (stream);
-	}
 	auto channel = node2.network.find_node_id (node3.node_id.pub);
 	ASSERT_NE (nullptr, channel);
-	channel->send_buffer (nano::shared_const_buffer (std::move (buffer)));
+	channel->send (confirm, nano::transport::traffic_type::test);
 	ASSERT_TIMELY (10s, node3.stats.count (nano::stat::type::message, nano::stat::detail::confirm_ack, nano::stat::dir::in) >= 3);
 	ASSERT_EQ (node1.latest (nano::dev::genesis_key.pub), send1->hash ());
 	ASSERT_EQ (node2.latest (nano::dev::genesis_key.pub), send1->hash ());
@@ -2662,13 +2657,6 @@ TEST (node, dont_write_lock_node)
 
 TEST (node, bidirectional_tcp)
 {
-#ifdef _WIN32
-	if (nano::rocksdb_config::using_rocksdb_in_tests ())
-	{
-		// Don't test this in rocksdb mode
-		GTEST_SKIP ();
-	}
-#endif
 	nano::test::system system;
 	nano::node_flags node_flags;
 	// Disable bootstrap to start elections for new blocks

@@ -229,10 +229,6 @@ nano::node::node (std::shared_ptr<boost::asio::io_context> io_ctx_a, std::filesy
 		wallets.observer = [this] (bool active) {
 			observers.wallet.notify (active);
 		};
-		network.channel_observer = [this] (std::shared_ptr<nano::transport::channel> const & channel_a) {
-			debug_assert (channel_a != nullptr);
-			observers.endpoint.notify (channel_a);
-		};
 		network.disconnect_observer = [this] () {
 			observers.disconnect.notify ();
 		};
@@ -297,8 +293,8 @@ nano::node::node (std::shared_ptr<boost::asio::io_context> io_ctx_a, std::filesy
 			});
 		}
 
-		observers.endpoint.add ([this] (std::shared_ptr<nano::transport::channel> const & channel_a) {
-			this->network.send_keepalive_self (channel_a);
+		observers.channel_connected.add ([this] (std::shared_ptr<nano::transport::channel> const & channel) {
+			network.send_keepalive_self (channel);
 		});
 
 		observers.vote.add ([this] (std::shared_ptr<nano::vote> vote, std::shared_ptr<nano::transport::channel> const & channel, nano::vote_source source, nano::vote_code code) {
@@ -709,7 +705,7 @@ void nano::node::stop ()
 	epoch_upgrader.stop ();
 	local_block_broadcaster.stop ();
 	message_processor.stop ();
-	network.stop (); // Stop network last to avoid killing in-use sockets
+	network.stop ();
 	monitor.stop ();
 
 	bootstrap_workers.stop ();
@@ -720,6 +716,7 @@ void nano::node::stop ()
 	// work pool is not stopped on purpose due to testing setup
 
 	// Stop the IO runner last
+	runner.abort ();
 	runner.join ();
 	debug_assert (io_ctx_shared.use_count () == 1); // Node should be the last user of the io_context
 }
