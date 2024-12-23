@@ -240,8 +240,6 @@ public: // Testing convenience functions
 	nano::uint128_t balance (nano::account const &);
 
 private:
-	void long_inactivity_cleanup ();
-
 	static std::string make_logger_identifier (nano::keypair const & node_id);
 };
 

@@ -591,8 +591,6 @@ void nano::node::process_local_async (std::shared_ptr<nano::block> const & block
 
 void nano::node::start ()
 {
-	long_inactivity_cleanup ();
-
 	network.start ();
 	message_processor.start ();
 
@@ -773,26 +771,6 @@ nano::uint128_t nano::node::weight (nano::account const & account_a)
 nano::uint128_t nano::node::minimum_principal_weight ()
 {
 	return online_reps.trended () / network_params.network.principal_weight_factor;
-}
-
-void nano::node::long_inactivity_cleanup ()
-{
-	bool perform_cleanup = false;
-	auto const transaction = store.tx_begin_write ();
-	if (store.online_weight.count (transaction) > 0)
-	{
-		auto sample (store.online_weight.rbegin (transaction));
-		auto n (store.online_weight.rend (transaction));
-		debug_assert (sample != n);
-		auto const one_week_ago = static_cast<std::size_t> ((std::chrono::system_clock::now () - std::chrono::hours (7 * 24)).time_since_epoch ().count ());
-		perform_cleanup = sample->first < one_week_ago;
-	}
-	if (perform_cleanup)
-	{
-		store.online_weight.clear (transaction);
-		store.peer.clear (transaction);
-		logger.info (nano::log::type::node, "Removed records of peers and online weight after a long period of inactivity");
-	}
 }
 
 void nano::node::backup_wallet ()
