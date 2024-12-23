@@ -40,6 +40,7 @@ add_executable(
   numbers.cpp
   object_stream.cpp
   observer_set.cpp
+  online_reps.cpp
   optimistic_scheduler.cpp
   processing_queue.cpp
   processor_service.cpp

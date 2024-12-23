@@ -432,5 +432,7 @@ namespace test
 	 * Returns all blocks in the ledger
 	 */
 	std::vector<std::shared_ptr<nano::block>> all_blocks (nano::node &);
+
+	nano::uint128_t minimum_principal_weight ();
 }
 }

@@ -26,6 +26,7 @@
 #include <nano/node/message_processor.hpp>
 #include <nano/node/monitor.hpp>
 #include <nano/node/node.hpp>
+#include <nano/node/online_reps.hpp>
 #include <nano/node/peer_history.hpp>
 #include <nano/node/portmapping.hpp>
 #include <nano/node/request_aggregator.hpp>
@@ -138,7 +139,8 @@ nano::node::node (std::shared_ptr<boost::asio::io_context> io_ctx_a, std::filesy
 	rep_crawler (config.rep_crawler, *this),
 	rep_tiers{ ledger, network_params, online_reps, stats, logger },
 	warmed_up (0),
-	online_reps (ledger, config),
+	online_reps_impl{ std::make_unique<nano::online_reps> (config, ledger, stats, logger) },
+	online_reps{ *online_reps_impl },
 	history_impl{ std::make_unique<nano::local_vote_history> (config.network_params.voting) },
 	history{ *history_impl },
 	vote_uniquer{},
@@ -333,10 +335,12 @@ nano::node::node (std::shared_ptr<boost::asio::io_context> io_ctx_a, std::filesy
 		logger.info (nano::log::type::node, "Work peers: {}", config.work_peers.size ());
 		logger.info (nano::log::type::node, "Node ID: {}", node_id.pub.to_node_id ());
 		logger.info (nano::log::type::node, "Number of buckets: {}", bucketing.size ());
+		logger.info (nano::log::type::node, "Genesis block: {}", config.network_params.ledger.genesis->hash ().to_string ());
+		logger.info (nano::log::type::node, "Genesis account: {}", config.network_params.ledger.genesis->account ().to_account ());
 
 		if (!work_generation_enabled ())
 		{
-			logger.info (nano::log::type::node, "Work generation is disabled");
+			logger.warn (nano::log::type::node, "Work generation is disabled");
 		}
 
 		logger.info (nano::log::type::node, "Outbound bandwidth limit: {} bytes/s, burst ratio: {}",
@@ -587,8 +591,6 @@ void nano::node::process_local_async (std::shared_ptr<nano::block> const & block
 
 void nano::node::start ()
 {
-	long_inactivity_cleanup ();
-
 	network.start ();
 	message_processor.start ();
 
@@ -603,8 +605,6 @@ void nano::node::start ()
 	{
 		rep_crawler.start ();
 	}
-
-	ongoing_online_weight_calculation_queue ();
 
 	bool tcp_enabled = false;
 	if (config.tcp_incoming_connections_max > 0 && !(flags.disable_bootstrap_listener && flags.disable_tcp_realtime))
@@ -659,6 +659,7 @@ void nano::node::start ()
 	local_block_broadcaster.start ();
 	peer_history.start ();
 	vote_router.start ();
+	online_reps.start ();
 	monitor.start ();
 
 	add_initial_peers ();
@@ -675,7 +676,7 @@ void nano::node::stop ()
 	logger.info (nano::log::type::node, "Node stopping...");
 
 	tcp_listener.stop ();
-
+	online_reps.stop ();
 	vote_router.stop ();
 	peer_history.stop ();
 	// Cancels ongoing work generation tasks, which may be blocking other threads
@@ -770,26 +771,6 @@ nano::uint128_t nano::node::weight (nano::account const & account_a)
 nano::uint128_t nano::node::minimum_principal_weight ()
 {
 	return online_reps.trended () / network_params.network.principal_weight_factor;
-}
-
-void nano::node::long_inactivity_cleanup ()
-{
-	bool perform_cleanup = false;
-	auto const transaction = store.tx_begin_write ();
-	if (store.online_weight.count (transaction) > 0)
-	{
-		auto sample (store.online_weight.rbegin (transaction));
-		auto n (store.online_weight.rend (transaction));
-		debug_assert (sample != n);
-		auto const one_week_ago = static_cast<std::size_t> ((std::chrono::system_clock::now () - std::chrono::hours (7 * 24)).time_since_epoch ().count ());
-		perform_cleanup = sample->first < one_week_ago;
-	}
-	if (perform_cleanup)
-	{
-		store.online_weight.clear (transaction);
-		store.peer.clear (transaction);
-		logger.info (nano::log::type::node, "Removed records of peers and online weight after a long period of inactivity");
-	}
 }
 
 void nano::node::backup_wallet ()
@@ -1061,26 +1042,9 @@ bool nano::node::block_confirmed_or_being_confirmed (nano::block_hash const & ha
 	return block_confirmed_or_being_confirmed (ledger.tx_begin_read (), hash_a);
 }
 
-void nano::node::ongoing_online_weight_calculation_queue ()
-{
-	std::weak_ptr<nano::node> node_w (shared_from_this ());
-	workers.post_delayed ((std::chrono::seconds (network_params.node.weight_period)), [node_w] () {
-		if (auto node_l = node_w.lock ())
-		{
-			node_l->ongoing_online_weight_calculation ();
-		}
-	});
-}
-
 bool nano::node::online () const
 {
 	return rep_crawler.total_weight () > online_reps.delta ();
-}
-
-void nano::node::ongoing_online_weight_calculation ()
-{
-	online_reps.sample ();
-	ongoing_online_weight_calculation_queue ();
 }
 
 std::shared_ptr<nano::node> nano::node::shared ()

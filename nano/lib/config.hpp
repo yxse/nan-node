@@ -41,7 +41,7 @@ consteval bool is_asan_build ()
 #else
 	return false;
 #endif
-// GCC builds
+	// GCC builds
 #elif defined(__SANITIZE_ADDRESS__)
 	return true;
 #else
@@ -57,7 +57,7 @@ consteval bool is_tsan_build ()
 #else
 	return false;
 #endif
-// GCC builds
+	// GCC builds
 #elif defined(__SANITIZE_THREAD__)
 	return true;
 #else
@@ -105,6 +105,9 @@ bool slow_instrumentation ();
 
 /** Set the active network to the dev network */
 void force_nano_dev_network ();
+
+/** Checks that we are running in test mode */
+bool is_dev_run ();
 }
 
 namespace nano

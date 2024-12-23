@@ -81,6 +81,7 @@ enum class type
 	signal_manager,
 	peer_history,
 	message_processor,
+	online_reps,
 	local_block_broadcaster,
 	monitor,
 	confirming_set,
