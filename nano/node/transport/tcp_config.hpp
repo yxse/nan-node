@@ -1,6 +1,7 @@
 #pragma once
 
 #include <nano/lib/config.hpp>
+#include <nano/lib/constants.hpp>
 
 #include <chrono>
 
@@ -20,6 +21,9 @@ public:
 			connect_timeout = std::chrono::seconds{ 5 };
 		}
 	}
+
+public:
+	// TODO: Serialize/deserialize
 
 public:
 	size_t max_inbound_connections{ 2048 };

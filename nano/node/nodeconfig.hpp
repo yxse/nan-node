@@ -27,6 +27,7 @@
 #include <nano/node/scheduler/hinted.hpp>
 #include <nano/node/scheduler/optimistic.hpp>
 #include <nano/node/scheduler/priority.hpp>
+#include <nano/node/transport/tcp_config.hpp>
 #include <nano/node/transport/tcp_listener.hpp>
 #include <nano/node/vote_cache.hpp>
 #include <nano/node/vote_processor.hpp>
@@ -109,8 +110,6 @@ public:
 	std::chrono::seconds tcp_io_timeout{ (network_params.network.is_dev_network () && !is_sanitizer_build ()) ? std::chrono::seconds (5) : std::chrono::seconds (15) };
 	std::chrono::nanoseconds pow_sleep_interval{ 0 };
 
-	/** Default maximum incoming TCP connections, including realtime network & bootstrap */
-	unsigned tcp_incoming_connections_max{ 2048 };
 	bool use_memory_pools{ true };
 	static std::chrono::minutes constexpr wallet_backup_interval = std::chrono::minutes (5);
 	/** Default outbound traffic shaping is 10MB/s */
