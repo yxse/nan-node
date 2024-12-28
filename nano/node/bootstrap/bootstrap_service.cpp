@@ -342,7 +342,7 @@ void nano::bootstrap_service::wait (std::function<bool ()> const & predicate) co
 	}
 }
 
-void nano::bootstrap_service::wait_blockprocessor () const
+void nano::bootstrap_service::wait_block_processor () const
 {
 	wait ([this] () {
 		return block_processor.size (nano::block_source::bootstrap) < config.block_processor_threshold;
@@ -569,7 +569,7 @@ bool nano::bootstrap_service::request_frontiers (nano::account start, std::share
 
 void nano::bootstrap_service::run_one_priority ()
 {
-	wait_blockprocessor ();
+	wait_block_processor ();
 	auto channel = wait_channel ();
 	if (!channel)
 	{
@@ -611,7 +611,7 @@ void nano::bootstrap_service::run_priorities ()
 
 void nano::bootstrap_service::run_one_database (bool should_throttle)
 {
-	wait_blockprocessor ();
+	wait_block_processor ();
 	auto channel = wait_channel ();
 	if (!channel)
 	{
@@ -641,7 +641,7 @@ void nano::bootstrap_service::run_database ()
 
 void nano::bootstrap_service::run_one_dependency ()
 {
-	// No need to wait for blockprocessor, as we are not processing blocks
+	// No need to wait for block_processor, as we are not processing blocks
 	auto channel = wait_channel ();
 	if (!channel)
 	{
@@ -669,7 +669,7 @@ void nano::bootstrap_service::run_dependencies ()
 
 void nano::bootstrap_service::run_one_frontier ()
 {
-	// No need to wait for blockprocessor, as we are not processing blocks
+	// No need to wait for block_processor, as we are not processing blocks
 	wait ([this] () {
 		return !accounts.priority_half_full ();
 	});

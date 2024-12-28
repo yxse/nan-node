@@ -5854,7 +5854,7 @@ TEST (ledger_transaction, write_wait_order)
 	WAIT (250ms); // Allow thread to start
 
 	auto fut2 = std::async (std::launch::async, [&ctx, &acquired2, &latch2] {
-		auto tx = ctx.ledger ().tx_begin_write (nano::store::writer::blockprocessor);
+		auto tx = ctx.ledger ().tx_begin_write (nano::store::writer::block_processor);
 		acquired2 = true;
 		latch2.wait (); // Wait for the signal to drop tx
 	});

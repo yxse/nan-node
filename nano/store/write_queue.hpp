@@ -13,7 +13,7 @@ enum class writer
 {
 	generic,
 	node,
-	blockprocessor,
+	block_processor,
 	confirmation_height,
 	pruning,
 	voting_final,

@@ -1045,7 +1045,7 @@ TEST (toml_config, log_config_no_defaults)
 
 	[log.levels]
 	active_elections = "trace"
-	blockprocessor = "trace"
+	block_processor = "trace"
 	)toml";
 
 	nano::tomlconfig toml;

@@ -113,8 +113,8 @@ private:
 	/* Waits for a condition to be satisfied with incremental backoff */
 	void wait (std::function<bool ()> const & predicate) const;
 
-	/* Ensure there is enough space in blockprocessor for queuing new blocks */
-	void wait_blockprocessor () const;
+	/* Ensure there is enough space in block_processor for queuing new blocks */
+	void wait_block_processor () const;
 	/* Waits for a channel that is not full */
 	std::shared_ptr<nano::transport::channel> wait_channel ();
 	/* Waits until a suitable account outside of cooldown period is available */
