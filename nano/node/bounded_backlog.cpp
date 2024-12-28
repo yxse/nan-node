@@ -1,7 +1,7 @@
 #include <nano/lib/blocks.hpp>
 #include <nano/lib/thread_roles.hpp>
 #include <nano/node/backlog_scan.hpp>
-#include <nano/node/blockprocessor.hpp>
+#include <nano/node/block_processor.hpp>
 #include <nano/node/bounded_backlog.hpp>
 #include <nano/node/confirming_set.hpp>
 #include <nano/node/node.hpp>

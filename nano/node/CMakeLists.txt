@@ -20,8 +20,8 @@ add_library(
   backlog_scan.cpp
   bandwidth_limiter.hpp
   bandwidth_limiter.cpp
-  blockprocessor.hpp
-  blockprocessor.cpp
+  block_processor.hpp
+  block_processor.cpp
   bucketing.hpp
   bucketing.cpp
   bounded_backlog.hpp

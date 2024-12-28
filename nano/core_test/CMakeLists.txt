@@ -9,7 +9,7 @@ add_executable(
   backlog.cpp
   block.cpp
   block_store.cpp
-  blockprocessor.cpp
+  block_processor.cpp
   bootstrap.cpp
   bootstrap_server.cpp
   bucketing.cpp
