@@ -250,6 +250,7 @@ TEST (toml_config, daemon_config_deserialize_defaults)
 	[node.websocket]
 	[node.lmdb]
 	[node.rocksdb]
+	[node.tcp]
 	[opencl]
 	[rpc]
 	[rpc.child_process]
@@ -417,6 +418,14 @@ TEST (toml_config, daemon_config_deserialize_defaults)
 
 	ASSERT_EQ (conf.node.message_processor.threads, defaults.node.message_processor.threads);
 	ASSERT_EQ (conf.node.message_processor.max_queue, defaults.node.message_processor.max_queue);
+
+	ASSERT_EQ (conf.node.tcp.max_inbound_connections, defaults.node.tcp.max_inbound_connections);
+	ASSERT_EQ (conf.node.tcp.max_outbound_connections, defaults.node.tcp.max_outbound_connections);
+	ASSERT_EQ (conf.node.tcp.max_attempts, defaults.node.tcp.max_attempts);
+	ASSERT_EQ (conf.node.tcp.max_attempts_per_ip, defaults.node.tcp.max_attempts_per_ip);
+	ASSERT_EQ (conf.node.tcp.connect_timeout, defaults.node.tcp.connect_timeout);
+	ASSERT_EQ (conf.node.tcp.handshake_timeout, defaults.node.tcp.handshake_timeout);
+	ASSERT_EQ (conf.node.tcp.io_timeout, defaults.node.tcp.io_timeout);
 }
 
 /** Deserialize a node config with non-default values */
@@ -639,6 +648,15 @@ TEST (toml_config, daemon_config_deserialize_no_defaults)
 	threads = 999
 	max_queue = 999
 
+	[node.tcp]
+	max_inbound_connections = 999
+	max_outbound_connections = 999
+	max_attempts = 999
+	max_attempts_per_ip = 999
+	connect_timeout = 999
+	handshake_timeout = 999
+	io_timeout = 999
+
 	[opencl]
 	device = 999
 	enable = true
@@ -820,6 +838,14 @@ TEST (toml_config, daemon_config_deserialize_no_defaults)
 
 	ASSERT_NE (conf.node.message_processor.threads, defaults.node.message_processor.threads);
 	ASSERT_NE (conf.node.message_processor.max_queue, defaults.node.message_processor.max_queue);
+
+	ASSERT_NE (conf.node.tcp.max_inbound_connections, defaults.node.tcp.max_inbound_connections);
+	ASSERT_NE (conf.node.tcp.max_outbound_connections, defaults.node.tcp.max_outbound_connections);
+	ASSERT_NE (conf.node.tcp.max_attempts, defaults.node.tcp.max_attempts);
+	ASSERT_NE (conf.node.tcp.max_attempts_per_ip, defaults.node.tcp.max_attempts_per_ip);
+	ASSERT_NE (conf.node.tcp.connect_timeout, defaults.node.tcp.connect_timeout);
+	ASSERT_NE (conf.node.tcp.handshake_timeout, defaults.node.tcp.handshake_timeout);
+	ASSERT_NE (conf.node.tcp.io_timeout, defaults.node.tcp.io_timeout);
 }
 
 /** There should be no required values **/
