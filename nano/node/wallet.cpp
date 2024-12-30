@@ -1349,6 +1349,10 @@ void nano::wallets::do_wallet_actions ()
 	}
 }
 
+/*
+ * wallets
+ */
+
 nano::wallets::wallets (bool error_a, nano::node & node_a) :
 	network_params{ node_a.config.network_params },
 	observer ([] (bool) {}),
@@ -1413,16 +1417,38 @@ nano::wallets::wallets (bool error_a, nano::node & node_a) :
 	{
 		item.second->enter_initial_password ();
 	}
-	if (node_a.config.enable_voting)
-	{
-		lock.unlock ();
-		ongoing_compute_reps ();
-	}
 }
 
 nano::wallets::~wallets ()
 {
 	stop ();
+}
+
+void nano::wallets::start ()
+{
+	thread = std::thread{ [this] () {
+		nano::thread_role::set (nano::thread_role::name::wallet_actions);
+		do_wallet_actions ();
+	} };
+
+	if (node.config.enable_voting)
+	{
+		ongoing_compute_reps ();
+	}
+}
+
+void nano::wallets::stop ()
+{
+	{
+		nano::lock_guard<nano::mutex> action_lock{ action_mutex };
+		stopped = true;
+		actions.clear ();
+	}
+	condition.notify_all ();
+	if (thread.joinable ())
+	{
+		thread.join ();
+	}
 }
 
 std::shared_ptr<nano::wallet> nano::wallets::open (nano::wallet_id const & id_a)
@@ -1608,28 +1634,6 @@ bool nano::wallets::exists (store::transaction const & transaction_a, nano::acco
 		result = i->second->store.exists (transaction_a, account_a);
 	}
 	return result;
-}
-
-void nano::wallets::stop ()
-{
-	{
-		nano::lock_guard<nano::mutex> action_lock{ action_mutex };
-		stopped = true;
-		actions.clear ();
-	}
-	condition.notify_all ();
-	if (thread.joinable ())
-	{
-		thread.join ();
-	}
-}
-
-void nano::wallets::start ()
-{
-	thread = std::thread{ [this] () {
-		nano::thread_role::set (nano::thread_role::name::wallet_actions);
-		do_wallet_actions ();
-	} };
 }
 
 nano::store::write_transaction nano::wallets::tx_begin_write ()
