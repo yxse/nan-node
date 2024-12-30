@@ -96,9 +96,12 @@ public:
 	nano::container_info container_info () const;
 
 public:
+	const std::filesystem::path application_path;
 	const nano::keypair node_id;
+	boost::latch node_initialized_latch;
 	nano::node_config config;
 	nano::node_flags flags;
+	nano::network_params & network_params;
 	std::shared_ptr<boost::asio::io_context> io_ctx_shared;
 	boost::asio::io_context & io_ctx;
 	std::unique_ptr<nano::logger> logger_impl;
@@ -107,8 +110,6 @@ public:
 	nano::stats & stats;
 	std::unique_ptr<nano::thread_runner> runner_impl;
 	nano::thread_runner & runner;
-	boost::latch node_initialized_latch;
-	nano::network_params & network_params;
 	nano::node_observers observers;
 	std::unique_ptr<nano::thread_pool> workers_impl;
 	nano::thread_pool & workers;
@@ -127,6 +128,8 @@ public:
 	nano::unchecked_map & unchecked;
 	std::unique_ptr<nano::wallets_store> wallets_store_impl;
 	nano::wallets_store & wallets_store;
+	std::unique_ptr<nano::wallets> wallets_impl;
+	nano::wallets & wallets;
 	std::unique_ptr<nano::ledger> ledger_impl;
 	nano::ledger & ledger;
 	std::unique_ptr<nano::bandwidth_limiter> outbound_limiter_impl;
@@ -139,7 +142,6 @@ public:
 	nano::telemetry & telemetry;
 	std::unique_ptr<nano::transport::tcp_listener> tcp_listener_impl;
 	nano::transport::tcp_listener & tcp_listener;
-	std::filesystem::path application_path;
 	std::unique_ptr<nano::port_mapping> port_mapping_impl;
 	nano::port_mapping & port_mapping;
 	std::unique_ptr<nano::block_processor> block_processor_impl;
@@ -178,8 +180,6 @@ public:
 	nano::scheduler::component & scheduler;
 	std::unique_ptr<nano::request_aggregator> aggregator_impl;
 	nano::request_aggregator & aggregator;
-	std::unique_ptr<nano::wallets> wallets_impl;
-	nano::wallets & wallets;
 	std::unique_ptr<nano::backlog_scan> backlog_scan_impl;
 	nano::backlog_scan & backlog_scan;
 	std::unique_ptr<nano::bounded_backlog> backlog_impl;
