@@ -110,7 +110,8 @@ public:
 	nano::stats & stats;
 	std::unique_ptr<nano::thread_runner> runner_impl;
 	nano::thread_runner & runner;
-	nano::node_observers observers;
+	std::unique_ptr<nano::node_observers> observers_impl;
+	nano::node_observers & observers;
 	std::unique_ptr<nano::thread_pool> workers_impl;
 	nano::thread_pool & workers;
 	std::unique_ptr<nano::thread_pool> bootstrap_workers_impl;

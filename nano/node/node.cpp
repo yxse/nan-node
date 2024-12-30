@@ -92,6 +92,8 @@ nano::node::node (std::shared_ptr<boost::asio::io_context> io_ctx_a, std::filesy
 	stats{ *stats_impl },
 	runner_impl{ std::make_unique<nano::thread_runner> (io_ctx_shared, logger, config.io_threads) },
 	runner{ *runner_impl },
+	observers_impl{ std::make_unique<nano::node_observers> () },
+	observers{ *observers_impl },
 	workers_impl{ std::make_unique<nano::thread_pool> (config.background_threads, nano::thread_role::name::worker, /* start immediately */ true) },
 	workers{ *workers_impl },
 	bootstrap_workers_impl{ std::make_unique<nano::thread_pool> (config.bootstrap_serving_threads, nano::thread_role::name::bootstrap_worker, /* start immediately */ true) },
