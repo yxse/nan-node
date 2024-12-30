@@ -47,7 +47,7 @@ enum class type
 	tls,
 	active_elections,
 	election,
-	blockprocessor,
+	block_processor,
 	network,
 	message,
 	channel,
@@ -122,7 +122,7 @@ enum class detail
 	election_expired,
 	broadcast_vote,
 
-	// blockprocessor
+	// block_processor
 	block_processed,
 
 	// vote_processor

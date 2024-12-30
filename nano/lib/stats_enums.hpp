@@ -60,10 +60,10 @@ enum class type
 	vote_cache,
 	vote_cache_processor,
 	hinting,
-	blockprocessor,
-	blockprocessor_source,
-	blockprocessor_result,
-	blockprocessor_overfill,
+	block_processor,
+	block_processor_source,
+	block_processor_result,
+	block_processor_overfill,
 	bootstrap,
 	bootstrap_verify,
 	bootstrap_verify_blocks,
@@ -206,7 +206,7 @@ enum class detail
 	representative_mismatch,
 	block_position,
 
-	// blockprocessor
+	// block_processor
 	process_blocking,
 	process_blocking_timeout,
 	force,

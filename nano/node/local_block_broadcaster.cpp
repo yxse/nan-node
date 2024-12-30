@@ -1,7 +1,7 @@
 #include <nano/lib/blocks.hpp>
 #include <nano/lib/threading.hpp>
 #include <nano/lib/utility.hpp>
-#include <nano/node/blockprocessor.hpp>
+#include <nano/node/block_processor.hpp>
 #include <nano/node/confirming_set.hpp>
 #include <nano/node/local_block_broadcaster.hpp>
 #include <nano/node/network.hpp>
