@@ -33,37 +33,6 @@
 
 namespace nano
 {
-class active_elections;
-class bandwidth_limiter;
-class confirming_set;
-class message_processor;
-class monitor;
-class node;
-class telemetry;
-class online_reps;
-class vote_processor;
-class vote_cache_processor;
-class vote_router;
-class work_pool;
-class peer_history;
-class port_mapping;
-class thread_runner;
-
-namespace scheduler
-{
-	class component;
-}
-namespace transport
-{
-	class tcp_listener;
-}
-namespace rocksdb
-{
-} // Declare a namespace rocksdb inside nano so all references to the rocksdb library need to be globally scoped e.g. ::rocksdb::Slice
-}
-
-namespace nano
-{
 class node final : public std::enable_shared_from_this<node>
 {
 public:
@@ -127,18 +96,22 @@ public:
 	nano::container_info container_info () const;
 
 public:
+	const std::filesystem::path application_path;
 	const nano::keypair node_id;
+	boost::latch node_initialized_latch;
 	nano::node_config config;
 	nano::node_flags flags;
+	nano::network_params & network_params;
 	std::shared_ptr<boost::asio::io_context> io_ctx_shared;
 	boost::asio::io_context & io_ctx;
-	nano::logger logger;
+	std::unique_ptr<nano::logger> logger_impl;
+	nano::logger & logger;
+	std::unique_ptr<nano::stats> stats_impl;
+	nano::stats & stats;
 	std::unique_ptr<nano::thread_runner> runner_impl;
 	nano::thread_runner & runner;
-	boost::latch node_initialized_latch;
-	nano::network_params & network_params;
-	nano::stats stats;
-	nano::node_observers observers;
+	std::unique_ptr<nano::node_observers> observers_impl;
+	nano::node_observers & observers;
 	std::unique_ptr<nano::thread_pool> workers_impl;
 	nano::thread_pool & workers;
 	std::unique_ptr<nano::thread_pool> bootstrap_workers_impl;
@@ -148,24 +121,28 @@ public:
 	std::unique_ptr<nano::thread_pool> election_workers_impl;
 	nano::thread_pool & election_workers;
 	nano::work_pool & work;
-	nano::distributed_work_factory distributed_work;
+	std::unique_ptr<nano::distributed_work_factory> distributed_work_impl;
+	nano::distributed_work_factory & distributed_work;
 	std::unique_ptr<nano::store::component> store_impl;
 	nano::store::component & store;
-	nano::unchecked_map unchecked;
+	std::unique_ptr<nano::unchecked_map> unchecked_impl;
+	nano::unchecked_map & unchecked;
 	std::unique_ptr<nano::wallets_store> wallets_store_impl;
 	nano::wallets_store & wallets_store;
+	std::unique_ptr<nano::wallets> wallets_impl;
+	nano::wallets & wallets;
 	std::unique_ptr<nano::ledger> ledger_impl;
 	nano::ledger & ledger;
 	std::unique_ptr<nano::bandwidth_limiter> outbound_limiter_impl;
 	nano::bandwidth_limiter & outbound_limiter;
 	std::unique_ptr<nano::message_processor> message_processor_impl;
 	nano::message_processor & message_processor;
-	nano::network network;
+	std::unique_ptr<nano::network> network_impl;
+	nano::network & network;
 	std::unique_ptr<nano::telemetry> telemetry_impl;
 	nano::telemetry & telemetry;
 	std::unique_ptr<nano::transport::tcp_listener> tcp_listener_impl;
 	nano::transport::tcp_listener & tcp_listener;
-	std::filesystem::path application_path;
 	std::unique_ptr<nano::port_mapping> port_mapping_impl;
 	nano::port_mapping & port_mapping;
 	std::unique_ptr<nano::block_processor> block_processor_impl;
@@ -178,14 +155,18 @@ public:
 	nano::active_elections & active;
 	std::unique_ptr<nano::online_reps> online_reps_impl;
 	nano::online_reps & online_reps;
-	nano::rep_crawler rep_crawler;
-	nano::rep_tiers rep_tiers;
-	unsigned warmed_up;
+	std::unique_ptr<nano::rep_crawler> rep_crawler_impl;
+	nano::rep_crawler & rep_crawler;
+	std::unique_ptr<nano::rep_tiers> rep_tiers_impl;
+	nano::rep_tiers & rep_tiers;
 	std::unique_ptr<nano::local_vote_history> history_impl;
 	nano::local_vote_history & history;
-	nano::block_uniquer block_uniquer;
-	nano::vote_uniquer vote_uniquer;
-	nano::vote_cache vote_cache;
+	std::unique_ptr<nano::block_uniquer> block_uniquer_impl;
+	nano::block_uniquer & block_uniquer;
+	std::unique_ptr<nano::vote_uniquer> vote_uniquer_impl;
+	nano::vote_uniquer & vote_uniquer;
+	std::unique_ptr<nano::vote_cache> vote_cache_impl;
+	nano::vote_cache & vote_cache;
 	std::unique_ptr<nano::vote_router> vote_router_impl;
 	nano::vote_router & vote_router;
 	std::unique_ptr<nano::vote_processor> vote_processor_impl;
@@ -200,7 +181,6 @@ public:
 	nano::scheduler::component & scheduler;
 	std::unique_ptr<nano::request_aggregator> aggregator_impl;
 	nano::request_aggregator & aggregator;
-	nano::wallets wallets;
 	std::unique_ptr<nano::backlog_scan> backlog_scan_impl;
 	nano::backlog_scan & backlog_scan;
 	std::unique_ptr<nano::bounded_backlog> backlog_impl;
@@ -209,11 +189,14 @@ public:
 	nano::bootstrap_server & bootstrap_server;
 	std::unique_ptr<nano::bootstrap_service> bootstrap_impl;
 	nano::bootstrap_service & bootstrap;
-	nano::websocket_server websocket;
-	nano::epoch_upgrader epoch_upgrader;
+	std::unique_ptr<nano::websocket_server> websocket_impl;
+	nano::websocket_server & websocket;
+	std::unique_ptr<nano::epoch_upgrader> epoch_upgrader_impl;
+	nano::epoch_upgrader & epoch_upgrader;
 	std::unique_ptr<nano::local_block_broadcaster> local_block_broadcaster_impl;
 	nano::local_block_broadcaster & local_block_broadcaster;
-	nano::process_live_dispatcher process_live_dispatcher;
+	std::unique_ptr<nano::process_live_dispatcher> process_live_dispatcher_impl;
+	nano::process_live_dispatcher & process_live_dispatcher;
 	std::unique_ptr<nano::peer_history> peer_history_impl;
 	nano::peer_history & peer_history;
 	std::unique_ptr<nano::monitor> monitor_impl;
@@ -228,7 +211,7 @@ public:
 	static double constexpr free_cutoff = 1024.0;
 
 public: // For tests only
-	unsigned node_seq;
+	const unsigned node_seq;
 	std::optional<uint64_t> work_generate_blocking (nano::block &);
 	std::optional<uint64_t> work_generate_blocking (nano::root const &, uint64_t);
 	std::optional<uint64_t> work_generate_blocking (nano::root const &);

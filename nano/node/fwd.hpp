@@ -53,6 +53,7 @@ enum class vote_code;
 
 namespace nano::scheduler
 {
+class component;
 class hinted;
 class manual;
 class optimistic;
