@@ -250,6 +250,7 @@ TEST (toml_config, daemon_config_deserialize_defaults)
 	[node.websocket]
 	[node.lmdb]
 	[node.rocksdb]
+	[node.tcp]
 	[opencl]
 	[rpc]
 	[rpc.child_process]
@@ -305,7 +306,6 @@ TEST (toml_config, daemon_config_deserialize_defaults)
 	ASSERT_EQ (conf.node.preconfigured_representatives, defaults.node.preconfigured_representatives);
 	ASSERT_EQ (conf.node.receive_minimum, defaults.node.receive_minimum);
 	ASSERT_EQ (conf.node.signature_checker_threads, defaults.node.signature_checker_threads);
-	ASSERT_EQ (conf.node.tcp_incoming_connections_max, defaults.node.tcp_incoming_connections_max);
 	ASSERT_EQ (conf.node.tcp_io_timeout, defaults.node.tcp_io_timeout);
 	ASSERT_EQ (conf.node.unchecked_cutoff_time, defaults.node.unchecked_cutoff_time);
 	ASSERT_EQ (conf.node.use_memory_pools, defaults.node.use_memory_pools);
@@ -418,6 +418,14 @@ TEST (toml_config, daemon_config_deserialize_defaults)
 
 	ASSERT_EQ (conf.node.message_processor.threads, defaults.node.message_processor.threads);
 	ASSERT_EQ (conf.node.message_processor.max_queue, defaults.node.message_processor.max_queue);
+
+	ASSERT_EQ (conf.node.tcp.max_inbound_connections, defaults.node.tcp.max_inbound_connections);
+	ASSERT_EQ (conf.node.tcp.max_outbound_connections, defaults.node.tcp.max_outbound_connections);
+	ASSERT_EQ (conf.node.tcp.max_attempts, defaults.node.tcp.max_attempts);
+	ASSERT_EQ (conf.node.tcp.max_attempts_per_ip, defaults.node.tcp.max_attempts_per_ip);
+	ASSERT_EQ (conf.node.tcp.connect_timeout, defaults.node.tcp.connect_timeout);
+	ASSERT_EQ (conf.node.tcp.handshake_timeout, defaults.node.tcp.handshake_timeout);
+	ASSERT_EQ (conf.node.tcp.io_timeout, defaults.node.tcp.io_timeout);
 }
 
 /** Deserialize a node config with non-default values */
@@ -458,7 +466,6 @@ TEST (toml_config, daemon_config_deserialize_no_defaults)
 	preconfigured_representatives = ["nano_3arg3asgtigae3xckabaaewkx3bzsh7nwz7jkmjos79ihyaxwphhm6qgjps4"]
 	receive_minimum = "999"
 	signature_checker_threads = 999
-	tcp_incoming_connections_max = 999
 	tcp_io_timeout = 999
 	unchecked_cutoff_time = 999
 	use_memory_pools = false
@@ -641,6 +648,15 @@ TEST (toml_config, daemon_config_deserialize_no_defaults)
 	threads = 999
 	max_queue = 999
 
+	[node.tcp]
+	max_inbound_connections = 999
+	max_outbound_connections = 999
+	max_attempts = 999
+	max_attempts_per_ip = 999
+	connect_timeout = 999
+	handshake_timeout = 999
+	io_timeout = 999
+
 	[opencl]
 	device = 999
 	enable = true
@@ -710,7 +726,6 @@ TEST (toml_config, daemon_config_deserialize_no_defaults)
 	ASSERT_NE (conf.node.preconfigured_representatives, defaults.node.preconfigured_representatives);
 	ASSERT_NE (conf.node.receive_minimum, defaults.node.receive_minimum);
 	ASSERT_NE (conf.node.signature_checker_threads, defaults.node.signature_checker_threads);
-	ASSERT_NE (conf.node.tcp_incoming_connections_max, defaults.node.tcp_incoming_connections_max);
 	ASSERT_NE (conf.node.tcp_io_timeout, defaults.node.tcp_io_timeout);
 	ASSERT_NE (conf.node.unchecked_cutoff_time, defaults.node.unchecked_cutoff_time);
 	ASSERT_NE (conf.node.use_memory_pools, defaults.node.use_memory_pools);
@@ -823,6 +838,14 @@ TEST (toml_config, daemon_config_deserialize_no_defaults)
 
 	ASSERT_NE (conf.node.message_processor.threads, defaults.node.message_processor.threads);
 	ASSERT_NE (conf.node.message_processor.max_queue, defaults.node.message_processor.max_queue);
+
+	ASSERT_NE (conf.node.tcp.max_inbound_connections, defaults.node.tcp.max_inbound_connections);
+	ASSERT_NE (conf.node.tcp.max_outbound_connections, defaults.node.tcp.max_outbound_connections);
+	ASSERT_NE (conf.node.tcp.max_attempts, defaults.node.tcp.max_attempts);
+	ASSERT_NE (conf.node.tcp.max_attempts_per_ip, defaults.node.tcp.max_attempts_per_ip);
+	ASSERT_NE (conf.node.tcp.connect_timeout, defaults.node.tcp.connect_timeout);
+	ASSERT_NE (conf.node.tcp.handshake_timeout, defaults.node.tcp.handshake_timeout);
+	ASSERT_NE (conf.node.tcp.io_timeout, defaults.node.tcp.io_timeout);
 }
 
 /** There should be no required values **/
