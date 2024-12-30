@@ -149,7 +149,6 @@ public:
 	nano::online_reps & online_reps;
 	nano::rep_crawler rep_crawler;
 	nano::rep_tiers rep_tiers;
-	unsigned warmed_up;
 	std::unique_ptr<nano::local_vote_history> history_impl;
 	nano::local_vote_history & history;
 	nano::block_uniquer block_uniquer;

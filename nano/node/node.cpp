@@ -138,7 +138,6 @@ nano::node::node (std::shared_ptr<boost::asio::io_context> io_ctx_a, std::filesy
 	active{ *active_impl },
 	rep_crawler (config.rep_crawler, *this),
 	rep_tiers{ ledger, network_params, online_reps, stats, logger },
-	warmed_up (0),
 	online_reps_impl{ std::make_unique<nano::online_reps> (config, ledger, stats, logger) },
 	online_reps{ *online_reps_impl },
 	history_impl{ std::make_unique<nano::local_vote_history> (config.network_params.voting) },
