@@ -17,6 +17,7 @@ class network_constants;
 class object_stream;
 class root;
 class thread_pool;
+class thread_runner;
 class tomlconfig;
 template <typename Key, typename Value>
 class uniquer;

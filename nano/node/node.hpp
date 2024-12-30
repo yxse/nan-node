@@ -33,37 +33,6 @@
 
 namespace nano
 {
-class active_elections;
-class bandwidth_limiter;
-class confirming_set;
-class message_processor;
-class monitor;
-class node;
-class telemetry;
-class online_reps;
-class vote_processor;
-class vote_cache_processor;
-class vote_router;
-class work_pool;
-class peer_history;
-class port_mapping;
-class thread_runner;
-
-namespace scheduler
-{
-	class component;
-}
-namespace transport
-{
-	class tcp_listener;
-}
-namespace rocksdb
-{
-} // Declare a namespace rocksdb inside nano so all references to the rocksdb library need to be globally scoped e.g. ::rocksdb::Slice
-}
-
-namespace nano
-{
 class node final : public std::enable_shared_from_this<node>
 {
 public:
