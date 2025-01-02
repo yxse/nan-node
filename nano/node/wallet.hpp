@@ -172,6 +172,7 @@ public:
 	std::function<void (bool, bool)> lock_observer;
 	nano::wallet_store store;
 	nano::wallets & wallets;
+	nano::logger & logger;
 	nano::mutex representatives_mutex;
 	std::unordered_set<nano::account> representatives;
 };
@@ -242,6 +243,7 @@ public:
 	MDB_dbi handle;
 	MDB_dbi send_action_ids;
 	nano::node & node;
+	nano::logger & logger;
 	nano::store::lmdb::env & env;
 	std::atomic<bool> stopped;
 	std::thread thread;
