@@ -1,3 +1,4 @@
+# For Dogenano
 export prefix=xdg_
 export source=4FE444C1F67C7E36CC5C96D25AD0E921C2EEB692A65AA1B932547A4325CF59BC
 export account=xdg_1mz6am1zez5y8u87s7pkddagkag4xtub7bktn8wm6o5taekwypfww4p6frby
@@ -6,6 +7,15 @@ export signature=CCB3783A6926B1B0BCDA027A5EAA42F19CBE49760904DFEB8210D676EB54B0E
 export name=Dogenan
 export peering=peering.dogenano.io
 export peering_port=7079
+# For Nano
+export prefix=xrb_
+export source=E89208DD038FBB269987689621D52292AE9C35941A7484756ECCED92A65093BA
+export account=nano_3t6k35gi95xu6tergt6p69ck76ogmitsa8mnijtpxm9fkcm736xtoncuohr3
+export work=62f05417dd3fb691
+export signature=9F0C933C8ADE004D808EA1985FA746A7E95BA2A38F867640F53EC8F180BDFE9E2C1268DEAD7C2664F356E37ABA362BC58E46DBA03E523A7B5A19E4B6EB12BB02
+export name=NANA
+export peering=peering.nano.org
+export peering_port=7075
 echo $name
 echo $ticket
 echo $source
