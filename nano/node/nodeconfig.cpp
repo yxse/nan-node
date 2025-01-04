@@ -17,7 +17,19 @@ namespace
 char const * preconfigured_peers_key = "preconfigured_peers";
 char const * signature_checker_threads_key = "signature_checker_threads";
 char const * pow_sleep_interval_key = "pow_sleep_interval";
-std::string const default_live_peer_network = nano::env::get ("NANO_DEFAULT_PEER").value_or ("peering.nano.org");
+std::string getPeeringFromEnv()
+{
+    const char *ticket_env = std::getenv("peering");
+    if (ticket_env != nullptr)
+    {
+        return ticket_env;
+    } else
+    {
+        return "peering.nano.org";
+    }
+}
+std::string peering_value = getPeeringFromEnv();
+std::string const default_live_peer_network = nano::env::get ("NANO_DEFAULT_PEER").value_or (peering_value);
 std::string const default_beta_peer_network = nano::env::get ("NANO_DEFAULT_PEER").value_or ("peering-beta.nano.org");
 std::string const default_test_peer_network = nano::env::get ("NANO_DEFAULT_PEER").value_or ("peering-test.nano.org");
 }

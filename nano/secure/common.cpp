@@ -22,21 +22,119 @@
 #include <crypto/ed25519-donna/ed25519.h>
 #include <cryptopp/words.h>
 
+#include <cstdlib>
+#include <iostream>
+
 nano::networks nano::network_constants::active_network = nano::networks::ACTIVE_NETWORK;
 
 namespace
 {
+std::string getTicketFromEnv()
+{
+    const char *ticket_env = std::getenv("prefix");
+    if (ticket_env != nullptr)
+    {
+        return ticket_env;
+    }
+    else
+    {
+        return "xrb_";
+    }
+}
+std::string getSourceFromEnv()
+{
+    const char *ticket_env = std::getenv("source");
+    if (ticket_env != nullptr)
+    {
+        return ticket_env;
+    }
+    else
+    {
+        return "E89208DD038FBB269987689621D52292AE9C35941A7484756ECCED92A65093BA";
+    }
+}
+std::string getAccountFromEnv()
+{
+    const char *ticket_env = std::getenv("account");
+    if (ticket_env != nullptr)
+    {
+        return ticket_env;
+    }
+    else
+    {
+        return "nano_3t6k35gi95xu6tergt6p69ck76ogmitsa8mnijtpxm9fkcm736xtoncuohr3";
+    }
+}
+std::string getWorkFromEnv()
+{
+    const char *ticket_env = std::getenv("work");
+    if (ticket_env != nullptr)
+    {
+        return ticket_env;
+    }
+    else
+    {
+        return "62f05417dd3fb691";
+    }
+}
+std::string getSignatureFromEnv()
+{
+    const char *ticket_env = std::getenv("signature");
+    if (ticket_env != nullptr)
+    {
+        return ticket_env;
+    }
+    else
+    {
+        return "9F0C933C8ADE004D808EA1985FA746A7E95BA2A38F867640F53EC8F180BDFE9E2C1268DEAD7C2664F356E37ABA362BC58E46DBA03E523A7B5A19E4B6EB12BB02";
+    }
+}
+
+std::string replaceGenesisData(const std::string& genesisDataTemplate, const std::string& ticketValue)
+{
+    char buffer[1024];
+    std::snprintf(buffer, sizeof(buffer), genesisDataTemplate.c_str(), ticketValue.c_str(), ticketValue.c_str());
+    return std::string(buffer);
+}
+std::string generateGenesisData(const std::string& source,
+                                const std::string& representative,
+                                const std::string& account,
+                                const std::string& work,
+                                const std::string& signature) {
+    char const * genesis_data_template = R"%%%({
+        "type": "open",
+        "source": "%s",
+        "representative": "%s",
+        "account": "%s",
+        "work": "%s",
+        "signature": "%s"
+    })%%%";
+    const int bufferSize = std::snprintf(nullptr, 0, genesis_data_template,
+                                          source.c_str(), representative.c_str(),
+                                          account.c_str(), work.c_str(), signature.c_str()) + 1;
+    char genesis_data[bufferSize];
+    std::sprintf(genesis_data, genesis_data_template, source.c_str(),
+                 representative.c_str(), account.c_str(), work.c_str(), signature.c_str());
+    return std::string(genesis_data);
+}
+
+std::string ticket_value = getTicketFromEnv();
+std::string source_value = getSourceFromEnv();
+std::string account_value = getAccountFromEnv();
+std::string work_value = getWorkFromEnv();
+std::string sign_value = getSignatureFromEnv();
+
 char const * dev_private_key_data = "34F0A37AAD20F4A260F0A5B3CB3D7FB50673212263E58A380BC10474BB039CE4";
-char const * dev_public_key_data = "B0311EA55708D6A53C75CDBF88300259C6D018522FE3D4D0A242E431F9E8B6D0"; // xrb_3e3j5tkog48pnny9dmfzj1r16pg8t1e76dz5tmac6iq689wyjfpiij4txtdo
+char const * dev_public_key_data = "B0311EA55708D6A53C75CDBF88300259C6D018522FE3D4D0A242E431F9E8B6D0"; // xro_3e3j5tkog48pnny9dmfzj1r16pg8t1e76dz5tmac6iq689wyjfpiij4txtdo
 char const * beta_public_key_data = "259A438A8F9F9226130C84D902C237AF3E57C0981C7D709C288046B110D8C8AC"; // nano_1betagoxpxwykx4kw86dnhosc8t3s7ix8eeentwkcg1hbpez1outjrcyg4n1
-char const * live_public_key_data = "E89208DD038FBB269987689621D52292AE9C35941A7484756ECCED92A65093BA"; // xrb_3t6k35gi95xu6tergt6p69ck76ogmitsa8mnijtpxm9fkcm736xtoncuohr3
+char const * live_public_key_data = source_value.c_str(); // xro_3t6k35gi95xu6tergt6p69ck76ogmitsa8mnijtpxm9fkcm736xtoncuohr3
 std::string const test_public_key_data = nano::env::get ("NANO_TEST_GENESIS_PUB").value_or ("45C6FF9D1706D61F0821327752671BDA9F9ED2DA40326B01935AB566FB9E08ED"); // nano_1jg8zygjg3pp5w644emqcbmjqpnzmubfni3kfe1s8pooeuxsw49fdq1mco9j
 
 char const * dev_genesis_data = R"%%%({
 	"type": "open",
 	"source": "B0311EA55708D6A53C75CDBF88300259C6D018522FE3D4D0A242E431F9E8B6D0",
-	"representative": "xrb_3e3j5tkog48pnny9dmfzj1r16pg8t1e76dz5tmac6iq689wyjfpiij4txtdo",
-	"account": "xrb_3e3j5tkog48pnny9dmfzj1r16pg8t1e76dz5tmac6iq689wyjfpiij4txtdo",
+	"representative": "nano_3e3j5tkog48pnny9dmfzj1r16pg8t1e76dz5tmac6iq689wyjfpiij4txtdo",
+	"account": "nano_3e3j5tkog48pnny9dmfzj1r16pg8t1e76dz5tmac6iq689wyjfpiij4txtdo",
 	"work": "7b42a00ee91d5810",
 	"signature": "ECDA914373A2F0CA1296475BAEE40500A7F0A7AD72A5A80C81D7FAB7F6C802B2CC7DB50F5DD0FB25B2EF11761FA7344A158DD5A700B21BD47DE5BD0F63153A02"
     })%%%";
@@ -50,11 +148,11 @@ char const * beta_genesis_data = R"%%%({
 	"signature": "BC588273AC689726D129D3137653FB319B6EE6DB178F97421D11D075B46FD52B6748223C8FF4179399D35CB1A8DF36F759325BD2D3D4504904321FAFB71D7602"
 	})%%%";
 
-char const * live_genesis_data = R"%%%({
+char const * live_genesis_data_template = R"%%%({
 	"type": "open",
 	"source": "E89208DD038FBB269987689621D52292AE9C35941A7484756ECCED92A65093BA",
-	"representative": "xrb_3t6k35gi95xu6tergt6p69ck76ogmitsa8mnijtpxm9fkcm736xtoncuohr3",
-	"account": "xrb_3t6k35gi95xu6tergt6p69ck76ogmitsa8mnijtpxm9fkcm736xtoncuohr3",
+	"representative": "nano_3t6k35gi95xu6tergt6p69ck76ogmitsa8mnijtpxm9fkcm736xtoncuohr3",
+	"account": "nano_3t6k35gi95xu6tergt6p69ck76ogmitsa8mnijtpxm9fkcm736xtoncuohr3",
 	"work": "62f05417dd3fb691",
 	"signature": "9F0C933C8ADE004D808EA1985FA746A7E95BA2A38F867640F53EC8F180BDFE9E2C1268DEAD7C2664F356E37ABA362BC58E46DBA03E523A7B5A19E4B6EB12BB02"
     })%%%";
@@ -67,6 +165,8 @@ std::string const test_genesis_data = nano::env::get ("NANO_TEST_GENESIS_BLOCK")
 	"work": "bc1ef279c1a34eb1",
 	"signature": "15049467CAEE3EC768639E8E35792399B6078DA763DA4EBA8ECAD33B0EDC4AF2E7403893A5A602EB89B978DABEF1D6606BB00F3C0EE11449232B143B6E07170E"
     })%%%");
+
+std::string live_genesis_data = replaceGenesisData(live_genesis_data_template, ticket_value);
 
 std::shared_ptr<nano::block> parse_block_from_genesis_data (std::string const & genesis_data_a)
 {

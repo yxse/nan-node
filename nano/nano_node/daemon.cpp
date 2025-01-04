@@ -99,8 +99,17 @@ void nano::daemon::run (std::filesystem::path const & data_path, nano::node_flag
 	nano::work_pool opencl_work (config.node.network_params.network, config.node.work_threads, config.node.pow_sleep_interval, opencl_work_func);
 	try
 	{
+		std::string ticket;
+		const char* ticket_env = std::getenv("prefix");
+		if (ticket_env != nullptr)
+		{
+			ticket = ticket_env;
+		} else
+		{
+			ticket = "nano_";
+		}
 		// This avoids a blank prompt during any node initialization delays
-		logger.info (nano::log::type::daemon, "Starting up Nano node...");
+		logger.info (nano::log::type::daemon, "Starting up {} node...", ticket);
 
 		// Print info about number of logical cores detected, those are used to decide how many IO, worker and signature checker threads to spawn
 		logger.info (nano::log::type::daemon, "Hardware concurrency: {} ( configured: {} )", std::thread::hardware_concurrency (), nano::hardware_concurrency ());

@@ -25,23 +25,31 @@ std::filesystem::path nano::app_path ()
 std::filesystem::path nano::working_path (nano::networks network)
 {
 	auto result = nano::app_path ();
-
+	std::string network_directory;
+	const char* name = std::getenv("name");
+	if (name != nullptr)
+	{
+		network_directory = name;
+	}
+	else {
+		network_directory = "Nano";
+	}
 	switch (network)
 	{
 		case nano::networks::invalid:
 			release_assert (false);
 			break;
 		case nano::networks::nano_dev_network:
-			result /= "NanoDev";
+			result /= network_directory + "Dev";
 			break;
 		case nano::networks::nano_beta_network:
-			result /= "NanoBeta";
+			result /= network_directory + "Beta";
 			break;
 		case nano::networks::nano_live_network:
-			result /= "Nano";
+			result /= network_directory;
 			break;
 		case nano::networks::nano_test_network:
-			result /= "NanoTest";
+			result /= network_directory + "Test";
 			break;
 	}
 	return result;

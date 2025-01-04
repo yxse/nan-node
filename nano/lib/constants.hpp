@@ -74,7 +74,6 @@ public:
 class network_constants
 {
 	static constexpr std::chrono::seconds default_cleanup_period = std::chrono::seconds (60);
-
 public:
 	network_constants (nano::work_thresholds & work_, nano::networks network_a) :
 		current_network (network_a),
@@ -97,9 +96,27 @@ public:
 		vote_broadcast_interval (15 * 1000),
 		block_broadcast_interval (150 * 1000)
 	{
+		std::string peering_port;
+		const char* ticket_env = std::getenv("peering_port");
+		if (ticket_env != nullptr)
+		{
+			peering_port = ticket_env;
+		} else
+		{
+			peering_port = "7075";
+		}
+		int peering_port_int = 0;
+		try
+		{
+			peering_port_int = std::stoi(peering_port);
+		}
+		catch (const std::invalid_argument & e)
+		{
+			peering_port_int = 7075;
+		}
 		if (is_live_network ())
 		{
-			default_node_port = 7075;
+			default_node_port = peering_port_int;
 			default_rpc_port = 7076;
 			default_ipc_port = 7077;
 			default_websocket_port = 7078;

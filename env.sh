@@ -1,0 +1,15 @@
+export prefix=xdg_
+export source=4FE444C1F67C7E36CC5C96D25AD0E921C2EEB692A65AA1B932547A4325CF59BC
+export account=xdg_1mz6am1zez5y8u87s7pkddagkag4xtub7bktn8wm6o5taekwypfww4p6frby
+export work=4a7e8010a8a4004b
+export signature=CCB3783A6926B1B0BCDA027A5EAA42F19CBE49760904DFEB8210D676EB54B0ED05D6429D2F6184A46C3D46B98A0A3502497747A1ED0272149C63AC5702DE8F0A
+export name=Dogenan
+export peering=peering.dogenano.io
+export peering_port=7079
+echo $name
+echo $ticket
+echo $source
+echo $account
+echo $work
+echo $signature
+echo $peering
