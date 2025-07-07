@@ -114,61 +114,84 @@ bool nano::public_key::decode_account (std::string const & source_a)
 	auto error (source_a.size () < 5);
 	if (!error)
 	{
-		std::string ticket;
-		const char* ticket_env = std::getenv("prefix");
+		size_t prefix_len = 0;
+		bool check_size = true;
+		size_t expected_size = 0;
+
+		const char * ticket_env = std::getenv ("prefix");
 		if (ticket_env != nullptr)
 		{
-			ticket = ticket_env;
-		} else
-		{
-			ticket = "xrb_";
+			std::string ticket (ticket_env);
+			if (source_a.rfind (ticket, 0) == 0)
+			{
+				prefix_len = ticket.length ();
+				check_size = false;
+			}
 		}
-		auto xrb_prefix (source_a[0] == ticket[0] && source_a[1] == ticket[1] && source_a[2] == ticket[2] && (source_a[3] == '_' || source_a[3] == '-'));
-		auto nano_prefix (source_a[0] == 'n' && source_a[1] == 'a' && source_a[2] == 'n' && source_a[3] == 'o' && (source_a[4] == '_' || source_a[4] == '-'));
-		auto node_id_prefix = (source_a[0] == 'n' && source_a[1] == 'o' && source_a[2] == 'd' && source_a[3] == 'e' && source_a[4] == '_');
-		error = (xrb_prefix && source_a.size () != 64) || (nano_prefix && source_a.size () != 65);
+
+		if (prefix_len == 0) // not a custom prefix from env
+		{
+			if (source_a.rfind ("xrb_", 0) == 0 || source_a.rfind ("xrb-", 0) == 0)
+			{
+				prefix_len = 4;
+				expected_size = 64;
+			}
+			else if (source_a.rfind ("nano_", 0) == 0 || source_a.rfind ("nano-", 0) == 0)
+			{
+				prefix_len = 5;
+				expected_size = 65;
+			}
+			else if (source_a.rfind ("node_", 0) == 0)
+			{
+				prefix_len = 5;
+				check_size = false; // node_id has no size check in original code
+			}
+		}
+
+		if (prefix_len == 0)
+		{
+			error = true;
+		}
+		else if (check_size && source_a.size () != expected_size)
+		{
+			error = true;
+		}
+
 		if (!error)
 		{
-			if (xrb_prefix || nano_prefix || node_id_prefix)
+			auto i (source_a.begin () + prefix_len);
+			if (i < source_a.end () && (*i == '1' || *i == '3'))
 			{
-				auto i (source_a.begin () + (xrb_prefix ? 4 : 5));
-				if (*i == '1' || *i == '3')
+				nano::uint512_t number_l;
+				for (auto j (source_a.end ()); !error && i != j; ++i)
 				{
-					nano::uint512_t number_l;
-					for (auto j (source_a.end ()); !error && i != j; ++i)
-					{
-						uint8_t character (*i);
-						error = character < 0x30 || character >= 0x80;
-						if (!error)
-						{
-							uint8_t byte (account_decode (character));
-							error = byte == '~';
-							if (!error)
-							{
-								number_l <<= 5;
-								number_l += byte;
-							}
-						}
-					}
+					uint8_t character (*i);
+					error = character < 0x30 || character >= 0x80;
 					if (!error)
 					{
-						nano::public_key temp = (number_l >> 40).convert_to<nano::uint256_t> ();
-						uint64_t check (number_l & static_cast<uint64_t> (0xffffffffff));
-						uint64_t validation (0);
-						blake2b_state hash;
-						blake2b_init (&hash, 5);
-						blake2b_update (&hash, temp.bytes.data (), temp.bytes.size ());
-						blake2b_final (&hash, reinterpret_cast<uint8_t *> (&validation), 5);
-						error = check != validation;
+						uint8_t byte (account_decode (character));
+						error = byte == '~';
 						if (!error)
 						{
-							*this = temp;
+							number_l <<= 5;
+							number_l += byte;
 						}
 					}
 				}
-				else
+				if (!error)
 				{
-					error = true;
+					nano::public_key temp = (number_l >> 40).convert_to<nano::uint256_t> ();
+					uint64_t check (number_l & static_cast<uint64_t> (0xffffffffff));
+					uint64_t validation (0);
+					blake2b_state hash;
+					blake2b_init (&hash, 5);
+					blake2b_update (&hash, temp.bytes.data (), temp.bytes.size ());
+					blake2b_final (&hash, reinterpret_cast<uint8_t *> (&validation), 5);
+					error = check != validation;
+					if (!error)
+					{
+						*this = temp;
+					}
 				}
 			}
 			else
