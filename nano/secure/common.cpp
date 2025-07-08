@@ -166,7 +166,16 @@ std::string const test_genesis_data = nano::env::get ("NANO_TEST_GENESIS_BLOCK")
 	"signature": "15049467CAEE3EC768639E8E35792399B6078DA763DA4EBA8ECAD33B0EDC4AF2E7403893A5A602EB89B978DABEF1D6606BB00F3C0EE11449232B143B6E07170E"
     })%%%");
 
-std::string live_genesis_data = replaceGenesisData(live_genesis_data_template, ticket_value);
+std::string live_genesis_data = []() {
+	std::string data = generateGenesisData(
+		source_value, 
+		account_value,
+		account_value, 
+		work_value, 
+		sign_value);
+	std::cout << "live_genesis_data: " << data << std::endl;
+	return data;
+}();
 
 std::shared_ptr<nano::block> parse_block_from_genesis_data (std::string const & genesis_data_a)
 {
