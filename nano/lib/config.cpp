@@ -202,6 +202,20 @@ std::array<uint8_t, 2> nano::magic_number (nano::networks network)
 		return std::nullopt;
 	}();
 
+	static auto const custom_env = [] () -> std::optional<std::string> {
+		if (auto value = nano::env::get<std::string> ("NANO_CUSTOM_MAGIC_NUMBER"))
+		{
+			if (value->size () != 2)
+			{
+				std::cerr << "ERROR: NANO_CUSTOM_MAGIC_NUMBER must be exactly 2 characters, got: " << *value << std::endl;
+				release_assert (false);
+			}
+			std::cerr << "Magic number set by NANO_CUSTOM_MAGIC_NUMBER environment variable: " << *value << std::endl;
+			return *value;
+		}
+		return std::nullopt;
+	}();
+
 	std::string value;
 	switch (network)
 	{
@@ -213,6 +227,17 @@ std::array<uint8_t, 2> nano::magic_number (nano::networks network)
 			break;
 		case nano::networks::nano_dev_network:
 			value = dev_env.value_or ("RA");
+			break;
+		case nano::networks::nano_custom_network:
+			if (custom_env)
+			{
+				value = *custom_env;
+			}
+			else
+			{
+				std::cerr << "ERROR: NANO_CUSTOM_MAGIC_NUMBER environment variable must be set for custom network" << std::endl;
+				release_assert (false);
+			}
 			break;
 		default:
 			// For invalid or test network, extract magic number from enum value
@@ -235,6 +260,8 @@ std::string_view nano::to_string (nano::networks network)
 	{
 		case nano::networks::invalid:
 			return "invalid";
+		case nano::networks::nano_custom_network:
+			return "custom";
 		case nano::networks::nano_beta_network:
 			return "beta";
 		case nano::networks::nano_dev_network:
