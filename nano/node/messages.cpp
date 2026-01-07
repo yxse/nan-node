@@ -56,19 +56,7 @@ nano::message_header::message_header (bool & error_a, nano::stream & stream_a)
 
 void nano::message_header::serialize (nano::stream & stream_a) const
 {
-	uint16_t network_bytes;
-	if (network == nano::networks::nano_custom_network)
-	{
-		// For custom network, serialize the actual magic number instead of enum value
-		auto magic = nano::magic_number (network);
-		network_bytes = boost::endian::native_to_big (static_cast<uint16_t> ((magic[0] << 8) | magic[1]));
-	}
-	else
-	{
-		// For other networks, serialize the enum value directly
-		network_bytes = boost::endian::native_to_big (static_cast<uint16_t> (network));
-	}
-	nano::write (stream_a, network_bytes);
+	nano::write (stream_a, boost::endian::native_to_big (static_cast<uint16_t> (network)));
 	nano::write (stream_a, version_max);
 	nano::write (stream_a, version_using);
 	nano::write (stream_a, version_min);
@@ -84,24 +72,6 @@ bool nano::message_header::deserialize (nano::stream & stream_a)
 		uint16_t network_bytes;
 		nano::read (stream_a, network_bytes);
 		network = static_cast<nano::networks> (boost::endian::big_to_native (network_bytes));
-		
-		// If we're running on custom network, validate the magic number
-		if (nano::network_constants::get_active_network () == nano::networks::nano_custom_network)
-		{
-			auto expected_magic = nano::magic_number (nano::networks::nano_custom_network);
-			uint16_t expected_bytes = (expected_magic[0] << 8) | expected_magic[1];
-			if (boost::endian::big_to_native (network_bytes) != expected_bytes)
-			{
-				// Magic number doesn't match, set network to invalid
-				network = nano::networks::invalid;
-			}
-			else
-			{
-				// Magic number matches, set network to custom
-				network = nano::networks::nano_custom_network;
-			}
-		}
-		
 		nano::read (stream_a, version_max);
 		nano::read (stream_a, version_using);
 		nano::read (stream_a, version_min);

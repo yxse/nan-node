@@ -14,8 +14,6 @@ namespace nano
 enum class networks : uint16_t
 {
 	invalid = 0x0,
-	// Custom network with runtime-configured magic number
-	nano_custom_network = 0x0001,
 	// Low work parameters, publicly known genesis key, dev IP ports
 	nano_dev_network = 0x5241, // 'R', 'A'
 	// Normal work parameters, secret beta genesis key, beta IP ports
@@ -137,14 +135,6 @@ public:
 			default_ipc_port = test_ipc_port ();
 			default_websocket_port = test_websocket_port ();
 		}
-		else if (is_custom_network ())
-		{
-			// Use environment variables or sensible defaults for custom network
-			default_node_port = 44000;
-			default_rpc_port = 45000;
-			default_ipc_port = 46000;
-			default_websocket_port = 47000;
-		}
 		else if (is_dev_network ())
 		{
 			aec_loop_interval_ms = 20;
@@ -261,10 +251,6 @@ public:
 		{
 			active_network = nano::networks::nano_test_network;
 		}
-		else if (network_a == "custom")
-		{
-			active_network = nano::networks::nano_custom_network;
-		}
 		else
 		{
 			error = true;
@@ -284,8 +270,6 @@ public:
 				return "dev";
 			case nano::networks::nano_test_network:
 				return "test";
-			case nano::networks::nano_custom_network:
-				return "custom";
 			case networks::invalid:
 				break;
 		}
@@ -307,10 +291,6 @@ public:
 	bool is_test_network () const
 	{
 		return current_network == nano::networks::nano_test_network;
-	}
-	bool is_custom_network () const
-	{
-		return current_network == nano::networks::nano_custom_network;
 	}
 
 	/** Initial value is ACTIVE_NETWORK compile flag, but can be overridden by a CLI flag */

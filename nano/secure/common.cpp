@@ -211,9 +211,6 @@ nano::work_thresholds const & nano::work_thresholds_for_network (nano::networks 
 			return nano::work_thresholds::publish_dev;
 		case nano::networks::nano_test_network:
 			return nano::work_thresholds::publish_test;
-		case nano::networks::nano_custom_network:
-			// Use dev work thresholds for custom network (low difficulty for testing)
-			return nano::work_thresholds::publish_dev;
 		default:
 			release_assert (false, "invalid network");
 	}
@@ -230,7 +227,7 @@ nano::network_params::network_params (nano::networks network_type) :
 {
 	unsigned constexpr kdf_full_work = 64 * 1024;
 	unsigned constexpr kdf_dev_work = 8;
-	kdf_work = (network.is_dev_network () || network.is_custom_network ()) ? kdf_dev_work : kdf_full_work;
+	kdf_work = network.is_dev_network () ? kdf_dev_work : kdf_full_work;
 }
 
 /*
@@ -323,13 +320,6 @@ nano::ledger_constants::ledger_constants (nano::work_thresholds & work, nano::ne
 		{
 			genesis = nano_test_genesis;
 			epoch_v2_signer = nano_test_account;
-		}
-		break;
-		case networks::nano_custom_network:
-		{
-			// Use dev genesis for custom network
-			genesis = nano_dev_genesis;
-			epoch_v2_signer = nano::dev::genesis_key.pub;
 		}
 		break;
 		default:
