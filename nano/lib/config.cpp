@@ -175,6 +175,7 @@ std::array<uint8_t, 2> nano::magic_number (nano::networks network)
 	static auto const live_env = [] () -> std::optional<std::string> {
 		if (auto value = nano::env::get<std::string> ("NANO_LIVE_MAGIC_NUMBER"))
 		{
+			release_assert (value->size () == 2);
 			std::cerr << "Magic number overridden by NANO_LIVE_MAGIC_NUMBER environment variable: " << *value << std::endl;
 			return *value;
 		}
@@ -184,6 +185,7 @@ std::array<uint8_t, 2> nano::magic_number (nano::networks network)
 	static auto const beta_env = [] () -> std::optional<std::string> {
 		if (auto value = nano::env::get<std::string> ("NANO_BETA_MAGIC_NUMBER"))
 		{
+			release_assert (value->size () == 2);
 			std::cerr << "Magic number overridden by NANO_BETA_MAGIC_NUMBER environment variable: " << *value << std::endl;
 			return *value;
 		}
@@ -193,6 +195,7 @@ std::array<uint8_t, 2> nano::magic_number (nano::networks network)
 	static auto const dev_env = [] () -> std::optional<std::string> {
 		if (auto value = nano::env::get<std::string> ("NANO_DEV_MAGIC_NUMBER"))
 		{
+			release_assert (value->size () == 2);
 			std::cerr << "Magic number overridden by NANO_DEV_MAGIC_NUMBER environment variable: " << *value << std::endl;
 			return *value;
 		}
