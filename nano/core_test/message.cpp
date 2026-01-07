@@ -896,3 +896,45 @@ TEST (handshake, signature_v2)
 		ASSERT_FALSE (message.validate (cookie));
 	}
 }
+
+// Test that message header serialization/deserialization works correctly with live network
+// This validates that the magic_number() function is properly used for live network
+TEST (message, header_live_network_magic_number)
+{
+	// Create network constants for live network
+	nano::network_constants live_constants{ nano::networks::nano_live_network };
+	
+	// Create a message header for the live network
+	nano::message_header original{ live_constants, nano::message_type::keepalive };
+	ASSERT_EQ (nano::networks::nano_live_network, original.network);
+	
+	// Serialize the header
+	std::vector<uint8_t> bytes;
+	{
+		nano::vectorstream stream (bytes);
+		original.serialize (stream);
+	}
+	
+	// The first two bytes should be the magic number for live network
+	// By default, this should be 'R', 'C' (0x52, 0x43) which equals 0x5243 in big-endian
+	ASSERT_GE (bytes.size (), 2);
+	uint16_t network_bytes = (static_cast<uint16_t> (bytes[0]) << 8) | static_cast<uint16_t> (bytes[1]);
+	
+	// Get the expected magic number from the magic_number function
+	auto magic = nano::magic_number (nano::networks::nano_live_network);
+	uint16_t expected_bytes = (static_cast<uint16_t> (magic[0]) << 8) | static_cast<uint16_t> (magic[1]);
+	ASSERT_EQ (expected_bytes, network_bytes);
+	
+	// Deserialize the header and verify it matches
+	nano::bufferstream stream (bytes.data (), bytes.size ());
+	bool error = false;
+	nano::message_header deserialized (error, stream);
+	ASSERT_FALSE (error);
+	
+	// The network field should be set to nano_live_network after deserialization
+	ASSERT_EQ (nano::networks::nano_live_network, deserialized.network);
+	ASSERT_EQ (original.version_max, deserialized.version_max);
+	ASSERT_EQ (original.version_using, deserialized.version_using);
+	ASSERT_EQ (original.version_min, deserialized.version_min);
+	ASSERT_EQ (original.type, deserialized.type);
+}
