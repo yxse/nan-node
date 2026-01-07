@@ -56,7 +56,19 @@ nano::message_header::message_header (bool & error_a, nano::stream & stream_a)
 
 void nano::message_header::serialize (nano::stream & stream_a) const
 {
-	nano::write (stream_a, boost::endian::native_to_big (static_cast<uint16_t> (network)));
+	uint16_t network_bytes;
+	if (network == nano::networks::nano_live_network)
+	{
+		// For live network, use the magic_number() function which checks NANO_LIVE_MAGIC_NUMBER env var
+		auto magic = nano::magic_number (network);
+		network_bytes = (static_cast<uint16_t> (magic[0]) << 8) | static_cast<uint16_t> (magic[1]);
+	}
+	else
+	{
+		// For other networks, use the enum value directly
+		network_bytes = static_cast<uint16_t> (network);
+	}
+	nano::write (stream_a, boost::endian::native_to_big (network_bytes));
 	nano::write (stream_a, version_max);
 	nano::write (stream_a, version_using);
 	nano::write (stream_a, version_min);
@@ -71,7 +83,12 @@ bool nano::message_header::deserialize (nano::stream & stream_a)
 	{
 		uint16_t network_bytes;
 		nano::read (stream_a, network_bytes);
-		network = static_cast<nano::networks> (boost::endian::big_to_native (network_bytes));
+		network_bytes = boost::endian::big_to_native (network_bytes);
+
+		// Store the network bytes directly as the enum value
+		// Validation will be done in message_deserializer
+		network = static_cast<nano::networks> (network_bytes);
+
 		nano::read (stream_a, version_max);
 		nano::read (stream_a, version_using);
 		nano::read (stream_a, version_min);

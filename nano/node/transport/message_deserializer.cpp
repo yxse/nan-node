@@ -48,7 +48,23 @@ void nano::transport::message_deserializer::received_header (const nano::transpo
 		callback (boost::asio::error::fault, nullptr);
 		return;
 	}
-	if (header.network != network_constants_m.current_network)
+	// Validate network magic number
+	bool network_matches = false;
+	if (network_constants_m.current_network == nano::networks::nano_live_network)
+	{
+		// For live network, validate against configured magic number
+		auto magic = nano::magic_number (network_constants_m.current_network);
+		uint16_t expected_bytes = (static_cast<uint16_t> (magic[0]) << 8) | static_cast<uint16_t> (magic[1]);
+		uint16_t received_bytes = static_cast<uint16_t> (header.network);
+		network_matches = (received_bytes == expected_bytes);
+	}
+	else
+	{
+		// For other networks, compare enum values directly
+		network_matches = (header.network == network_constants_m.current_network);
+	}
+
+	if (!network_matches)
 	{
 		status = parse_status::invalid_network;
 		callback (boost::asio::error::fault, nullptr);
