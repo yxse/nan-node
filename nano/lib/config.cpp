@@ -173,10 +173,10 @@ std::array<uint8_t, 2> nano::test_magic_number ()
 std::array<uint8_t, 2> nano::magic_number (nano::networks network)
 {
 	static auto const live_env = [] () -> std::optional<std::string> {
-		if (auto value = nano::env::get<std::string> ("NANO_LIVE_MAGIC_NUMBER"))
+		if (auto value = nano::env::get<std::string> ("NANO_CUSTOM_MAGIC_NUMBER"))
 		{
 			release_assert (value->size () == 2);
-			std::cerr << "Magic number overridden by NANO_LIVE_MAGIC_NUMBER environment variable: " << *value << std::endl;
+			std::cerr << "Magic number overridden by NANO_CUSTOM_MAGIC_NUMBER environment variable: " << *value << std::endl;
 			return *value;
 		}
 		return std::nullopt;
