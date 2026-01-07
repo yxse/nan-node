@@ -215,7 +215,9 @@ std::array<uint8_t, 2> nano::magic_number (nano::networks network)
 			value = dev_env.value_or ("RA");
 			break;
 		default:
-			// For invalid or test network, use the default from the enum
+			// For invalid or test network, extract magic number from enum value
+			// The enum values are stored as uint16_t where high byte and low byte represent the two characters
+			// e.g., 0x5258 ('R', 'X') for test network
 			value = std::string (1, static_cast<char> ((static_cast<uint16_t> (network) >> 8) & 0xFF)) +
 			        std::string (1, static_cast<char> (static_cast<uint16_t> (network) & 0xFF));
 			break;
