@@ -84,11 +84,11 @@ bool nano::message_header::deserialize (nano::stream & stream_a)
 		uint16_t network_bytes;
 		nano::read (stream_a, network_bytes);
 		network_bytes = boost::endian::big_to_native (network_bytes);
-		
+
 		// Store the network bytes directly as the enum value
 		// Validation will be done in message_deserializer
 		network = static_cast<nano::networks> (network_bytes);
-		
+
 		nano::read (stream_a, version_max);
 		nano::read (stream_a, version_using);
 		nano::read (stream_a, version_min);
