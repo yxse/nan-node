@@ -85,27 +85,9 @@ bool nano::message_header::deserialize (nano::stream & stream_a)
 		nano::read (stream_a, network_bytes);
 		network_bytes = boost::endian::big_to_native (network_bytes);
 		
-		// Try to match against the active network
-		auto active = nano::network_constants::get_active_network ();
-		if (active == nano::networks::nano_live_network)
-		{
-			// For live network, check if the received magic number matches our configured one
-			auto magic = nano::magic_number (active);
-			uint16_t expected_bytes = (static_cast<uint16_t> (magic[0]) << 8) | static_cast<uint16_t> (magic[1]);
-			if (network_bytes == expected_bytes)
-			{
-				network = nano::networks::nano_live_network;
-			}
-			else
-			{
-				network = static_cast<nano::networks> (network_bytes);
-			}
-		}
-		else
-		{
-			// For other networks, use enum value directly
-			network = static_cast<nano::networks> (network_bytes);
-		}
+		// Store the network bytes directly as the enum value
+		// Validation will be done in message_deserializer
+		network = static_cast<nano::networks> (network_bytes);
 		
 		nano::read (stream_a, version_max);
 		nano::read (stream_a, version_using);

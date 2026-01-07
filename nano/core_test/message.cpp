@@ -925,14 +925,16 @@ TEST (message, header_live_network_magic_number)
 	uint16_t expected_bytes = (static_cast<uint16_t> (magic[0]) << 8) | static_cast<uint16_t> (magic[1]);
 	ASSERT_EQ (expected_bytes, network_bytes);
 	
-	// Deserialize the header and verify it matches
+	// Deserialize the header
 	nano::bufferstream stream (bytes.data (), bytes.size ());
 	bool error = false;
 	nano::message_header deserialized (error, stream);
 	ASSERT_FALSE (error);
 	
-	// The network field should be set to nano_live_network after deserialization
-	ASSERT_EQ (nano::networks::nano_live_network, deserialized.network);
+	// After deserialization, the network field contains the raw bytes
+	// which should match the magic number bytes
+	uint16_t deserialized_bytes = static_cast<uint16_t> (deserialized.network);
+	ASSERT_EQ (expected_bytes, deserialized_bytes);
 	ASSERT_EQ (original.version_max, deserialized.version_max);
 	ASSERT_EQ (original.version_using, deserialized.version_using);
 	ASSERT_EQ (original.version_min, deserialized.version_min);
