@@ -170,6 +170,65 @@ std::array<uint8_t, 2> nano::test_magic_number ()
 	return ret;
 }
 
+std::array<uint8_t, 2> nano::magic_number (nano::networks network)
+{
+	static auto const live_env = [] () -> std::optional<std::string> {
+		if (auto value = nano::env::get<std::string> ("NANO_LIVE_MAGIC_NUMBER"))
+		{
+			release_assert (value->size () == 2);
+			std::cerr << "Magic number overridden by NANO_LIVE_MAGIC_NUMBER environment variable: " << *value << std::endl;
+			return *value;
+		}
+		return std::nullopt;
+	}();
+
+	static auto const beta_env = [] () -> std::optional<std::string> {
+		if (auto value = nano::env::get<std::string> ("NANO_BETA_MAGIC_NUMBER"))
+		{
+			release_assert (value->size () == 2);
+			std::cerr << "Magic number overridden by NANO_BETA_MAGIC_NUMBER environment variable: " << *value << std::endl;
+			return *value;
+		}
+		return std::nullopt;
+	}();
+
+	static auto const dev_env = [] () -> std::optional<std::string> {
+		if (auto value = nano::env::get<std::string> ("NANO_DEV_MAGIC_NUMBER"))
+		{
+			release_assert (value->size () == 2);
+			std::cerr << "Magic number overridden by NANO_DEV_MAGIC_NUMBER environment variable: " << *value << std::endl;
+			return *value;
+		}
+		return std::nullopt;
+	}();
+
+	std::string value;
+	switch (network)
+	{
+		case nano::networks::nano_live_network:
+			value = live_env.value_or ("RC");
+			break;
+		case nano::networks::nano_beta_network:
+			value = beta_env.value_or ("RB");
+			break;
+		case nano::networks::nano_dev_network:
+			value = dev_env.value_or ("RA");
+			break;
+		default:
+			// For invalid or test network, extract magic number from enum value
+			// The enum values are stored as uint16_t where high byte and low byte represent the two characters
+			// e.g., 0x5258 ('R', 'X') for test network
+			value = std::string (1, static_cast<char> ((static_cast<uint16_t> (network) >> 8) & 0xFF)) +
+			        std::string (1, static_cast<char> (static_cast<uint16_t> (network) & 0xFF));
+			break;
+	}
+
+	release_assert (value.size () == 2);
+	std::array<uint8_t, 2> ret{};
+	std::copy (value.begin (), value.end (), ret.data ());
+	return ret;
+}
+
 std::string_view nano::to_string (nano::networks network)
 {
 	switch (network)

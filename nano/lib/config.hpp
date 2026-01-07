@@ -74,6 +74,8 @@ consteval bool is_sanitizer_build ()
 
 namespace nano
 {
+enum class networks : uint16_t; // Forward declaration
+
 uint8_t get_major_node_version ();
 uint8_t get_minor_node_version ();
 uint8_t get_patch_node_version ();
@@ -84,6 +86,7 @@ uint16_t test_rpc_port ();
 uint16_t test_ipc_port ();
 uint16_t test_websocket_port ();
 std::array<uint8_t, 2> test_magic_number ();
+std::array<uint8_t, 2> magic_number (nano::networks);
 uint32_t test_scan_wallet_reps_delay (); // How often to scan for representatives in local wallet, in milliseconds
 
 std::string get_node_toml_config_path (std::filesystem::path const & data_path);
